@@ -51,7 +51,7 @@
 
       body {
         font-family: var(--font-sans);
-        background: #0b1528;
+        background: #f1f5f9;
         color: var(--ink);
         min-height: 100vh;
         padding: 16px;
@@ -64,10 +64,8 @@
       .control-bar {
         width: 100%;
         max-width: 1080px;
-        background: rgba(255, 255, 255, 0.08);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: #ffffff;
+        border: 1.5px solid #e2e8f0;
         border-radius: 16px;
         padding: 12px 18px;
         margin-bottom: 20px;
@@ -76,7 +74,8 @@
         gap: 12px;
         align-items: center;
         justify-content: space-between;
-        color: #fff;
+        color: #0f172a;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
       }
 
       .control-bar h1 {
@@ -106,22 +105,22 @@
 
       .control-label {
         font-size: 12px;
-        color: #94a3b8;
+        color: #64748b;
         font-weight: 600;
       }
 
       .segmented {
         display: inline-flex;
-        background: rgba(0, 0, 0, 0.25);
+        background: #f1f5f9;
         padding: 3px;
         border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid #e2e8f0;
       }
 
       .segmented button {
         background: transparent;
         border: 0;
-        color: #cbd5e1;
+        color: #64748b;
         font-family: inherit;
         font-size: 12px;
         font-weight: 700;
@@ -134,7 +133,7 @@
       .segmented button.active {
         background: var(--primary);
         color: #fff;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 2px 6px rgba(21, 55, 117, 0.3);
       }
 
       /* Preview Frame Canvas */
@@ -183,8 +182,13 @@
       .mock-app-bg {
         position: absolute;
         inset: 0;
-        background: #0f172a;
-        opacity: 0.85;
+        background: #f1f5f9;
+        background-image:
+          radial-gradient(#cbd5e1 1px, transparent 1px),
+          radial-gradient(#cbd5e1 1px, #f1f5f9 1px);
+        background-size: 20px 20px;
+        background-position: 0 0, 10px 10px;
+        opacity: 0.7;
         pointer-events: none;
       }
 
@@ -196,9 +200,9 @@
       .detail-scrim {
         position: absolute;
         inset: 0;
-        background: rgba(10, 24, 52, 0.72);
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
+        background: rgba(15, 23, 42, 0.42);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
         display: flex;
         z-index: 100;
         overflow: hidden;
@@ -225,15 +229,16 @@
           var(--sheet-radius-outer) - (var(--sheet-pad) / 2)
         ); /* 16px */
 
-        background: var(--surface);
-        color: var(--ink);
+        background: #ffffff;
+        color: #10213f;
         width: 100%;
         display: flex;
         flex-direction: column;
-        box-shadow: var(--shadow-sheet);
+        box-shadow: 0 -12px 48px rgba(10, 25, 54, 0.16);
         position: relative;
         max-height: 90%;
         animation: sheetEntrance 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow: hidden;
       }
 
       /* Mobile Style */
@@ -282,6 +287,7 @@
         padding-bottom: 4px;
         justify-content: center;
         cursor: grab;
+        background: #ffffff;
       }
 
       .frame-mobile .sheet-handle-bar {
@@ -301,9 +307,11 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 10px 58px 8px 20px;
+        padding: 10px 58px 10px 20px;
         position: relative;
         min-height: 44px;
+        background: #ffffff;
+        border-bottom: 1px solid #f1f5f9;
       }
 
       .sheet-badge-group {
@@ -348,14 +356,14 @@
 
       .close-btn {
         position: absolute;
-        top: 12px;
+        top: 10px;
         right: 16px;
         width: 36px;
         height: 36px;
         border-radius: 50%;
-        background: var(--tint);
-        border: 1px solid var(--line);
-        color: var(--mut);
+        background: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        color: #334155;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
@@ -380,12 +388,13 @@
 
       /* 3. Scrollable Content Area */
       .sheet-scroll-body {
-        padding: 10px 20px 24px;
+        background: #f8fafc;
+        padding: 14px 20px 24px;
         overflow-y: auto;
         overscroll-behavior: contain;
         display: flex;
         flex-direction: column;
-        gap: 18px;
+        gap: 16px;
       }
 
       /* Layout Desktop: Split 2 Kolom */
@@ -846,17 +855,18 @@
         width: 100%;
         max-width: 1080px;
         margin-top: 10px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: #ffffff;
+        border: 1.5px solid #e2e8f0;
         border-radius: 14px;
         padding: 16px 20px;
-        color: #cbd5e1;
+        color: #334155;
         font-size: 13px;
         line-height: 1.55;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
       }
 
       .rationale-panel h3 {
-        color: var(--gold-light);
+        color: #1e3a8a;
         font-size: 14px;
         margin-bottom: 8px;
         display: flex;
@@ -872,14 +882,14 @@
       }
 
       .rationale-item {
-        background: rgba(0, 0, 0, 0.2);
+        background: #f8fafc;
         border-radius: 10px;
         padding: 10px 12px;
-        border: 1px solid rgba(255, 255, 255, 0.06);
+        border: 1px solid #e2e8f0;
       }
 
       .rationale-item b {
-        color: #fff;
+        color: #0f172a;
         display: block;
         margin-bottom: 3px;
       }
