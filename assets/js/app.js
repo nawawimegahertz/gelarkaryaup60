@@ -4087,6 +4087,7 @@ document.addEventListener("keydown", (e) => {
 });
 
 function boot() {
+  document.documentElement.setAttribute("data-theme", "light");
   const h = location.hash.slice(1);
   const initialTab =
     TABS.some((t) => t[0] === h) || h === "hadir" || h === "qrbooth"
