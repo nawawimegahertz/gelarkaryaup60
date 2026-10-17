@@ -1734,7 +1734,7 @@ function viewSdgs() {
   );
   const activeEntries = Object.entries(SDGINFO).filter(([n]) => (c[n] || 0) > 0);
   $("#v-sdgs").innerHTML =
-    `<div class="sec" style="margin-top:0"><h2>Keterkaitan SDGs</h2><p class="lead">${activeEntries.length} dari 17 tujuan terhubung dengan 60 karya yang dipamerkan. Ketuk salah satu kartu untuk melihat daftar booth terkait.</p></div>
+    `<div class="sec" style="margin-top:0"><h2>Keterkaitan SDGs</h2><p class="lead">Ketuk salah satu untuk melihat daftar booth terkait.</p></div>
   <div class="sdgs">${activeEntries
     .map(([n, [l]]) => {
       const v = c[n] || 0;
@@ -2659,7 +2659,7 @@ async function submitForm(ev) {
 /* ---------- Umpan balik ---------- */
 function fbCard() {
   const f = S.fb;
-  return `<div class="sec"><h2>Evaluasi & Masukan</h2><div class="card">
+  return `<div class="sec"><h2>Umpan balik pameran</h2><div class="card">
     <p style="margin:0 0 12px;color:var(--mut);font-size:14px;line-height:1.5">Penilaian Anda sangat bermanfaat bagi panitia untuk evaluasi penyelenggaraan dan apresiasi karya riset.</p>
     ${f.n ? `<div class="big" style="margin-bottom:12px"><b class="num" style="font-size:36px">${f.avg.toFixed(1).replace(".", ",")}</b><span>Rata-rata dari ${f.n} responden (skala 5)</span></div>` : ""}
     <div class="row card-actions" style="justify-content:flex-end; gap:8px;">
