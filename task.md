@@ -5,7 +5,7 @@ Dokumen pelacak progres pengerjaan refactoring antarmuka mobile-first Gelar Kary
 ---
 
 ## 📌 Status Keseluruhan
-- [ ] **Batch 1: Sistem Tipografi & Spacing Fluid**
+- [x] **Batch 1: Sistem Tipografi & Spacing Fluid** (Selesai)
 - [ ] **Batch 2: Hero Header & Bottom Navigation Bar**
 - [ ] **Batch 3: Kartu Karya (Jelajah), Filter Sticky & Search**
 - [ ] **Batch 4: Modal Bottom Sheet, Denah & Scanner**
@@ -15,11 +15,11 @@ Dokumen pelacak progres pengerjaan refactoring antarmuka mobile-first Gelar Kary
 ## 🚀 Rincian Pekerjaan Tiap Batch
 
 ### Batch 1: Sistem Tipografi & Spacing Fluid
-- [ ] Tentukan token CSS `--text-xs` hingga `--text-3xl` dengan formula `clamp()`.
-- [ ] Tentukan token skala jarak `--space-2xs` (4px) hingga `--space-2xl` (36px).
-- [ ] Terapkan `text-wrap: balance` pada judul (`h1`, `h2`, `h3`) dan `text-wrap: pretty` pada paragraf.
-- [ ] Integrasikan `100dvh` dan `env(safe-area-inset-bottom)` pada root layout.
-- [ ] Validasi kontras teks gelap/terang dan keterbacaan di layar kecil (360px).
+- [x] Tentukan token CSS `--text-xs` hingga `--text-3xl` dengan formula `clamp()`.
+- [x] Tentukan token skala jarak `--space-2xs` (4px) hingga `--space-2xl` (36px).
+- [x] Terapkan `text-wrap: balance` pada judul (`h1`, `h2`, `h3`) dan `text-wrap: pretty` pada paragraf.
+- [x] Integrasikan `100dvh` dan `env(safe-area-inset-bottom)` pada root layout.
+- [x] Validasi kontras teks gelap/terang dan keterbacaan di layar kecil (360px).
 
 ### Batch 2: Hero Header & Bottom Navigation Bar
 - [ ] Redesain layout `.hero .wrap` menjadi mobile-first stack yang ringkas.
