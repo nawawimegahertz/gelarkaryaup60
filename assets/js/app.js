@@ -1,9 +1,9 @@
 /* ===== KONFIGURASI PANITIA ===== */
 const CONFIG = {
-  publicUrl:
-    "https://script.google.com/macros/s/AKfycbyt1GXR_mPDL5pJo8Gqi8GNRMfNdUHhdHGnXsr4E-R-hdKGz3SgvAp-J_ngJu2PgupD/exec",
+  publicUrl: "", // Kosongkan agar otomatis menggunakan URL web aktif saat ini (Vercel / domain UP)
+  pinPanitia: "1966", // PIN verifikasi panitia (default: 1966 - tahun berdirinya UP)
   gasUrl:
-    "https://script.google.com/macros/s/AKfycbyt1GXR_mPDL5pJo8Gqi8GNRMfNdUHhdHGnXsr4E-R-hdKGz3SgvAp-J_ngJu2PgupD/exec", // tautan publik halaman ini; dipakai untuk QR
+    "https://script.google.com/macros/s/AKfycbyt1GXR_mPDL5pJo8Gqi8GNRMfNdUHhdHGnXsr4E-R-hdKGz3SgvAp-J_ngJu2PgupD/exec", // backend endpoint Google Apps Script
   panel: {}, // pemetaan nomor karya ke nomor panel bila berbeda, contoh {7: 12}
   jamBuka: 8,
   jamTutup: 16, // rentang grafik kehadiran per jam
@@ -1290,6 +1290,7 @@ const S = {
     admin: false,
   },
   checked: store.get("hadir", false),
+  isPanitia: store.get("panitia", false),
   stamp: store.get("stamp", {}),
   fb: { n: 0, avg: 0 },
   fbDone: store.get("umpan", false),
@@ -1954,10 +1955,78 @@ function openDetail(no) {
 }
 function closeLayer() {
   $("#layer").innerHTML = "";
-  if (lastFocus && lastFocus.focus)
+  if (lastFocus && lastFocus.focus) {
     try {
       lastFocus.focus();
     } catch (e) {}
+  }
+  lastFocus = null;
+  if (S.tab === "qrbooth" && !S.isPanitia) {
+    go("hadir");
+  }
+}
+
+function getPublicUrl() {
+  const custom = (store.get("url", CONFIG.publicUrl || "") || "").trim();
+  if (
+    (custom.startsWith("http://") || custom.startsWith("https://")) &&
+    !custom.includes("script.google.com")
+  ) {
+    return custom.replace(/\/$/, "");
+  }
+  if (
+    typeof window !== "undefined" &&
+    window.location &&
+    window.location.origin
+  ) {
+    const origin = window.location.origin;
+    if (origin && origin !== "null" && origin.startsWith("http")) {
+      return (origin + window.location.pathname).replace(/\/$/, "");
+    }
+  }
+  return "";
+}
+
+function promptPanitiaPin(onSuccess, onCancel) {
+  lastFocus = document.activeElement;
+  $("#layer").innerHTML =
+    `<div class="scrim" data-close="1"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="pt">
+    <button type="button" class="x" data-close="1" aria-label="Tutup">×</button>
+    <h2 id="pt">Akses Khusus Panitia</h2>
+    <p style="color:var(--mut);margin:6px 0 14px;font-size:14px">Fitur cetak QR booth dan undian doorprize hanya dapat diakses oleh panitia pelaksana.</p>
+    <form id="pinf" novalidate>
+      <label class="f">PIN Panitia
+        <input class="txt" id="pin-val" type="password" inputmode="numeric" placeholder="Masukkan PIN (Default: 1966)" autocomplete="off" required>
+      </label>
+      <p id="pin-err" style="color:var(--err);margin:8px 0 0;font-size:13.5px" hidden></p>
+      <div class="row" style="margin-top:16px">
+        <button type="submit" class="btn gold">Masuk</button>
+        <button type="button" class="btn ghost" data-close="1">Batal</button>
+      </div>
+    </form></div></div>`;
+  const inp = $("#pin-val");
+  if (inp) setTimeout(() => inp.focus(), 80);
+  const f = $("#pinf");
+  if (f) {
+    f.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const val = (inp ? inp.value : "").trim();
+      if (val === (CONFIG.pinPanitia || "1966")) {
+        S.isPanitia = true;
+        store.set("panitia", true);
+        closeLayer();
+        toast("Akses panitia diverifikasi");
+        if (onSuccess) onSuccess();
+      } else {
+        const err = $("#pin-err");
+        if (err) {
+          err.textContent = "PIN salah. Hubungi panitia pelaksana.";
+          err.hidden = false;
+        }
+        if (inp) inp.select();
+      }
+    });
+  }
 }
 
 /* ---------- Kehadiran ---------- */
@@ -1988,7 +2057,7 @@ function viewHadir() {
   const hrs = [];
   for (let h = CONFIG.jamBuka; h <= CONFIG.jamTutup; h++) hrs.push(h);
   const maxH = Math.max(1, ...hrs.map((h) => a.hours[h] || 0));
-  const url = store.get("url", CONFIG.publicUrl || "");
+  const url = getPublicUrl();
   $("#v-hadir").innerHTML = `
   <button class="link" data-go="beranda">← Kembali ke beranda</button>
   <div class="sec" style="margin-top:0"><h2>Kehadiran pengunjung</h2></div>
@@ -2012,12 +2081,12 @@ function viewHadir() {
     .join("")}</div></div></div>
   ${undianPanel()}
   <div class="sec"><h2>Untuk panitia</h2><div class="card">
-    <p style="margin:0;color:var(--mut);font-size:14px">Tempel tautan publik halaman ini untuk membuat QR. Pasang QR pintu masuk di meja registrasi dan QR umpan balik di pintu keluar.</p>
+    <p style="margin:0;color:var(--mut);font-size:14px">Tautan publik halaman ini untuk membuat QR pintu masuk di meja registrasi dan QR umpan balik di pintu keluar.</p>
     <label class="f" style="margin-top:10px">Tautan publik<input class="txt" id="pubUrl" type="url" inputmode="url" placeholder="https://..." value="${esc(url)}"></label>
     <div class="qrs"><div class="qrbox"><div class="qrimg" id="qr1"></div><b>QR pintu masuk</b><span>Registrasi kehadiran, lalu katalog</span></div><div class="qrbox"><div class="qrimg" id="qr2"></div><b>QR pintu keluar</b><span>Langsung ke umpan balik</span></div></div>
     <details><summary>Menyambungkan penyimpanan kehadiran</summary>
       <ol class="steps"><li>Data kehadiran tersimpan otomatis dan terhubung ke backend Google Sheets melalui Google Apps Script Web App.</li>
-      <li>Tempel tautan publik halaman ini (misal URL Vercel atau domain UP) di kolom di atas untuk membuat QR pintu masuk dan pintu keluar.</li>
+      <li>Tautan publik di atas otomatis mendeteksi alamat website (misal URL Vercel atau domain UP).</li>
       <li>Pengunjung memindai QR pintu masuk untuk registrasi kehadiran dan menjelajahi katalog karya inovasi.</li>
       <li>Data pengunjung dan kunjungan per jam diperbarui secara berkala otomatis.</li></ol></details>
   </div></div>`;
@@ -2028,10 +2097,10 @@ function viewHadir() {
   makeQR();
 }
 function makeQR() {
-  const u = (store.get("url", CONFIG.publicUrl || "") || "").trim();
+  const u = getPublicUrl();
   [
     ["qr1", u],
-    ["qr2", u + "#umpan"],
+    ["qr2", u ? u + "#umpan" : ""],
   ].forEach(([id, t]) => {
     const box = document.getElementById(id);
     if (!box) return;
@@ -3009,11 +3078,22 @@ function drawWinner() {
 }
 /* QR booth untuk dicetak panitia */
 function viewQrBooth() {
-  const u = (store.get("url", CONFIG.publicUrl || "") || "").trim(),
+  if (!S.isPanitia) {
+    promptPanitiaPin(
+      () => {
+        render("qrbooth");
+      },
+      () => {
+        go("hadir");
+      },
+    );
+    return;
+  }
+  const u = getPublicUrl(),
     web = u.startsWith("http://") || u.startsWith("https://");
   $("#v-qrbooth").innerHTML =
     `<div class="noprint"><button class="link" data-go="hadir">← Kembali ke kehadiran</button>
-    <div class="sec" style="margin-top:0"><h2>QR booth untuk dicetak</h2><p class="lead">Satu QR per panel; tempel di bawah poster nomor yang sama. ${web ? "QR berisi tautan halaman ini beserta kode, sehingga kamera ponsel biasa pun dapat mencatat kunjungan." : "Tautan publik belum diisi di halaman Kehadiran, jadi QR hanya berisi kode dan hanya terbaca oleh pemindai di dalam halaman ini."}</p>
+    <div class="sec" style="margin-top:0"><h2>QR booth untuk dicetak</h2><p class="lead">Satu QR per panel; tempel di bawah poster nomor yang sama. ${web ? `QR berisi tautan web <b>${esc(u)}</b> beserta kode panel.` : "Tautan publik belum diisi di halaman Kehadiran, jadi QR hanya berisi kode dan hanya terbaca oleh pemindai di dalam halaman ini."}</p>
     <div class="row"><button class="btn gold" data-act="print">Cetak (2 × 3 per A4)</button></div></div></div>
     <div class="qrgrid" style="margin-top:14px">${DATA.map((d) => panelOf(d))
       .sort((a, b) => a - b)
@@ -3183,10 +3263,22 @@ document.addEventListener("click", async (e) => {
     return;
   }
   if (d.act === "qrbooth") {
+    if (!S.isPanitia) {
+      promptPanitiaPin(() => {
+        go("qrbooth");
+      });
+      return;
+    }
     go("qrbooth");
     return;
   }
   if (d.act === "draw") {
+    if (!S.isPanitia) {
+      promptPanitiaPin(() => {
+        drawWinner();
+      });
+      return;
+    }
     drawWinner();
     return;
   }
