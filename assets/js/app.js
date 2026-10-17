@@ -1496,39 +1496,39 @@ function questCard(opt = {}) {
 
   // Gamifikasi 5 Level (Bite-sized Sprints @ 15 Booths - Goal-Gradient Effect)
   let level = 1;
-  let levelTitle = "Level 1: Penjelajah Mula";
-  let sprintMsg = `Target Sprint 1: Kunjungi 15 booth untuk capai Level 2!`;
-  let desc = `Pindai QR di bawah poster booth untuk kumpulkan stempel. Lengkapi 60 booth untuk membuka kupon undian doorprize ${esc(CONFIG.undian.hadiah)}.`;
+  let levelTitle = "Level 1: Penjelajah Pemula";
+  let sprintMsg = `🚀 Langkah Awal: Tinggal <b>${15 - n} booth lagi</b> menuju Level 2.`;
+  let desc = `Pindai QR di bawah poster setiap booth untuk kumpulkan stempel undian doorprize.`;
 
   if (n >= target) {
     level = 5;
-    levelTitle = "Level 5: Master Gelar Karya UP60";
+    levelTitle = "Level 5: Calon Juara Undian";
     sprintMsg = "🏆 Target 60/60 Tercapai! Kupon Undian Siap Diundi.";
     desc = done
-      ? `Kupon undian Anda resmi terdaftar: <b>#${esc(done.kode)}</b>. Simpan bukti ini untuk sesi pengundian!`
-      : `Luar biasa! Seluruh 60 booth telah Anda jelajahi. Daftarkan kupon undian ${esc(CONFIG.undian.hadiah)} Anda sekarang!`;
+      ? `Kupon undian Anda resmi terdaftar: <b>#${esc(done.kode)}</b>. Simpan bukti ini untuk sesi pengundian doorprize!`
+      : `Semua 60 booth selesai! Daftarkan kupon undian doorprize ${esc(CONFIG.undian.hadiah)} Anda sekarang.`;
   } else if (n >= 45) {
     level = 4;
-    levelTitle = "Level 4: Kandidat Juara";
+    levelTitle = "Level 4: Hampir Juara";
     const sisa = 60 - n;
     sprintMsg = `🔥 Sprint Akhir: Tinggal <b>${sisa} booth lagi</b> menuju Kupon Undian!`;
-    desc = `Garis finish di depan mata! Jelajahi ${sisa} booth penutup untuk membuka kupon undian doorprize ${esc(CONFIG.undian.hadiah)}.`;
+    desc = `Tinggal selangkah lagi untuk mengaktifkan kupon undian doorprize ${esc(CONFIG.undian.hadiah)}.`;
   } else if (n >= 30) {
     level = 3;
-    levelTitle = "Level 3: Penjelajah Unggul";
+    levelTitle = "Level 3: Panutan";
     const sisa = 45 - n;
     sprintMsg = `⚡ Separuh Tuntas! Tinggal <b>${sisa} booth lagi</b> menuju Level 4.`;
-    desc = `Hebat! Lebih dari separuh pameran telah Anda bedah. Teruskan langkah untuk meraih predikat Kandidat Juara!`;
+    desc = `Lebih dari separuh pameran telah dijelajahi. Teruskan langkah ke babak penentuan!`;
   } else if (n >= 15) {
     level = 2;
-    levelTitle = "Level 2: Penjelajah Aktif";
+    levelTitle = "Level 2: Pantang Nyerah";
     const sisa = 30 - n;
     sprintMsg = `✨ Momentum Bagus! Tinggal <b>${sisa} booth lagi</b> menuju Titik Separuh (30 Booth).`;
-    desc = `Sprint pertama berhasil Anda lewati! Lanjutkan eksplorasi untuk menembus milestone 30 booth.`;
+    desc = `Pertahankan ritme jelajah Anda dan temukan berbagai inovasi karya menarik.`;
   } else if (n > 0) {
     const sisa = 15 - n;
     sprintMsg = `🚀 Langkah Awal! Tinggal <b>${sisa} booth lagi</b> menuju Level 2.`;
-    desc = `Awal yang mantap! Kunjungi ${sisa} booth lagi untuk segera naik pangkat ke Penjelajah Aktif.`;
+    desc = `Pindai QR di bawah poster setiap booth untuk kumpulkan stempel undian doorprize.`;
   }
 
   return `
@@ -1564,15 +1564,15 @@ function questCard(opt = {}) {
         <div class="quest-milestones-row">
           <div class="quest-milestone-item ${n >= 15 ? "reached" : level === 1 ? "current" : ""}">
             <span class="m-dot"></span>
-            <span>15 (Aktif)</span>
+            <span>15 (Pantang Nyerah)</span>
           </div>
           <div class="quest-milestone-item ${n >= 30 ? "reached" : level === 2 ? "current" : ""}">
             <span class="m-dot"></span>
-            <span>30 (Separuh)</span>
+            <span>30 (Panutan)</span>
           </div>
           <div class="quest-milestone-item ${n >= 45 ? "reached" : level === 3 ? "current" : ""}">
             <span class="m-dot"></span>
-            <span>45 (Juara)</span>
+            <span>45 (Hampir Juara)</span>
           </div>
           <div class="quest-milestone-item ${n >= 60 ? "reached" : level === 4 ? "current" : ""}">
             <span class="m-dot"></span>

@@ -170,9 +170,16 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 - [x] Sinkronisasi kedua halaman: `#beranda` dan `#jelajah` kini memanggil komponen yang sama secara konsisten (`questCard({ inJelajah: true })`), hemat memori, mudah di-maintain, dan live-sync saat stempel bertambah.
 - [x] Update visual dan styles pada `mockup-beranda-gamifikasi.html`.
 
+### Milestone 18: Perbaikan Layout Mobile Sprint Badge & Reduksi Redundansi Deskripsi Gamifikasi
+- [x] Perbaiki `.quest-sprint-badge` dari `display: inline-flex` menjadi `display: block; text-align: left; line-height: 1.45;` untuk mengatasi tampilan teks yang terbelah seperti justify kiri-kanan pada layar ponsel sempit (mobile viewport).
+- [x] Terapkan title kustom pengguna (Level 1: Penjelajah Pemula, Level 2: Pantang Nyerah, Level 3: Panutan, Level 4: Hampir Juara, Level 5: Calon Juara Undian).
+- [x] Buat deskripsi tantangan jauh lebih ringkas, padat aksi (*action-oriented*), dan hilangkan pengulangan matematika kuota sisa booth yang sudah disampaikan di sprint badge.
+- [x] Sinkronisasi nama milestone checkpoint titik stempel (15 Pantang Nyerah, 30 Panutan, 45 Hampir Juara, 60 Undian 🏆) di `assets/js/app.js` dan `mockup-beranda-gamifikasi.html`.
+
 ---
 
 ### Milestone 7: QA Polish, Performance, & Accessibility Audit
 - [x] Pengujian visual pada resolusi mobile sempit (360px), standar (390px - 412px), dan desktop.
 - [x] Verifikasi kontras teks WCAG AAA pada kartu biru dan dock aktif.
 - [x] Audit performa: zero layout shift (CLS 0) dan transisi responsif 60fps.
+

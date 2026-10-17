@@ -276,21 +276,27 @@
       }
 
       .quest-sprint-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
+        display: block;
+        text-align: left;
+        line-height: 1.45;
         font-size: 12px;
-        font-weight: 700;
+        font-weight: 600;
         color: #ffd36b;
         background: rgba(245, 168, 0, 0.18);
         border: 1px solid rgba(245, 168, 0, 0.4);
         border-radius: 8px;
-        padding: 5px 10px;
-        margin: 4px 0 10px;
+        padding: 6px 11px;
+        margin: 6px 0 10px;
+        box-sizing: border-box;
+        width: fit-content;
+        max-width: 100%;
+        word-break: normal;
+        overflow-wrap: break-word;
       }
 
       .quest-sprint-badge b {
         color: #ffffff;
+        font-weight: 800;
       }
 
       .quest-milestones-row {
@@ -766,10 +772,10 @@
         </div>
 
         <h2 class="quest-headline">Undian Rp 250.000</h2>
-        <div id="questLevelTitle" style="font-size:14px; font-weight:700; color:var(--primary); margin:2px 0 4px;">Level 2: Penjelajah Aktif</div>
+        <div id="questLevelTitle" style="font-size:14px; font-weight:700; color:var(--primary); margin:2px 0 4px;">Level 2: Pantang Nyerah</div>
         <div class="quest-sprint-badge" id="questSprintBadge">✨ Momentum Bagus! Tinggal <b>6 booth lagi</b> menuju Titik Separuh (30 Booth).</div>
         <p class="quest-desc" id="questDesc">
-          Pindai QR di bawah poster setiap booth. Pengunjung yang melengkapi seluruh 60 booth berhak mengikuti undian doorprize Rp 250.000.
+          Pertahankan ritme jelajah Anda dan temukan berbagai inovasi karya menarik.
         </p>
 
         <!-- Progress Box -->
@@ -784,15 +790,15 @@
           <div class="quest-milestones-row" id="questMilestonesRow">
             <div class="quest-milestone-item reached" id="m15">
               <span class="m-dot"></span>
-              <span>15 (Aktif)</span>
+              <span>15 (Pantang Nyerah)</span>
             </div>
             <div class="quest-milestone-item current" id="m30">
               <span class="m-dot"></span>
-              <span>30 (Separuh)</span>
+              <span>30 (Panutan)</span>
             </div>
             <div class="quest-milestone-item" id="m45">
               <span class="m-dot"></span>
-              <span>45 (Juara)</span>
+              <span>45 (Hampir Juara)</span>
             </div>
             <div class="quest-milestone-item" id="m60">
               <span class="m-dot"></span>
@@ -978,36 +984,36 @@
         fillBar.style.width = pct + "%";
         textCount.innerHTML = `<b style="color:#b45309; font-size:15px;">${currentStamps}</b> / ${targetStamps} Booth Dikunjungi (${pct}%)`;
 
-        let lvl = 1, title = "Level 1: Pemula", badge = "", desc = "";
+        let lvl = 1, title = "Level 1: Penjelajah Pemula", badge = "", desc = "";
         if (currentStamps >= 60) {
           lvl = 5;
           title = "Level 5: Calon Juara Undian";
           badge = "🏆 Target 60/60 Tercapai! Kupon Undian Siap Diundi.";
-          desc = "Luar biasa! Seluruh 60 booth telah Anda jelajahi. Kupon undian Doorprize Rp250.000 kini telah AKTIF!";
+          desc = "Seluruh 60 booth tuntas! Daftarkan kupon undian doorprize Rp 250.000 Anda sekarang.";
         } else if (currentStamps >= 45) {
           lvl = 4;
-          title = "Level 4: Calon Juara";
+          title = "Level 4: Hampir Juara";
           const s = 60 - currentStamps;
           badge = `🔥 Sprint Akhir: Tinggal <b>${s} booth lagi</b> menuju Kupon Undian!`;
-          desc = `Garis finish di depan mata! Jelajahi ${s} booth penutup untuk membuka kupon undian doorprize Rp 250.000.`;
+          desc = `Tinggal selangkah lagi untuk membuka tiket undian Doorprize Rp 250.000.`;
         } else if (currentStamps >= 30) {
           lvl = 3;
           title = "Level 3: Panutan";
           const s = 45 - currentStamps;
           badge = `⚡ Separuh Tuntas! Tinggal <b>${s} booth lagi</b> menuju Level 4.`;
-          desc = `Hebat! Lebih dari separuh pameran telah Anda bedah. Teruskan langkah untuk meraih predikat Kandidat Juara!`;
+          desc = `Lebih dari separuh pameran telah dijelajahi. Teruskan langkah ke babak penentuan!`;
         } else if (currentStamps >= 15) {
           lvl = 2;
           title = "Level 2: Pantang Nyerah";
           const s = 30 - currentStamps;
           badge = `✨ Momentum Bagus! Tinggal <b>${s} booth lagi</b> menuju Titik Separuh (30 Booth).`;
-          desc = `Sprint pertama berhasil Anda lewati! Lanjutkan eksplorasi untuk menembus milestone 30 booth.`;
+          desc = `Pertahankan ritme jelajah Anda dan temukan berbagai inovasi karya menarik.`;
         } else {
           lvl = 1;
           title = "Level 1: Penjelajah Pemula";
           const s = 15 - currentStamps;
           badge = `🚀 Langkah Awal! Tinggal <b>${s} booth lagi</b> menuju Level 2.`;
-          desc = `Awal yang mantap! Kunjungi ${s} booth lagi untuk segera naik pangkat ke Penjelajah Aktif.`;
+          desc = `Pindai QR di setiap booth untuk mengumpulkan stempel undian doorprize.`;
         }
 
         lvlTitle.textContent = title;
