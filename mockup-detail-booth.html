@@ -404,13 +404,14 @@
 
       /* 4. Title & Researcher Hero Card */
       .hero-card {
-        background: var(--tint-subtle);
-        border: 1px solid var(--line);
+        background: #ffffff;
+        border: 1.5px solid var(--line);
         border-radius: var(--sheet-radius-inner);
         padding: 16px 18px;
         display: flex;
         flex-direction: column;
         gap: 10px;
+        box-shadow: var(--shadow-sm);
       }
 
       .hero-title {
@@ -460,16 +461,18 @@
         color: var(--mut);
       }
 
-      /* 5. Location & Telemetry Strip */
+      /* 5. Location & Telemetry Strip (Pristine White) */
       .loc-card {
-        background: #0f1f3d;
-        color: #fff;
+        background: #ffffff;
+        color: var(--ink);
+        border: 1.5px solid var(--line);
         border-radius: var(--sheet-radius-inner);
         padding: 14px 16px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 14px;
+        box-shadow: var(--shadow-sm);
       }
 
       .loc-left {
@@ -481,7 +484,7 @@
       .loc-panel-num {
         font-size: 28px;
         font-weight: 800;
-        color: var(--gold-light);
+        color: var(--primary);
         line-height: 1;
         letter-spacing: -0.02em;
       }
@@ -495,12 +498,12 @@
       .loc-info-title {
         font-size: 13px;
         font-weight: 700;
-        color: #fff;
+        color: var(--ink);
       }
 
       .loc-info-sub {
         font-size: 11.5px;
-        color: #94a3b8;
+        color: var(--mut);
       }
 
       .loc-status-pill {
@@ -511,19 +514,18 @@
         border-radius: 999px;
         font-size: 11px;
         font-weight: 700;
-        background: rgba(70, 214, 140, 0.18);
-        color: #46d68c;
-        border: 1px solid rgba(70, 214, 140, 0.35);
+        background: var(--tint);
+        color: var(--ink-light);
+        border: 1px solid var(--line);
         white-space: nowrap;
       }
 
       /* 6. Modular Info Section Cards */
       .info-card {
-        /* Golden Rule nested inside sheet: 20px padding -> radius 16px */
         border: 1.5px solid var(--line);
         border-radius: var(--sheet-radius-inner);
         padding: 14px 16px;
-        background: var(--surface);
+        background: #ffffff;
         display: flex;
         flex-direction: column;
         gap: 8px;
@@ -564,31 +566,222 @@
         display: inline-block;
       }
 
-      /* SDGs Grid inside Modal */
+      /* SDGs Grid inside Modal (Interactive) */
       .sdg-chip-list {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 8px;
         margin-top: 4px;
       }
 
       .sdg-chip-row {
         display: flex;
         align-items: center;
-        gap: 8px;
-        padding: 5px 8px;
-        background: var(--tint);
-        border-radius: 8px;
-        font-size: 12px;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 8px 12px;
+        background: #ffffff;
+        border: 1.5px solid var(--line);
+        border-radius: 10px;
+        font-size: 12.5px;
         font-weight: 600;
         color: var(--ink);
+        cursor: pointer;
+        transition: all 0.15s ease;
+        text-align: left;
+        width: 100%;
+        box-sizing: border-box;
       }
 
-      .sdg-chip-row img {
-        width: 26px;
-        height: 26px;
-        border-radius: 5px;
+      .sdg-chip-row:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        transform: translateY(-1px);
+      }
+
+      .sdg-chip-row:active {
+        transform: scale(0.98);
+      }
+
+      .sdg-chip-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .sdg-chip-left img {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
         object-fit: cover;
+        flex-shrink: 0;
+      }
+
+      .sdg-chip-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        min-width: 0;
+      }
+
+      .sdg-chip-title {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--ink);
+        line-height: 1.3;
+      }
+
+      .sdg-chip-sub {
+        font-size: 11px;
+        color: var(--mut);
+      }
+
+      .sdg-chip-right {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--primary);
+        flex-shrink: 0;
+      }
+
+      /* SDG Related Dialog */
+      .sdg-header-hero {
+        background: #ffffff;
+        border: 1.5px solid var(--line);
+        border-radius: var(--sheet-radius-inner);
+        padding: 16px 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .sdg-header-hero img {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        object-fit: cover;
+        flex-shrink: 0;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      }
+
+      .sdg-header-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        min-width: 0;
+      }
+
+      .sdg-header-title {
+        font-size: 16px;
+        font-weight: 800;
+        color: var(--ink);
+        line-height: 1.35;
+        letter-spacing: -0.01em;
+        margin: 0;
+      }
+
+      .sdg-header-sub {
+        font-size: 12px;
+        color: var(--mut);
+      }
+
+      .sdg-tabs-row {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+
+      .sdg-tab-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        border: 1.5px solid var(--line);
+        background: #ffffff;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--ink-light);
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.15s ease;
+      }
+
+      .sdg-tab-btn.active {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #ffffff;
+      }
+
+      .sdg-works-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .sdg-work-card {
+        background: #ffffff;
+        border: 1.5px solid var(--line);
+        border-radius: var(--sheet-radius-inner);
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.15s ease;
+      }
+
+      .sdg-work-card:hover {
+        border-color: #cbd5e1;
+        box-shadow: var(--shadow-md);
+      }
+
+      .sdg-work-card.is-current {
+        border-color: #93c5fd;
+        background: #f8fbff;
+      }
+
+      .sdg-work-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .tag-current {
+        font-size: 10.5px;
+        font-weight: 800;
+        color: #1e40af;
+        background: #dbeafe;
+        padding: 3px 8px;
+        border-radius: 999px;
+      }
+
+      .sdg-work-title {
+        font-size: 14.5px;
+        font-weight: 800;
+        line-height: 1.4;
+        color: var(--ink);
+        letter-spacing: -0.01em;
+        margin: 0;
+        text-wrap: balance;
+      }
+
+      .sdg-work-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding-top: 8px;
+        border-top: 1px dashed var(--line);
+        margin-top: 2px;
       }
 
       /* 7. Action Footer Bar */
@@ -1001,18 +1194,129 @@
         document.getElementById("mDana").textContent = d.dana;
         document.getElementById("mDampak").textContent = d.dampak;
 
-        // Render SDGs
+        // Render interactive SDGs
         const sdgHtml = d.sdg
-          .map(
-            (n) => `
-          <div class="sdg-chip-row">
-            <img src="assets/img/sdgs_logo/sdg-${n}.webp" alt="SDG ${n}" width="26" height="26">
-            <span>SDGs ${n} · ${SDG_NAMES[n] || "Tujuan PBB"}</span>
+          .map((n) => {
+            const relCount = SAMPLE_DATA.filter((x) =>
+              x.sdg.includes(n),
+            ).length;
+            return `
+          <div class="sdg-chip-row" onclick="openMockupSdg(${n}, ${d.no})">
+            <div class="sdg-chip-left">
+              <img src="assets/img/sdgs_logo/sdg-${n}.webp" alt="SDG ${n}" width="28" height="28">
+              <div class="sdg-chip-meta">
+                <span class="sdg-chip-title">SDGs ${n} · ${SDG_NAMES[n] || "Tujuan PBB"}</span>
+                <span class="sdg-chip-sub">${relCount} booth terkait</span>
+              </div>
+            </div>
+            <div class="sdg-chip-right">
+              <span>Lihat booth</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
           </div>
-        `,
-          )
+        `;
+          })
           .join("");
         document.getElementById("mSdgList").innerHTML = sdgHtml;
+
+        // Header click
+        const header =
+          document.querySelector("#mSdgList").previousElementSibling;
+        header.style.cursor = "pointer";
+        header.onclick = () => openMockupSdg(d.sdg[0], d.no);
+      }
+
+      function openMockupSdg(n, fromNo) {
+        const title = `SDGs ${n} · ${SDG_NAMES[n] || "Tujuan PBB"}`;
+        const related = SAMPLE_DATA.filter((x) => x.sdg.includes(n));
+        const currentItem = SAMPLE_DATA.find((x) => x.no === fromNo);
+
+        const tabs =
+          currentItem && currentItem.sdg.length > 1
+            ? `<div class="sdg-tabs-row" style="margin-bottom:12px;">
+            ${currentItem.sdg
+              .map(
+                (sn) => `
+              <button class="sdg-tab-btn ${sn === n ? "active" : ""}" onclick="openMockupSdg(${sn}, ${fromNo})">
+                <img src="assets/img/sdgs_logo/sdg-${sn}.webp" width="16" height="16" alt="">
+                SDGs ${sn}
+              </button>
+            `,
+              )
+              .join("")}
+          </div>`
+            : "";
+
+        const listHtml = related
+          .map((item) => {
+            const isCur = item.no === fromNo;
+            return `
+            <div class="sdg-work-card ${isCur ? "is-current" : ""}">
+              <div class="sdg-work-top">
+                <span class="tag-panel">Booth #${String(item.panel).padStart(2, "0")}</span>
+                <span class="tag-pill"><i class="dot"></i>${item.kat} · ${item.kl}</span>
+                ${isCur ? '<span class="tag-current">Karya Saat Ini</span>' : ""}
+              </div>
+              <h3 class="sdg-work-title">${item.judul}</h3>
+              <div class="researcher-meta">
+                <span class="researcher-name">${item.ketua}</span>
+                <span class="researcher-fak">${item.fak}</span>
+              </div>
+              <div class="sdg-work-foot">
+                <button class="btn-action-map" style="font-size:11.5px;min-height:36px;padding:4px 10px;" onclick="alert('Lihat booth #' + ${item.panel} + ' di denah')">Lihat di Denah</button>
+                <button class="btn-action-route" style="font-size:11.5px;min-height:36px;padding:4px 12px;" onclick="closeMockupSdg(); renderItem(${SAMPLE_DATA.findIndex((x) => x.no === item.no)})">${isCur ? "Buka Detail Ini" : "Buka Detail Booth"}</button>
+              </div>
+            </div>`;
+          })
+          .join("");
+
+        const modalHtml = `
+          <div class="detail-scrim" id="mockupSdgScrim" style="z-index:90;">
+            <article class="detail-sheet" role="dialog" style="max-height:88%;">
+              <div class="sheet-handle-bar"></div>
+              <div class="sheet-top-bar">
+                <div class="sheet-badge-group">
+                  <span class="tag-pill"><i class="dot"></i>Keterkaitan SDGs</span>
+                  <span class="tag-panel">SDGs ${n}</span>
+                </div>
+                <button class="close-btn" onclick="closeMockupSdg()" aria-label="Tutup Dialog">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+              <div class="sheet-scroll-body">
+                <div class="sdg-header-hero">
+                  <img src="assets/img/sdgs_logo/sdg-${n}.webp" alt="SDGs ${n}" width="48" height="48">
+                  <div class="sdg-header-meta">
+                    <h2 class="sdg-header-title">${title}</h2>
+                    <span class="sdg-header-sub">Menampilkan ${related.length} booth pameran yang berkontribusi pada tujuan ini</span>
+                  </div>
+                </div>
+                ${tabs}
+                <div class="sdg-works-list">
+                  ${listHtml}
+                </div>
+              </div>
+              <div class="sheet-footer-bar">
+                <button class="btn-action-map" onclick="closeMockupSdg()">Kembali ke Booth</button>
+                <button class="btn-action-route" onclick="closeMockupSdg()">Tutup</button>
+              </div>
+            </article>
+          </div>
+        `;
+
+        const existing = document.getElementById("mockupSdgScrim");
+        if (existing) existing.remove();
+        document
+          .getElementById("previewFrame")
+          .insertAdjacentHTML("beforeend", modalHtml);
+      }
+
+      function closeMockupSdg() {
+        const el = document.getElementById("mockupSdgScrim");
+        if (el) el.remove();
       }
 
       renderItem(0);

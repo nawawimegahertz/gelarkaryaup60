@@ -1959,13 +1959,25 @@ function openDetail(no) {
   const sdgHtml =
     Array.isArray(d.sdg) && d.sdg.length
       ? d.sdg
-          .map(
-            (n) => `
-        <div class="sdg-chip-row">
-          <img src="assets/img/sdgs_logo/sdg-${n}.webp" alt="SDGs ${n}" width="26" height="26" loading="lazy">
-          <span>SDGs ${n} · ${esc(SDGINFO[n]?.[0] || "Tujuan PBB")}</span>
-        </div>`,
-          )
+          .map((n) => {
+            const relCount = DATA.filter(
+              (x) => Array.isArray(x.sdg) && x.sdg.includes(n),
+            ).length;
+            return `
+        <div class="sdg-chip-row" data-open-sdg="${n}" data-from="${d.no}" role="button" tabindex="0" aria-label="Lihat ${relCount} karya terkait SDGs ${n}">
+          <div class="sdg-chip-left">
+            <img src="assets/img/sdgs_logo/sdg-${n}.webp" alt="SDGs ${n}" width="28" height="28" loading="lazy">
+            <div class="sdg-chip-meta">
+              <span class="sdg-chip-title">SDGs ${n} · ${esc(SDGINFO[n]?.[0] || "Tujuan PBB")}</span>
+              <span class="sdg-chip-sub">${relCount} booth pameran terkait</span>
+            </div>
+          </div>
+          <div class="sdg-chip-right">
+            <span>Lihat booth</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+        </div>`;
+          })
           .join("")
       : `<div style="font-size:12px;color:var(--mut)">Tidak ada SDGs terkait yang dispesifikasikan.</div>`;
 
@@ -2042,9 +2054,12 @@ function openDetail(no) {
             </div>
 
             <div class="info-card ${p === "mahasiswa" ? "highlight" : ""}" style="grid-column: 1 / -1;">
-              <div class="info-card-header">
+              <div class="info-card-header" ${Array.isArray(d.sdg) && d.sdg[0] ? `data-open-sdg="${d.sdg[0]}" data-from="${d.no}" style="cursor:pointer"` : ""}>
                 <span class="info-card-label">Keterkaitan SDGs</span>
-                <span style="font-size:11px;color:var(--mut);">Agenda PBB 2030</span>
+                <span style="font-size:11px;font-weight:700;color:var(--primary);display:inline-flex;align-items:center;gap:4px;">
+                  Lihat Booth Terkait
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+                </span>
               </div>
               <div class="sdg-chip-list">
                 ${sdgHtml}
@@ -2061,6 +2076,129 @@ function openDetail(no) {
             inRoute
               ? `<button class="btn-action-route in-route" data-del="${d.no}" data-keep="1" aria-label="Hapus dari rute">Tersimpan di Rute (Hapus)</button>`
               : `<button class="btn-action-route" data-add="${d.no}" data-keep="1" aria-label="${cta}">${cta}</button>`
+          }
+        </div>
+      </article>
+    </div>`;
+  $(".sheet .x").focus();
+}
+
+/* ---------- SDGs Detail Sheet (Related Booths) ---------- */
+function openSdgSheet(sdgNum, fromBoothNo) {
+  const n = +sdgNum || 1;
+  const info = SDGINFO[n];
+  if (!info) return;
+
+  lastFocus = document.activeElement;
+  const currentBooth = fromBoothNo
+    ? DATA.find((x) => x.no === fromBoothNo)
+    : null;
+  const related = DATA.filter(
+    (x) => Array.isArray(x.sdg) && x.sdg.includes(n),
+  ).sort((a, b) => panelOf(a) - panelOf(b));
+
+  const multiTabs =
+    currentBooth &&
+    Array.isArray(currentBooth.sdg) &&
+    currentBooth.sdg.length > 1
+      ? `<div class="sdg-tabs-row">
+        ${currentBooth.sdg
+          .map(
+            (sn) => `
+          <button class="sdg-tab-btn ${sn === n ? "active" : ""}" data-open-sdg="${sn}" data-from="${fromBoothNo}">
+            <img src="assets/img/sdgs_logo/sdg-${sn}.webp" width="16" height="16" alt="" loading="lazy">
+            SDGs ${sn}
+          </button>
+        `,
+          )
+          .join("")}
+      </div>`
+      : "";
+
+  $("#layer").innerHTML = `
+    <div class="scrim" data-close="1">
+      <article class="sheet detail-sheet" role="dialog" aria-modal="true" aria-labelledby="sdgt">
+        <div class="sheet-handle-bar"></div>
+
+        <div class="sheet-top-bar">
+          <div class="sheet-badge-group">
+            <span class="tag-pill">
+              <i class="dot"></i>
+              Keterkaitan SDGs
+            </span>
+            <span class="tag-panel">
+              SDGs ${n}
+            </span>
+          </div>
+          <button class="x close-btn" data-close="1" aria-label="Tutup Dialog">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="sheet-scroll-body">
+          <div class="sdg-header-hero">
+            <img src="assets/img/sdgs_logo/sdg-${n}.webp" alt="SDGs ${n}" width="48" height="48" loading="lazy">
+            <div class="sdg-header-meta">
+              <h2 class="sdg-header-title" id="sdgt">SDGs ${n} · ${esc(info[0])}</h2>
+              <span class="sdg-header-sub">Menampilkan ${related.length} booth pameran yang berkontribusi pada tujuan ini</span>
+            </div>
+          </div>
+
+          ${multiTabs}
+
+          <div class="sdg-works-list">
+            ${
+              related.length
+                ? related
+                    .map((item) => {
+                      const pNum = String(panelOf(item)).padStart(2, "0");
+                      const isCurrent = fromBoothNo && item.no === fromBoothNo;
+                      return `
+              <div class="sdg-work-card ${isCurrent ? "is-current" : ""}">
+                <div class="sdg-work-top">
+                  <span class="tag-panel">Booth #${pNum}</span>
+                  <span class="tag-pill"><i class="dot"></i>${esc(item.kat)} · ${esc(KLASTER[item.kl])}</span>
+                  ${isCurrent ? '<span class="tag-current">Karya Saat Ini</span>' : ""}
+                </div>
+
+                <h3 class="sdg-work-title">${esc(item.judul)}</h3>
+
+                <div class="researcher-meta">
+                  <span class="researcher-name">${esc(item.ketua)}</span>
+                  <span class="researcher-fak">${esc(fakOf(item))}</span>
+                </div>
+
+                <div class="sdg-work-foot">
+                  <button class="btn sm ghost" data-map="${item.no}">
+                    Lihat di Denah
+                  </button>
+                  <button class="btn sm gold" data-open="${item.no}">
+                    ${isCurrent ? "Buka Detail Ini" : "Buka Detail Booth"}
+                  </button>
+                </div>
+              </div>`;
+                    })
+                    .join("")
+                : '<div class="info-card" style="text-align:center;color:var(--mut);padding:24px;">Belum ada booth terdaftar pada tujuan ini.</div>'
+            }
+          </div>
+        </div>
+
+        <div class="sheet-footer-bar">
+          ${
+            fromBoothNo
+              ? `<button class="btn-action-map" data-open="${fromBoothNo}">
+                   Kembali ke Booth
+                 </button>
+                 <button class="btn-action-route" data-close="1">
+                   Tutup
+                 </button>`
+              : `<button class="btn-action-route" data-close="1" style="flex:1">
+                   Tutup
+                 </button>`
           }
         </div>
       </article>
@@ -3367,7 +3505,7 @@ function delRoute(n) {
 
 document.addEventListener("click", async (e) => {
   const t = e.target.closest(
-    "[data-go],[data-open],[data-add],[data-del],[data-filter],[data-seg],[data-peran],[data-fr],[data-nilai],[data-act],[data-close],[data-map],[data-mseg],[data-mkl],[data-mroute],[data-mz]",
+    "[data-go],[data-open],[data-open-sdg],[data-add],[data-del],[data-filter],[data-seg],[data-peran],[data-fr],[data-nilai],[data-act],[data-close],[data-map],[data-mseg],[data-mkl],[data-mroute],[data-mz]",
   );
   if (!t) return;
   const d = t.dataset;
@@ -3409,6 +3547,10 @@ document.addEventListener("click", async (e) => {
   }
   if (d.open) {
     openDetail(+d.open);
+    return;
+  }
+  if (d.openSdg) {
+    openSdgSheet(+d.openSdg, d.from ? +d.from : null);
     return;
   }
   if (d.add) {

@@ -1547,13 +1547,14 @@ label.f {
 
 /* 4. Title & Researcher Hero Card */
 .sheet.detail-sheet .hero-card {
-  background: var(--tint-subtle, #f8fafc);
-  border: 1px solid var(--line);
+  background: #ffffff;
+  border: 1.5px solid var(--line);
   border-radius: var(--sheet-radius-inner);
   padding: 16px 18px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  box-shadow: var(--shadow-sm);
 }
 
 .sheet.detail-sheet .hero-title {
@@ -1607,10 +1608,11 @@ label.f {
   color: var(--mut);
 }
 
-/* 5. Location & Telemetry Strip */
+/* 5. Location & Telemetry Strip (Pristine White High-Contrast) */
 .sheet.detail-sheet .loc-card {
-  background: var(--navy, #0a1936);
-  color: #fff;
+  background: #ffffff;
+  color: var(--ink);
+  border: 1.5px solid var(--line);
   border-radius: var(--sheet-radius-inner);
   padding: 14px 16px;
   display: flex;
@@ -1618,6 +1620,7 @@ label.f {
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
+  box-shadow: var(--shadow-sm);
 }
 
 .sheet.detail-sheet .loc-left {
@@ -1629,7 +1632,7 @@ label.f {
 .sheet.detail-sheet .loc-panel-num {
   font-size: 28px;
   font-weight: 800;
-  color: var(--gold-light, #ffd36b);
+  color: var(--primary);
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -1643,12 +1646,12 @@ label.f {
 .sheet.detail-sheet .loc-info-title {
   font-size: 13px;
   font-weight: 700;
-  color: #fff;
+  color: var(--ink);
 }
 
 .sheet.detail-sheet .loc-info-sub {
   font-size: 11.5px;
-  color: #cbd5e1;
+  color: var(--mut);
 }
 
 .sheet.detail-sheet .loc-status-pill {
@@ -1659,16 +1662,16 @@ label.f {
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.12);
-  color: #e2e8f0;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--tint);
+  color: var(--ink-light);
+  border: 1px solid var(--line);
   white-space: nowrap;
 }
 
 .sheet.detail-sheet .loc-status-pill.ok {
-  background: rgba(70, 214, 140, 0.2);
-  color: #46d68c;
-  border-color: rgba(70, 214, 140, 0.4);
+  background: #ecfdf5;
+  color: #15803d;
+  border-color: #a7f3d0;
 }
 
 /* 6. Modular Info Section Cards */
@@ -1682,7 +1685,7 @@ label.f {
   border: 1.5px solid var(--line);
   border-radius: var(--sheet-radius-inner);
   padding: 14px 16px;
-  background: var(--surface);
+  background: #ffffff;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -1723,32 +1726,235 @@ label.f {
   display: inline-block;
 }
 
-/* SDGs List inside Modal */
+/* SDGs List inside Modal (Interactive Buttons) */
 .sheet.detail-sheet .sdg-chip-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-top: 2px;
+  gap: 8px;
+  margin-top: 4px;
 }
 
 .sheet.detail-sheet .sdg-chip-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 8px;
-  background: var(--tint);
-  border-radius: 8px;
-  font-size: 12px;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  font-size: 12.5px;
   font-weight: 600;
   color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  box-sizing: border-box;
 }
 
-.sheet.detail-sheet .sdg-chip-row img {
-  width: 26px;
-  height: 26px;
-  border-radius: 5px;
+.sheet.detail-sheet .sdg-chip-row:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.sheet.detail-sheet .sdg-chip-row:active {
+  transform: scale(0.98);
+}
+
+.sheet.detail-sheet .sdg-chip-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.sheet.detail-sheet .sdg-chip-left img {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
   object-fit: cover;
   flex-shrink: 0;
+}
+
+.sheet.detail-sheet .sdg-chip-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.sheet.detail-sheet .sdg-chip-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+.sheet.detail-sheet .sdg-chip-sub {
+  font-size: 11px;
+  color: var(--mut);
+}
+
+.sheet.detail-sheet .sdg-chip-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+/* ========================================================
+   SDG RELATED BOOTHS SHEET & MODAL
+   ======================================================== */
+.sdg-header-hero {
+  background: #ffffff;
+  border: 1.5px solid var(--line);
+  border-radius: var(--sheet-radius-inner);
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.sdg-header-hero img {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.sdg-header-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.sdg-header-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.sdg-header-sub {
+  font-size: 12px;
+  color: var(--mut);
+}
+
+.sdg-tabs-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.sdg-tabs-row::-webkit-scrollbar {
+  display: none;
+}
+
+.sdg-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-light);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.sdg-tab-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+.sdg-works-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sdg-work-card {
+  background: #ffffff;
+  border: 1.5px solid var(--line);
+  border-radius: var(--sheet-radius-inner);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease;
+}
+
+.sdg-work-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: var(--shadow-md);
+}
+
+.sdg-work-card.is-current {
+  border-color: #93c5fd;
+  background: #f8fbff;
+}
+
+.sdg-work-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tag-current {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #1e40af;
+  background: #dbeafe;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+.sdg-work-title {
+  font-size: 14.5px;
+  font-weight: 800;
+  line-height: 1.4;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.sdg-work-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+  margin-top: 2px;
+}
+
+.sdg-work-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
 }
 
 /* 7. Action Footer Bar */
