@@ -373,10 +373,17 @@ main {
 }
 
 .card {
+  --card-outer-radius: 18px;
+  --card-pad: var(--space-md, 16px);
+  /* Aturan Emas: inner radius = outer radius - [padding / 2] */
+  --card-inner-radius: calc(
+    var(--card-outer-radius) - (var(--card-pad) / 2)
+  ); /* 10px */
+
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  padding: var(--space-md);
+  border-radius: var(--card-outer-radius);
+  padding: var(--card-pad);
   box-shadow: var(--shadow);
 }
 
@@ -497,7 +504,8 @@ main {
 .role {
   border: 1.5px solid var(--line);
   background: var(--surface);
-  border-radius: var(--radius-md);
+  /* Aturan Emas: inner radius = outer radius (18px) - [padding (16px) / 2] = 10px */
+  border-radius: var(--card-inner-radius, 10px);
   min-height: 56px;
   padding: 10px 8px;
   font-weight: 700;
@@ -685,10 +693,17 @@ main {
 }
 
 .work {
+  --work-outer-radius: 18px;
+  --work-pad: 14px;
+  /* Aturan Emas: inner radius = outer radius - [padding / 2] */
+  --work-inner-radius: calc(
+    var(--work-outer-radius) - (var(--work-pad) / 2)
+  ); /* 11px */
+
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--radius-lg, 16px);
-  padding: var(--space-md);
+  border-radius: var(--work-outer-radius);
+  padding: var(--work-pad);
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
@@ -831,12 +846,19 @@ main {
 
 /* Jelajah */
 .tools {
+  --tools-outer-radius: 20px;
+  --tools-pad: 14px;
+  /* Aturan Emas: inner radius = outer radius - [padding / 2] */
+  --tools-inner-radius: calc(
+    var(--tools-outer-radius) - (var(--tools-pad) / 2)
+  ); /* 13px */
+
   display: grid;
   gap: var(--space-xs);
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: var(--radius-lg, 16px);
-  padding: var(--space-md);
+  border-radius: var(--tools-outer-radius);
+  padding: var(--tools-pad);
   box-shadow: var(--shadow);
 }
 
@@ -848,7 +870,7 @@ main {
   width: 100%;
   min-height: 48px;
   border: 1.5px solid var(--line);
-  border-radius: var(--radius-md);
+  border-radius: var(--tools-inner-radius, 13px);
   padding: 10px 14px 10px 44px;
   background: var(--surface);
   font-size: 16px !important;
@@ -875,11 +897,18 @@ main {
 }
 
 .seg {
+  --seg-outer-radius: var(--tools-inner-radius, 13px);
+  --seg-pad: 4px;
+  /* Aturan Emas: inner radius = outer radius - [padding / 2] = 13px - 2px = 11px */
+  --seg-inner-radius: calc(
+    var(--seg-outer-radius) - (var(--seg-pad) / 2)
+  ); /* 11px */
+
   display: flex;
   gap: 4px;
   background: var(--tint);
-  padding: 4px;
-  border-radius: var(--radius-md);
+  padding: var(--seg-pad);
+  border-radius: var(--seg-outer-radius);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -895,7 +924,7 @@ main {
   min-width: 68px;
   border: 0;
   background: transparent;
-  border-radius: var(--radius-sm);
+  border-radius: var(--seg-inner-radius, 11px);
   min-height: 40px;
   font-weight: 700;
   font-size: var(--text-xs);
@@ -933,7 +962,7 @@ main {
 .sels select {
   min-height: 46px;
   border: 1.5px solid var(--line);
-  border-radius: var(--radius-md);
+  border-radius: var(--tools-inner-radius, 13px);
   padding: 0 12px;
   background: var(--surface);
   font-size: 16px !important;
@@ -1310,51 +1339,65 @@ label.f {
   color: #d4e0f8;
 }
 
-/* Navigasi bawah */
+/* Navigasi bawah - Floating Dock */
 nav.tabs {
+  --dock-outer-radius: 22px;
+  --dock-pad: 5px;
+  /* Aturan Emas: inner radius = outer radius - [padding / 2] */
+  --dock-inner-radius: calc(
+    var(--dock-outer-radius) - (var(--dock-pad) / 2)
+  ); /* 19.5px */
+
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.06);
+  left: max(12px, env(safe-area-inset-left, 12px));
+  right: max(12px, env(safe-area-inset-right, 12px));
+  bottom: max(10px, env(safe-area-inset-bottom, 10px));
+  max-width: 520px;
+  margin-inline: auto;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow:
+    0 12px 32px -4px rgba(15, 23, 42, 0.12),
+    0 4px 12px -2px rgba(15, 23, 42, 0.06);
+  border-radius: var(--dock-outer-radius);
+  padding: var(--dock-pad);
   display: grid;
   grid-template-columns: repeat(6, 1fr);
-  padding: 6px 4px max(8px, env(safe-area-inset-bottom, 8px));
+  gap: 3px;
   z-index: 40;
   transition:
     transform 0.2s ease,
-    background 0.2s ease;
+    background 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 nav.tabs button {
   border: 0;
-  background: none;
+  background: transparent;
+  border-radius: var(--dock-inner-radius);
+  min-height: 48px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
-  min-height: var(--touch-comfortable, 48px);
+  gap: 2.5px;
+  padding: 5px 2px 4px;
   font-size: var(--text-2xs);
-  font-weight: 700;
-  color: var(--mut);
-  border-radius: var(--radius-sm, 10px);
+  font-weight: 600;
+  color: #64748b;
   position: relative;
-  padding: 4px 2px;
   touch-action: manipulation;
   cursor: pointer;
   transition:
-    color 0.18s ease,
-    background-color 0.18s ease,
+    color 0.16s ease,
+    background-color 0.16s ease,
     transform 0.12s ease;
 }
 
 nav.tabs button:active {
-  transform: scale(0.92);
+  transform: scale(0.93);
 }
 
 nav.tabs button:focus-visible {
@@ -1363,9 +1406,10 @@ nav.tabs button:focus-visible {
 }
 
 nav.tabs svg {
-  width: 21px;
-  height: 21px;
-  transition: transform 0.18s ease;
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.1;
+  transition: transform 0.16s ease;
 }
 
 nav.tabs button[aria-current="page"] {
@@ -1375,49 +1419,33 @@ nav.tabs button[aria-current="page"] {
 }
 
 nav.tabs button[aria-current="page"] svg {
-  transform: translateY(-1px);
-}
-
-nav.tabs button[aria-current="page"]::before {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 14px;
-  height: 2.5px;
-  border-radius: 999px;
-  background: var(--primary);
+  transform: scale(1.06);
 }
 
 nav.tabs .n {
   position: absolute;
   top: 3px;
-  right: calc(50% - 19px);
+  right: calc(50% - 17px);
   background: var(--gold);
   color: var(--on-gold);
   border-radius: 999px;
   padding: 0 4px;
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 800;
   min-width: 16px;
   height: 16px;
   line-height: 16px;
   text-align: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
-  border: 1.5px solid var(--surface);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border: 1.5px solid #ffffff;
 }
 
 @media (min-width: 820px) {
   nav.tabs {
-    max-width: 580px;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 12px;
-    border-radius: var(--radius-lg, 16px);
-    border: 1px solid var(--line);
-    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12);
-    padding-bottom: 6px;
+    bottom: 14px;
+    box-shadow:
+      0 16px 36px -4px rgba(15, 23, 42, 0.14),
+      0 6px 16px -2px rgba(15, 23, 42, 0.08);
   }
 }
 
