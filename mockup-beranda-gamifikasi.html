@@ -275,13 +275,126 @@
         transition: width 0.4s ease;
       }
 
-      .quest-milestones {
+      .quest-sprint-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #92400e;
+        background: #fef3c7;
+        border: 1px solid #fde68a;
+        border-radius: 8px;
+        padding: 5px 10px;
+        margin: 4px 0 10px;
+      }
+
+      .quest-milestones-row {
         display: flex;
         justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px dashed var(--line, #e2e8f0);
+      }
+
+      .quest-milestone-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        font-size: 10.5px;
+        color: var(--mut, #64748b);
+      }
+
+      .quest-milestone-item .m-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #cbd5e1;
+        transition: all 0.2s ease;
+      }
+
+      .quest-milestone-item.reached {
+        color: var(--ink, #10213f);
+        font-weight: 700;
+      }
+
+      .quest-milestone-item.reached .m-dot {
+        background: var(--gold, #f5a800);
+      }
+
+      .quest-milestone-item.current {
+        color: var(--primary, #1857c4);
+        font-weight: 800;
+      }
+
+      .quest-milestone-item.current .m-dot {
+        background: var(--primary, #1857c4);
+        box-shadow: 0 0 0 3px rgba(24, 87, 196, 0.22);
+      }
+
+      /* ===== DOCK MENU (HIGH CONTRAST) ===== */
+      nav.tabs {
+        position: fixed;
+        left: max(12px, env(safe-area-inset-left, 12px));
+        right: max(12px, env(safe-area-inset-right, 12px));
+        bottom: max(10px, env(safe-area-inset-bottom, 10px));
+        max-width: 520px;
+        margin-inline: auto;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(226, 232, 240, 0.95);
+        box-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.14);
+        border-radius: 22px;
+        padding: 5px;
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 3px;
+        z-index: 40;
+      }
+
+      nav.tabs button {
+        border: 0;
+        background: transparent;
+        border-radius: 18px;
+        min-height: 48px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2.5px;
+        padding: 5px 2px 4px;
         font-size: 11px;
-        color: #94a3b8;
-        margin-top: 6px;
         font-weight: 600;
+        color: #52617d;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.16s ease;
+      }
+
+      nav.tabs button:hover {
+        color: #0a2558;
+      }
+
+      nav.tabs svg {
+        width: 20px;
+        height: 20px;
+        stroke: currentColor;
+      }
+
+      nav.tabs button[aria-current="page"] {
+        color: #ffffff;
+        background: linear-gradient(135deg, #0a2558 0%, #15459e 100%);
+        font-weight: 800;
+        box-shadow: 0 4px 14px rgba(10, 37, 88, 0.28);
+      }
+
+      nav.tabs button[aria-current="page"] svg {
+        transform: scale(1.08);
+        stroke: #ffffff;
+        color: #ffffff;
       }
 
       /* Quest Actions (Right-thumb accessible) */
@@ -648,9 +761,11 @@
           <span class="quest-reward">Hadiah: <b>Undian Rp250.000</b></span>
         </div>
 
-        <h2 class="quest-headline">Kunjungi 60 Booth, Buka Peluang Undian Rp 250.000!</h2>
-        <p class="quest-desc">
-          Pindai QR di bawah poster setiap booth. Pengunjung yang melengkapi seluruh 60 booth berhak mengikuti undian doorprize (konsisten dengan syarat di menu Jelajah).
+        <h2 class="quest-headline">Undian Rp 250.000</h2>
+        <div id="questLevelTitle" style="font-size:14px; font-weight:700; color:var(--primary); margin:2px 0 4px;">Level 2: Penjelajah Aktif</div>
+        <div class="quest-sprint-badge" id="questSprintBadge">✨ Momentum Bagus! Tinggal <b>6 booth lagi</b> menuju Titik Separuh (30 Booth).</div>
+        <p class="quest-desc" id="questDesc">
+          Pindai QR di bawah poster setiap booth. Pengunjung yang melengkapi seluruh 60 booth berhak mengikuti undian doorprize Rp 250.000.
         </p>
 
         <!-- Progress Box -->
@@ -662,10 +777,23 @@
           <div class="quest-progress-track">
             <div class="quest-progress-fill" id="stampFill" style="width: 40%;"></div>
           </div>
-          <div class="quest-milestones">
-            <span>Mulai (0)</span>
-            <span>Separuh (30 Booth)</span>
-            <span>Target Lengkap (60/60)</span>
+          <div class="quest-milestones-row" id="questMilestonesRow">
+            <div class="quest-milestone-item reached" id="m15">
+              <span class="m-dot"></span>
+              <span>15 (Aktif)</span>
+            </div>
+            <div class="quest-milestone-item current" id="m30">
+              <span class="m-dot"></span>
+              <span>30 (Separuh)</span>
+            </div>
+            <div class="quest-milestone-item" id="m45">
+              <span class="m-dot"></span>
+              <span>45 (Juara)</span>
+            </div>
+            <div class="quest-milestone-item" id="m60">
+              <span class="m-dot"></span>
+              <span>60 (Undian 🏆)</span>
+            </div>
           </div>
         </div>
 
@@ -801,6 +929,34 @@
       </footer>
     </main>
 
+    <!-- FLOATING DOCK MENU (HIGH CONTRAST) -->
+    <nav class="tabs" id="dockNav" aria-label="Navigasi Dok">
+      <button class="dock-tab" data-tab="beranda" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        Beranda
+      </button>
+      <button class="dock-tab" data-tab="jelajah">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        Jelajah
+      </button>
+      <button class="dock-tab" data-tab="sdgs">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+        SDGs
+      </button>
+      <button class="dock-tab" data-tab="denah">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+        Denah
+      </button>
+      <button class="dock-tab" data-tab="rute">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a4.5 4.5 0 0 0 0-9H7"></path><polyline points="10 6 7 9 10 12"></polyline></svg>
+        Rute
+      </button>
+      <button class="dock-tab" data-tab="umpan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        Umpan
+      </button>
+    </nav>
+
     <!-- SCRIPT SIMULATOR INTERAKTIF -->
     <script>
       let currentStamps = 24;
@@ -809,16 +965,69 @@
       const btnScanAction = document.getElementById("btnScanAction");
       const textCount = document.getElementById("stampCountText");
       const fillBar = document.getElementById("stampFill");
+      const lvlTitle = document.getElementById("questLevelTitle");
+      const sprintBadge = document.getElementById("questSprintBadge");
+      const descEl = document.getElementById("questDesc");
+
+      function updateGamificationUI() {
+        const pct = Math.min(100, Math.round((currentStamps / targetStamps) * 100));
+        fillBar.style.width = pct + "%";
+        textCount.innerHTML = `<b style="color:#b45309; font-size:15px;">${currentStamps}</b> / ${targetStamps} Booth Dikunjungi (${pct}%)`;
+
+        let lvl = 1, title = "Level 1: Penjelajah Mula", badge = "", desc = "";
+        if (currentStamps >= 60) {
+          lvl = 5;
+          title = "Level 5: Master Gelar Karya UP60";
+          badge = "🏆 Target 60/60 Tercapai! Kupon Undian Siap Diundi.";
+          desc = "Luar biasa! Seluruh 60 booth telah Anda jelajahi. Kupon undian Doorprize Rp250.000 kini telah AKTIF!";
+        } else if (currentStamps >= 45) {
+          lvl = 4;
+          title = "Level 4: Kandidat Juara";
+          const s = 60 - currentStamps;
+          badge = `🔥 Sprint Akhir: Tinggal <b>${s} booth lagi</b> menuju Kupon Undian!`;
+          desc = `Garis finish di depan mata! Jelajahi ${s} booth penutup untuk membuka kupon undian doorprize Rp 250.000.`;
+        } else if (currentStamps >= 30) {
+          lvl = 3;
+          title = "Level 3: Penjelajah Unggul";
+          const s = 45 - currentStamps;
+          badge = `⚡ Separuh Tuntas! Tinggal <b>${s} booth lagi</b> menuju Level 4.`;
+          desc = `Hebat! Lebih dari separuh pameran telah Anda bedah. Teruskan langkah untuk meraih predikat Kandidat Juara!`;
+        } else if (currentStamps >= 15) {
+          lvl = 2;
+          title = "Level 2: Penjelajah Aktif";
+          const s = 30 - currentStamps;
+          badge = `✨ Momentum Bagus! Tinggal <b>${s} booth lagi</b> menuju Titik Separuh (30 Booth).`;
+          desc = `Sprint pertama berhasil Anda lewati! Lanjutkan eksplorasi untuk menembus milestone 30 booth.`;
+        } else {
+          lvl = 1;
+          title = "Level 1: Penjelajah Mula";
+          const s = 15 - currentStamps;
+          badge = `🚀 Langkah Awal! Tinggal <b>${s} booth lagi</b> menuju Level 2.`;
+          desc = `Awal yang mantap! Kunjungi ${s} booth lagi untuk segera naik pangkat ke Penjelajah Aktif.`;
+        }
+
+        lvlTitle.textContent = title;
+        sprintBadge.innerHTML = badge;
+        descEl.innerHTML = desc;
+
+        // Update checkpoint dots
+        const m15 = document.getElementById("m15");
+        const m30 = document.getElementById("m30");
+        const m45 = document.getElementById("m45");
+        const m60 = document.getElementById("m60");
+
+        m15.className = "quest-milestone-item " + (currentStamps >= 15 ? "reached" : (lvl === 1 ? "current" : ""));
+        m30.className = "quest-milestone-item " + (currentStamps >= 30 ? "reached" : (lvl === 2 ? "current" : ""));
+        m45.className = "quest-milestone-item " + (currentStamps >= 45 ? "reached" : (lvl === 3 ? "current" : ""));
+        m60.className = "quest-milestone-item " + (currentStamps >= 60 ? "reached" : (lvl === 4 ? "current" : ""));
+      }
 
       function addStamp() {
         if (currentStamps < targetStamps) {
           currentStamps++;
-          const pct = Math.min(100, Math.round((currentStamps / targetStamps) * 100));
-          fillBar.style.width = pct + "%";
-          textCount.innerHTML = `<b style="color:#b45309; font-size:15px;">${currentStamps}</b> / ${targetStamps} Booth Dikunjungi`;
-          
+          updateGamificationUI();
           if (currentStamps === targetStamps) {
-            alert("SELAMAT! Syarat Undian Terpenuhi!\nAnda telah mengunjungi seluruh 60 booth (60/60). Kupon undian Doorprize Rp250.000 kini telah AKTIF!");
+            alert("SELAMAT! Target 60/60 Tercapai!\nKupon undian Doorprize Rp250.000 kini telah AKTIF!");
           }
         } else {
           alert("Lengkap! Seluruh 60 booth telah dikunjungi (60/60)!");
@@ -827,7 +1036,7 @@
 
       btnScan.addEventListener("click", addStamp);
       btnScanAction.addEventListener("click", () => {
-        alert("Kamera Pemindai QR aktif! Pada aplikasi asli, mengarahkan kamera ke QR booth akan menambah stempel misi ini.");
+        alert("Kamera Pemindai QR aktif! Mengarahkan kamera ke QR booth akan menambah stempel misi 60 booth ini.");
       });
 
       // Role chip toggle demo
@@ -837,6 +1046,17 @@
           chip.classList.add("active");
         });
       });
+
+      // Dock nav tab toggle demo
+      document.querySelectorAll(".dock-tab").forEach(tab => {
+        tab.addEventListener("click", () => {
+          document.querySelectorAll(".dock-tab").forEach(t => t.removeAttribute("aria-current"));
+          tab.setAttribute("aria-current", "page");
+        });
+      });
+
+      // Initial render
+      updateGamificationUI();
     </script>
   </body>
 </html>

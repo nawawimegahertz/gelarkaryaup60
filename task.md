@@ -155,7 +155,16 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 
 ---
 
+### Milestone 16: Menu Dok Kontras Tinggi & Gamifikasi Sprint 5 Level (Teori Goal-Gradient)
+- [x] Rombak status aktif dock menu navigasi bawah (`nav.tabs button[aria-current="page"]`) menjadi pil biru dongker pekat (`linear-gradient(135deg, #0a2558, #15459e)`) dengan teks dan ikon putih bersih (`#ffffff`), bayangan nyata, memberikan orientasi visual seketika bagi pengguna.
+- [x] Terapkan teori gamifikasi *Goal-Gradient Effect* dan *Cognitive Chunking*: memecah tantangan 60 booth menjadi 4 sprint mikro (per 15 booth) dengan 5 tingkatan level (Level 1: Penjelajah Mula, Level 2: Penjelajah Aktif, Level 3: Penjelajah Unggul, Level 4: Kandidat Juara, Level 5: Master Gelar Karya UP60).
+- [x] Tampilkan lencana target terdekat (*Sprint Badge*) seperti "Tinggal 6 booth lagi ke Level 3" untuk mereduksi beban psikologis angka 60 sehingga terasa ringkas, dekat, dan memicu adrenalin.
+- [x] Hadirkan jejak milestone (*Sprint Checkpoint Trail*) dengan 4 titik indikator: 15 (Aktif), 30 (Separuh), 45 (Juara), dan 60 (Undian 🏆).
+- [x] Sinkronisasi simulator interaktif di `mockup-beranda-gamifikasi.html` beserta floating dock interaktif.
+
+---
+
 ### Milestone 7: QA Polish, Performance, & Accessibility Audit
 - [x] Pengujian visual pada resolusi mobile sempit (360px), standar (390px - 412px), dan desktop.
-- [x] Verifikasi kontras teks WCAG AAA pada latar putih bersih.
+- [x] Verifikasi kontras teks WCAG AAA pada latar putih bersih dan dock aktif.
 - [x] Audit performa: zero layout shift (CLS 0) dan transisi responsif 60fps.

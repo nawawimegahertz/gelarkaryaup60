@@ -1489,26 +1489,45 @@ function workCard(d, opt = {}) {
 /* ---------- Beranda (Decluttered & Gamifikasi Reward) ---------- */
 function questCard() {
   const n = Object.keys(S.stamp).length;
-  const target = BOOTH_N;
+  const target = BOOTH_N; // 60
   const pct = Math.min(100, Math.round((n / target) * 100));
   const done = store.get("undian", null);
 
-  let tier = "Tantangan Penjelajah Booth";
-  let tierDesc = `Pindai QR di bawah poster setiap booth. Pengunjung yang melengkapi seluruh ${target} booth berhak ikut undian ${esc(CONFIG.undian.hadiah)}.`;
-  let tierBadge = `${n}/${target}`;
+  // Gamifikasi 5 Level (Bite-sized Sprints @ 15 Booths - Goal-Gradient Effect)
+  let level = 1;
+  let levelTitle = "Level 1: Penjelajah Mula";
+  let sprintMsg = `Target Sprint 1: Kunjungi 15 booth untuk capai Level 2!`;
+  let desc = `Pindai QR di bawah poster booth untuk kumpulkan stempel. Lengkapi 60 booth untuk membuka kupon undian doorprize ${esc(CONFIG.undian.hadiah)}.`;
+
   if (n >= target) {
-    tier = "Seluruh 60 Booth Lengkap!";
-    tierDesc = done
-      ? `Kupon Anda terdaftar: #${esc(done.kode)}`
-      : `Luar biasa! Seluruh ${target} booth telah Anda lengkapi. Daftarkan kupon undian ${esc(CONFIG.undian.hadiah)} Anda sekarang!`;
-    tierBadge = "Lengkap 60/60";
+    level = 5;
+    levelTitle = "Level 5: Master Gelar Karya UP60";
+    sprintMsg = "🏆 Target 60/60 Tercapai! Kupon Undian Siap Diundi.";
+    desc = done
+      ? `Kupon undian Anda resmi terdaftar: <b>#${esc(done.kode)}</b>. Simpan bukti ini untuk sesi pengundian!`
+      : `Luar biasa! Seluruh 60 booth telah Anda jelajahi. Daftarkan kupon undian ${esc(CONFIG.undian.hadiah)} Anda sekarang!`;
+  } else if (n >= 45) {
+    level = 4;
+    levelTitle = "Level 4: Kandidat Juara";
+    const sisa = 60 - n;
+    sprintMsg = `🔥 Sprint Akhir: Tinggal <b>${sisa} booth lagi</b> menuju Kupon Undian!`;
+    desc = `Garis finish di depan mata! Jelajahi ${sisa} booth penutup untuk membuka kupon undian doorprize ${esc(CONFIG.undian.hadiah)}.`;
   } else if (n >= 30) {
-    tier = "Penjelajah Unggul (Separuh Booth)";
-    const sisa = target - n;
-    tierDesc = `Mantap! ${n} booth telah Anda kunjungi. Kunjungi ${sisa} booth lagi untuk memenuhi syarat undian doorprize!`;
+    level = 3;
+    levelTitle = "Level 3: Penjelajah Unggul";
+    const sisa = 45 - n;
+    sprintMsg = `⚡ Separuh Tuntas! Tinggal <b>${sisa} booth lagi</b> menuju Level 4.`;
+    desc = `Hebat! Lebih dari separuh pameran telah Anda bedah. Teruskan langkah untuk meraih predikat Kandidat Juara!`;
+  } else if (n >= 15) {
+    level = 2;
+    levelTitle = "Level 2: Penjelajah Aktif";
+    const sisa = 30 - n;
+    sprintMsg = `✨ Momentum Bagus! Tinggal <b>${sisa} booth lagi</b> menuju Titik Separuh (30 Booth).`;
+    desc = `Sprint pertama berhasil Anda lewati! Lanjutkan eksplorasi untuk menembus milestone 30 booth.`;
   } else if (n > 0) {
-    const sisa = target - n;
-    tierDesc = `Bagus! ${n} stempel terkumpul. Lanjutkan penjelajahan ${sisa} booth lagi untuk melengkapi 60 booth!`;
+    const sisa = 15 - n;
+    sprintMsg = `🚀 Langkah Awal! Tinggal <b>${sisa} booth lagi</b> menuju Level 2.`;
+    desc = `Awal yang mantap! Kunjungi ${sisa} booth lagi untuk segera naik pangkat ke Penjelajah Aktif.`;
   }
 
   return `
@@ -1527,10 +1546,11 @@ function questCard() {
     <div class="quest-body">
       <div class="quest-headline-row">
         <h2 class="quest-title">Undian ${esc(CONFIG.undian.hadiah)}</h2>
-        <span class="quest-tier-pill">${esc(tierBadge)}</span>
+        <span class="quest-tier-pill">${level === 5 ? "🏆 Master 60/60" : `Level ${level} • ${n}/${target}`}</span>
       </div>
-      <div class="quest-tier-name">${esc(tier)}</div>
-      <p class="quest-desc">${tierDesc}</p>
+      <div class="quest-tier-name">${esc(levelTitle)}</div>
+      <div class="quest-sprint-badge">${sprintMsg}</div>
+      <p class="quest-desc">${desc}</p>
 
       <div class="quest-progress-box">
         <div class="quest-prog-meta">
@@ -1539,6 +1559,24 @@ function questCard() {
         </div>
         <div class="prog quest-prog-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${target}" aria-valuenow="${n}">
           <i style="width:${pct}%"></i>
+        </div>
+        <div class="quest-milestones-row">
+          <div class="quest-milestone-item ${n >= 15 ? "reached" : level === 1 ? "current" : ""}">
+            <span class="m-dot"></span>
+            <span>15 (Aktif)</span>
+          </div>
+          <div class="quest-milestone-item ${n >= 30 ? "reached" : level === 2 ? "current" : ""}">
+            <span class="m-dot"></span>
+            <span>30 (Separuh)</span>
+          </div>
+          <div class="quest-milestone-item ${n >= 45 ? "reached" : level === 3 ? "current" : ""}">
+            <span class="m-dot"></span>
+            <span>45 (Juara)</span>
+          </div>
+          <div class="quest-milestone-item ${n >= 60 ? "reached" : level === 4 ? "current" : ""}">
+            <span class="m-dot"></span>
+            <span>60 (Undian 🏆)</span>
+          </div>
         </div>
       </div>
     </div>

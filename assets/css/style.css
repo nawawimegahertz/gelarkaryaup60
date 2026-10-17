@@ -2377,14 +2377,19 @@ nav.tabs button {
   padding: 5px 2px 4px;
   font-size: var(--text-2xs);
   font-weight: 600;
-  color: #64748b;
+  color: #52617d;
   position: relative;
   touch-action: manipulation;
   cursor: pointer;
   transition:
     color 0.16s ease,
     background-color 0.16s ease,
+    box-shadow 0.16s ease,
     transform 0.12s ease;
+}
+
+nav.tabs button:hover {
+  color: #0a2558;
 }
 
 nav.tabs button:active {
@@ -2400,17 +2405,21 @@ nav.tabs svg {
   width: 20px;
   height: 20px;
   stroke-width: 2.1;
+  stroke: currentColor;
   transition: transform 0.16s ease;
 }
 
 nav.tabs button[aria-current="page"] {
-  color: var(--primary);
-  background: var(--tint);
+  color: #ffffff;
+  background: linear-gradient(135deg, #0a2558 0%, #15459e 100%);
   font-weight: 800;
+  box-shadow: 0 4px 14px rgba(10, 37, 88, 0.28);
 }
 
 nav.tabs button[aria-current="page"] svg {
-  transform: scale(1.06);
+  transform: scale(1.08);
+  stroke: #ffffff;
+  color: #ffffff;
 }
 
 nav.tabs .n {
@@ -3447,6 +3456,66 @@ button,
   background: var(--gold, #f5a800);
   border-radius: var(--radius-pill, 9999px);
   transition: width 0.4s ease;
+}
+
+.quest-sprint-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 5px 10px;
+  margin: 4px 0 10px;
+}
+
+.quest-milestones-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line, #e2e8f0);
+}
+
+.quest-milestone-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: 10.5px;
+  color: var(--mut, #64748b);
+  position: relative;
+}
+
+.quest-milestone-item .m-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  transition: all 0.2s ease;
+}
+
+.quest-milestone-item.reached {
+  color: var(--ink, #10213f);
+  font-weight: 700;
+}
+
+.quest-milestone-item.reached .m-dot {
+  background: var(--gold, #f5a800);
+}
+
+.quest-milestone-item.current {
+  color: var(--primary, #1857c4);
+  font-weight: 800;
+}
+
+.quest-milestone-item.current .m-dot {
+  background: var(--primary, #1857c4);
+  box-shadow: 0 0 0 3px rgba(24, 87, 196, 0.22);
 }
 
 .quest-actions {
