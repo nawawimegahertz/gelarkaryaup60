@@ -15,7 +15,7 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 - [x] **Milestone 6: Halaman Umpan Balik (Evaluasi Pameran Ringkas & Tanpa Distraksi)** (Selesai)
 - [x] **Milestone 8: Ergonomi Sentuh Jempol Kanan Mobile (Right-Hand Thumb Ergonomics & Button Accessibility)** (Selesai)
 - [x] **Milestone 9: Penyempurnaan Visual Peta Karya & Otomatis Zoom In Denah** (Selesai)
-- [ ] **Milestone 7: QA Polish, Performance, & Accessibility Audit** (Tahap Akhir)
+- [x] **Milestone 7: QA Polish, Performance, & Accessibility Audit** (Selesai)
 
 ---
 
@@ -104,6 +104,6 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 ---
 
 ### Milestone 7: QA Polish, Performance, & Accessibility Audit
-- [ ] Pengujian visual pada resolusi mobile sempit (360px), standar (390px - 412px), dan desktop.
-- [ ] Verifikasi kontras teks WCAG AAA pada mode terang dan mode gelap.
-- [ ] Audit performa: zero layout shift (CLS 0) dan transisi responsif 60fps.
+- [x] Pengujian visual pada resolusi mobile sempit (360px), standar (390px - 412px), dan desktop.
+- [x] Verifikasi kontras teks WCAG AAA pada mode terang dan mode gelap.
+- [x] Audit performa: zero layout shift (CLS 0) dan transisi responsif 60fps.
