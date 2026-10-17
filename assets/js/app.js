@@ -2418,9 +2418,9 @@ function viewHadir() {
     max = Math.max(1, ...Object.values(a.counts));
   const modeLbl =
     {
-      gas: "Langsung",
-      "gas-api": "Langsung (Google Sheets via Apps Script)",
-      sheet: "Langsung (Google Sheets)",
+      gas: "",
+      "gas-api": "Langsung",
+      sheet: "Langsung",
       local: "Lokal di perangkat ini",
     }[S.att.mode] || "Langsung";
   const hrs = [];
