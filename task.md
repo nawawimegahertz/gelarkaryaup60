@@ -7,7 +7,7 @@ Dokumen pelacak progres pengerjaan refactoring antarmuka mobile-first Gelar Kary
 ## 📌 Status Keseluruhan
 - [x] **Batch 1: Sistem Tipografi & Spacing Fluid** (Selesai)
 - [x] **Batch 2: Hero Header & Bottom Navigation Bar** (Selesai)
-- [ ] **Batch 3: Kartu Karya (Jelajah), Filter Sticky & Search**
+- [x] **Batch 3: Kartu Karya (Jelajah), Filter Sticky & Search** (Selesai)
 - [ ] **Batch 4: Modal Bottom Sheet, Denah & Scanner**
 
 ---
@@ -29,10 +29,10 @@ Dokumen pelacak progres pengerjaan refactoring antarmuka mobile-first Gelar Kary
 - [x] Tambahkan animasi mikro transisi aktif yang halus (`livePulse`, active scale, active indicators).
 
 ### Batch 3: Kartu Karya (Jelajah), Filter Sticky & Search
-- [ ] Redesain kartu katalog karya (`.item` & `.card`): hierarki badge, judul, peneliti, dan tombol aksi.
-- [ ] Perbaiki input pencarian (`#q`) dengan font 16px (anti auto-zoom di iOS) dan tombol reset sentuh.
-- [ ] Buat filter segmen & kategori swipe horizontal dengan snap (`scroll-snap-type: x mandatory`).
-- [ ] Rapikan matriks kategori dan SDG cards agar tidak berjejal di layar 360px.
+- [x] Redesain kartu katalog karya (`.work` & `.card`): hierarki badge, judul balance, peneliti, dan tombol aksi terstruktur.
+- [x] Perbaiki input pencarian (`#q`, `.search input`) dengan font 16px (anti auto-zoom di iOS) dan padding sentuh yang lapang.
+- [x] Buat filter segmen & kategori swipe horizontal dengan snap (`scroll-snap-type: x mandatory`).
+- [x] Rapikan matriks kategori dan SDG cards agar tidak berjejal di layar 360px dengan `overflow-x: auto` dan typography fluid.
 
 ### Batch 4: Modal Bottom Sheet, Denah & Scanner
 - [ ] Ubah modal dialog `.sheet` menjadi bottom sheet mobile native lengkap dengan drag handle indicator.

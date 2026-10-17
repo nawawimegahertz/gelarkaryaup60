@@ -555,13 +555,16 @@ main {
 /* Matriks kategori */
 .matrix {
   display: grid;
-  grid-template-columns: 64px repeat(3, 1fr);
-  gap: 8px;
+  grid-template-columns: 56px repeat(3, minmax(0, 1fr));
+  gap: 6px;
   align-items: stretch;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
 }
 
 .matrix .h {
-  font-size: 12.5px;
+  font-size: var(--text-2xs);
   font-weight: 700;
   color: var(--mut);
   text-align: center;
@@ -570,7 +573,7 @@ main {
 }
 
 .matrix .rl {
-  font-size: 13px;
+  font-size: var(--text-xs);
   font-weight: 800;
   align-self: center;
 }
@@ -578,29 +581,39 @@ main {
 .cell {
   border: 1.5px solid var(--line);
   background: var(--surface);
-  border-radius: 12px;
-  min-height: 84px;
-  padding: 8px;
+  border-radius: var(--radius-sm);
+  min-height: 76px;
+  padding: 8px 6px;
   text-align: left;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.cell:active:not(.zero) {
+  transform: scale(0.96);
 }
 
 .cell b {
-  font-size: 28px;
+  font-size: var(--text-xl);
   line-height: 1;
   font-weight: 800;
   color: var(--primary);
 }
 
 .cell span {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--mut);
+  line-height: 1.2;
 }
 
 .cell.zero {
-  opacity: 0.55;
+  opacity: 0.5;
 }
 
 .cell:hover {
@@ -674,19 +687,27 @@ main {
 .work {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 14px;
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-md);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-xs);
   text-align: left;
   width: 100%;
   min-width: 0;
   box-shadow: var(--shadow);
+  transition:
+    transform 0.15s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .work:hover {
   border-color: var(--primary);
+}
+
+.work:active {
+  transform: scale(0.99);
 }
 
 .work .top {
@@ -694,51 +715,80 @@ main {
   gap: 8px;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
 }
 
 .work h3 {
-  font-size: 15.5px;
-  line-height: 1.35;
+  font-size: var(--text-base);
+  line-height: 1.38;
   font-weight: 700;
+  color: var(--ink);
+  text-wrap: balance;
   display: -webkit-box;
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  margin-block: 2px 4px;
 }
 
 .work .who {
-  font-size: 13.5px;
+  font-size: var(--text-xs);
   color: var(--mut);
+  line-height: 1.35;
 }
 
 .work .meta {
-  font-size: 13.5px;
+  font-size: var(--text-xs);
   display: grid;
   gap: 6px;
+  margin-block: 4px;
 }
 
 .work .meta .k {
   color: var(--mut);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  font-size: var(--text-2xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .work .foot {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
   margin-top: auto;
-  padding-top: 4px;
-  font-size: 13px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+  font-size: var(--text-xs);
   color: var(--mut);
+}
+
+.maplink {
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  color: var(--mut);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  touch-action: manipulation;
+  min-height: 40px;
+}
+
+.maplink:active {
+  opacity: 0.7;
 }
 
 .stan {
   font-weight: 800;
-  color: var(--ink);
+  color: var(--primary);
+  background: var(--tint);
+  padding: 2px 6px;
+  border-radius: 6px;
 }
 
 .chips {
@@ -755,14 +805,14 @@ main {
   height: 24px;
   padding: 0 7px;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
 }
 
 .badge {
   border-radius: 6px;
   padding: 2px 8px;
-  font-size: 12px;
+  font-size: var(--text-2xs);
   font-weight: 700;
   background: var(--gold);
   color: var(--on-gold);
@@ -771,12 +821,23 @@ main {
 .added {
   color: var(--ok);
   font-weight: 700;
+  font-size: var(--text-xs);
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  background: rgba(70, 214, 140, 0.12);
+  border-radius: 6px;
 }
 
 /* Jelajah */
 .tools {
   display: grid;
-  gap: 10px;
+  gap: var(--space-xs);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-md);
+  box-shadow: var(--shadow);
 }
 
 .search {
@@ -785,20 +846,32 @@ main {
 
 .search input {
   width: 100%;
-  min-height: 50px;
+  min-height: 48px;
   border: 1.5px solid var(--line);
-  border-radius: 12px;
-  padding: 10px 14px 10px 46px;
+  border-radius: var(--radius-md);
+  padding: 10px 14px 10px 44px;
   background: var(--surface);
+  font-size: 16px !important;
+  color: var(--ink);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.search input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--tint);
 }
 
 .search svg {
   position: absolute;
   left: 14px;
-  top: 14px;
+  top: 13px;
   width: 22px;
   height: 22px;
   color: var(--mut);
+  pointer-events: none;
 }
 
 .seg {
@@ -806,51 +879,82 @@ main {
   gap: 4px;
   background: var(--tint);
   padding: 4px;
-  border-radius: 12px;
-  flex-wrap: wrap;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+}
+
+.seg::-webkit-scrollbar {
+  display: none;
 }
 
 .seg button {
-  flex: 1;
-  min-width: 72px;
+  flex: 1 0 auto;
+  min-width: 68px;
   border: 0;
   background: transparent;
-  border-radius: 9px;
+  border-radius: var(--radius-sm);
   min-height: 40px;
   font-weight: 700;
-  font-size: 14px;
-  padding: 0 8px;
+  font-size: var(--text-xs);
+  padding: 6px 12px;
   color: var(--mut);
+  cursor: pointer;
+  touch-action: manipulation;
+  scroll-snap-align: start;
+  transition: all 0.15s ease;
+}
+
+.seg button:active {
+  transform: scale(0.96);
 }
 
 .seg button[aria-pressed="true"] {
   background: var(--surface);
-  color: var(--ink);
-  box-shadow: 0 1px 4px rgba(10, 42, 102, 0.18);
+  color: var(--primary);
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(10, 42, 102, 0.12);
 }
 
 .sels {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 8px;
+}
+
+@media (min-width: 480px) {
+  .sels {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .sels select {
   min-height: 46px;
   border: 1.5px solid var(--line);
-  border-radius: 12px;
-  padding: 0 10px;
+  border-radius: var(--radius-md);
+  padding: 0 12px;
   background: var(--surface);
+  font-size: 16px !important;
+  color: var(--ink);
   width: 100%;
   min-width: 0;
+  cursor: pointer;
+}
+
+.sels select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--tint);
 }
 
 .count {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 14px 0 8px;
-  font-size: 14px;
+  margin: var(--space-sm) 0 var(--space-xs);
+  font-size: var(--text-sm);
   color: var(--mut);
 }
 
@@ -858,53 +962,66 @@ main {
 .sdgs {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  gap: var(--space-xs);
 }
 
 @media (min-width: 620px) {
   .sdgs {
     grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-sm);
   }
 }
 
 @media (min-width: 900px) {
   .sdgs {
     grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-md);
   }
 }
 
 .sdgt {
   border: 0;
-  border-radius: 12px;
-  padding: 12px;
-  min-height: 116px;
+  border-radius: var(--radius-md);
+  padding: 12px 10px;
+  min-height: 108px;
   text-align: left;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.sdgt:active:not(:disabled) {
+  transform: scale(0.96);
 }
 
 .sdgt .n {
-  font-size: 30px;
+  font-size: var(--text-2xl);
   font-weight: 800;
   line-height: 1;
 }
 
 .sdgt .l {
-  font-size: 13px;
+  font-size: var(--text-2xs);
   font-weight: 700;
   line-height: 1.25;
 }
 
 .sdgt .c {
-  font-size: 12.5px;
+  font-size: 11px;
   font-weight: 600;
-  opacity: 0.92;
+  opacity: 0.9;
 }
 
 .sdgt.zero {
-  opacity: 0.38;
+  opacity: 0.4;
+  cursor: default;
 }
 
 /* Kehadiran */
