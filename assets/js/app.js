@@ -1978,11 +1978,13 @@ function viewHadir() {
   const a = effective(),
     tot = a.total || 0,
     max = Math.max(1, ...Object.values(a.counts));
-  const modeLbl = {
-    db: "Langsung (basis data Claude)",
-    sheet: "Langsung (Google Sheets)",
-    local: "Lokal di perangkat ini",
-  }[S.att.mode];
+  const modeLbl =
+    {
+      gas: "Langsung",
+      "gas-api": "Langsung (Google Sheets via Apps Script)",
+      sheet: "Langsung (Google Sheets)",
+      local: "Lokal di perangkat ini",
+    }[S.att.mode] || "Langsung";
   const hrs = [];
   for (let h = CONFIG.jamBuka; h <= CONFIG.jamTutup; h++) hrs.push(h);
   const maxH = Math.max(1, ...hrs.map((h) => a.hours[h] || 0));
@@ -2014,10 +2016,10 @@ function viewHadir() {
     <label class="f" style="margin-top:10px">Tautan publik<input class="txt" id="pubUrl" type="url" inputmode="url" placeholder="https://..." value="${esc(url)}"></label>
     <div class="qrs"><div class="qrbox"><div class="qrimg" id="qr1"></div><b>QR pintu masuk</b><span>Registrasi kehadiran, lalu katalog</span></div><div class="qrbox"><div class="qrimg" id="qr2"></div><b>QR pintu keluar</b><span>Langsung ke umpan balik</span></div></div>
     <details><summary>Menyambungkan penyimpanan kehadiran</summary>
-      <ol class="steps"><li>Di dalam Claude, kehadiran tersimpan otomatis di basis data artifact untuk anggota organisasi yang membuka halaman ini.</li>
-      <li>Untuk pengunjung umum, hosting berkas HTML ini di situs UP, buat Google Form (nama, peran, asal), lalu hubungkan jawabannya ke Sheets.</li>
-      <li>Publikasikan Sheets jawaban sebagai CSV, lalu isi <b>CONFIG.hadir.csvUrl</b>. Isi <b>formAction</b> dan kode <b>entry</b> agar formulir di halaman ini mengirim ke Google Form.</li>
-      <li>Angka di dasbor diperbarui otomatis setiap 30 detik.</li></ol></details>
+      <ol class="steps"><li>Data kehadiran tersimpan otomatis dan terhubung ke backend Google Sheets melalui Google Apps Script Web App.</li>
+      <li>Tempel tautan publik halaman ini (misal URL Vercel atau domain UP) di kolom di atas untuk membuat QR pintu masuk dan pintu keluar.</li>
+      <li>Pengunjung memindai QR pintu masuk untuk registrasi kehadiran dan menjelajahi katalog karya inovasi.</li>
+      <li>Data pengunjung dan kunjungan per jam diperbarui secara berkala otomatis.</li></ol></details>
   </div></div>`;
   $("#pubUrl").addEventListener("change", (e) => {
     store.set("url", e.target.value.trim());
