@@ -7,8 +7,8 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 ## 📌 Status & Milestones
 
 - [x] **Milestone 0: Fondasi Design System, Dialog/Sheet Putih & Presisi Tombol Tutup ("X")** (Selesai)
-- [ ] **Milestone 1: Halaman Beranda (Home, Stats, & Gateway Presensi)** (Antrean)
-- [ ] **Milestone 2: Halaman Jelajah (Katalog, Pencarian Karya, & Card Hierarchy)** (Antrean)
+- [x] **Milestone 1: Halaman Beranda (Home, Stats, & Gateway Presensi)** (Selesai)
+- [ ] **Milestone 2: Halaman Jelajah (Katalog, Pencarian Karya, & Card Hierarchy)** (Berikutnya)
 - [ ] **Milestone 3: Halaman SDGs (Pusat Keterkaitan SDGs & Active Filtering)** (Dalam Pengerjaan)
 - [ ] **Milestone 4: Halaman Denah (Interactive Map, Floorplan & Card Drawer)** (Antrean)
 - [ ] **Milestone 5: Halaman Rute (Itinerary Kunjungan Berurutan & Aksi)** (Antrean)
@@ -31,11 +31,12 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 ---
 
 ### Milestone 1: Halaman Beranda (Home, Stats, & Gateway Presensi)
-- [ ] **Hierarki Tipografi:** Kontras tegas `h1` judul pameran, label tanggal/waktu, dan angka statistik besar.
-- [ ] **Pemeringkasan Teks:** Ringkaskan deskripsi pembuka menjadi 1 baris padat informatif (*Senin, 19 Okt 2026 · 08.00–16.00 WIB · Aula At-Taqwa UP*).
-- [ ] Tata ulang grid statistik (2x2 seimbang) dan kartu presensi aktif.
-- [ ] Format Proper Case pada kartu peran ("Anda Datang Sebagai": Dosen, Mahasiswa, Mitra, Umum) dengan touch target $\ge 52\text{px}$.
-- [ ] Baris aksi cepat (*Quick Actions*): *"Mulai Jelajah"*, *"Buka Denah"*, *"Rute Saya"*.
+- [x] **Hierarki Tipografi:** Kontras tegas `h1` judul pameran (`text-wrap: balance`), label tanggal/waktu, dan angka statistik tabular.
+- [x] **Pemeringkasan Teks:** Ringkaskan deskripsi pembuka menjadi 1 baris padat informatif (*Senin, 19 Okt 2026 · 08.00–16.00 WIB · Aula Masjid At-Taqwa UP*).
+- [x] **Grid Statistik Seimbang & Banner Presensi:** Metrik pameran 2x2 simetris (Total Karya, Penelitian, Pengabdian, SDGs) + interactive full-width live attendance badge dengan pulse dot.
+- [x] **Kartu Peran Ergonomis:** Format Proper Case ("Dosen", "Mahasiswa", "Mitra", "Umum") dengan touch target $\ge 56\text{px}$, teks instruksi lugas tanpa basa-basi.
+- [x] **Baris Aksi Cepat (*Quick Actions*):** Navigasi thumb-accessible di Beranda: *"Mulai Jelajah"*, *"Buka Denah"*, *"Rute Saya"* (lengkap dengan live badge counter rute).
+- [x] **Alur Kunjungan & Undian Ringkas:** Pemeringkasan micro-copy pada `journeyCard` dan `stampCard` dengan Proper Case.
 
 ---
 

@@ -1360,20 +1360,26 @@ window.addEventListener("hashchange", () => {
 function renderStats() {
   const sdgUsed = new Set(DATA.flatMap((d) => d.sdg)).size;
   const pen = DATA.filter((d) => d.kat === "Penelitian").length;
-  const items = [
-    [DATA.length, "karya"],
-    [pen, "penelitian"],
-    [DATA.length - pen, "PKM"],
-    [sdgUsed, "dari 17 SDGs"],
-    [effective().total, S.att.demo ? "hadir (contoh)" : "pengunjung hadir"],
-  ];
-  $("#stats").innerHTML = items
-    .map(([v, l], i) =>
-      i === 4
-        ? `<button class="stat ${S.att.mode !== "local" && !S.att.demo ? "live" : ""}" data-go="hadir" aria-label="Lihat rincian kehadiran"><b class="num">${v}</b><span>${l}</span></button>`
-        : `<div class="stat"><b class="num">${v}</b><span>${l}</span></div>`,
-    )
-    .join("");
+  const pkm = DATA.length - pen;
+  const att = effective().total;
+  const isLive = S.att.mode !== "local" && !S.att.demo;
+  const attLabel = S.att.demo ? "Pengunjung (data contoh)" : "Pengunjung hadir hari ini";
+
+  $("#stats").innerHTML = `
+    <div class="stats-grid">
+      <div class="stat"><b class="num">${DATA.length}</b><span>Total Karya</span></div>
+      <div class="stat"><b class="num">${pen}</b><span>Penelitian</span></div>
+      <div class="stat"><b class="num">${pkm}</b><span>Pengabdian (PKM)</span></div>
+      <div class="stat"><b class="num">${sdgUsed}</b><span>Poin SDGs</span></div>
+    </div>
+    <button class="stat-attend ${isLive ? "live" : ""}" data-go="hadir" aria-label="Lihat rincian kehadiran pameran">
+      <span class="stat-attend-info">
+        <span class="stat-attend-dot"></span>
+        <span class="stat-attend-text"><b>${att}</b> ${attLabel}</span>
+      </span>
+      <span class="stat-attend-action">Rincian <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></span>
+    </button>
+  `;
 }
 
 /* ---------- Peran ---------- */
@@ -1383,19 +1389,19 @@ function roleChooser() {
   )
     .map(
       ([k, p]) =>
-        `<button class="role" role="radio" aria-checked="${S.peran === k}" data-peran="${k}">${p.nama}<small>${p.ket}</small></button>`,
+        `<button class="role" role="radio" aria-checked="${S.peran === k}" data-peran="${k}"><span class="role-name">${p.nama}</span><small>${p.ket}</small></button>`,
     )
     .join("")}</div>`;
 }
 const SOROT = {
   dosen: {
-    judul: "Pendanaan terbesar",
-    ket: "Karya dengan dana disetujui tertinggi, lengkap dengan skema untuk mencari rekan kolaborasi.",
+    judul: "Pendanaan Terbesar",
+    ket: "Karya dengan pendanaan tertinggi untuk pertimbangan kolaborasi riset lanjutan.",
     pick: () => [...DATA].sort((a, b) => b.dana - a.dana).slice(0, 4),
   },
   mahasiswa: {
-    judul: "Inspirasi topik lintas bidang",
-    ket: "Satu karya dari tiap bidang dengan kaitan SDGs paling luas, sebagai titik awal topik skripsi atau magang.",
+    judul: "Inspirasi Lintas Bidang",
+    ket: "Karya perwakilan bidang dengan kaitan SDGs terluas sebagai referensi tugas akhir atau magang.",
     pick: () => {
       const out = [];
       [
@@ -1413,8 +1419,8 @@ const SOROT = {
     },
   },
   mitra: {
-    judul: "Berorientasi terapan dan hilirisasi",
-    ket: "Hibah hilirisasi, RIIM, penelitian terapan, dan PKM yang sudah berhubungan dengan mitra atau pengguna.",
+    judul: "Orientasi Terapan & Hilirisasi",
+    ket: "Riset terapan, hilirisasi, dan PKM yang siap berkolaborasi dengan dunia industri dan mitra.",
     pick: () =>
       [...DATA]
         .filter(terapan)
@@ -1427,8 +1433,8 @@ const SOROT = {
         .slice(0, 4),
   },
   umum: {
-    judul: "Karya yang dekat dengan kehidupan sehari-hari",
-    ket: "Program pengabdian dan riset kesehatan yang manfaatnya langsung dirasakan masyarakat.",
+    judul: "Inovasi untuk Masyarakat",
+    ket: "Program pengabdian masyarakat dan riset kesehatan yang manfaatnya langsung dirasakan publik.",
     pick: () =>
       [
         ...DATA.filter((d) => d.kat === "PKM"),
@@ -1472,15 +1478,30 @@ function viewBeranda() {
   const src = count(DATA, (d) => d.sumber);
   const sg = SOROT[S.peran];
   el.innerHTML = `
+  <nav class="quick-nav" aria-label="Aksi cepat beranda">
+    <button class="quick-btn primary" data-go="jelajah" aria-label="Mulai jelajahi 60 karya">
+      <svg class="quick-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <span>Mulai Jelajah</span>
+    </button>
+    <button class="quick-btn" data-go="denah" aria-label="Buka denah booth pameran">
+      <svg class="quick-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+      <span>Buka Denah</span>
+    </button>
+    <button class="quick-btn" data-go="rute" aria-label="Buka rute kunjungan Anda">
+      <svg class="quick-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a4.5 4.5 0 0 0 0-9H7"></path><polyline points="10 6 7 9 10 12"></polyline></svg>
+      <span>Rute Saya${S.rute.length ? ` <b class="quick-badge">${S.rute.length}</b>` : ""}</span>
+    </button>
+  </nav>
+
   ${journeyCard()}
   <div style="margin-top:14px">${stampCard()}</div>
   <div class="card" style="margin-top:14px">
-    <h2 style="font-size:16px;margin-bottom:4px">Tampilan untuk peran Anda</h2>
-    <p style="margin:0 0 10px;color:var(--mut);font-size:14px">${S.peran ? esc(SOROT[S.peran].ket) + ". Ketuk peran lain untuk mengganti." : "Pilih satu peran. Informasi yang ditonjolkan menyesuaikan kebutuhan Anda."}</p>
+    <h2 style="font-size:16px;margin-bottom:4px">Rekomendasi Berdasarkan Peran</h2>
+    <p style="margin:0 0 10px;color:var(--mut);font-size:14px">${S.peran ? esc(SOROT[S.peran].ket) + " Ketuk peran lain untuk mengganti." : "Pilih peran Anda untuk kurasi karya yang paling relevan."}</p>
     ${roleChooser()}
   </div>
 
-  <div class="sec"><h2>Peta karya</h2><p class="lead">Ketuk satu kotak untuk melihat daftar karyanya.</p>
+  <div class="sec"><h2>Peta Distribusi Karya</h2><p class="lead">Pilih kombinasi kategori dan klaster untuk menyaring karya.</p>
     <div class="card"><div class="matrix">
       <span></span>${kls.map((k) => `<span class="h">${KLASTER[k]}</span>`).join("")}
       ${kats
@@ -1503,13 +1524,13 @@ function viewBeranda() {
           .pick()
           .map((d) => workCard(d))
           .join("")}</div></div>`
-      : `<div class="sec"><h2>Mulai dari mana?</h2><p class="lead">Pilih peran di atas untuk sorotan karya yang sesuai, atau langsung jelajahi seluruh karya.</p><button class="btn" data-go="jelajah">Jelajahi 60 karya</button></div>`
+      : `<div class="sec"><h2>Mulai Eksplorasi</h2><p class="lead">Pilih peran di atas untuk rekomendasi khusus, atau langsung telusuri seluruh karya pameran.</p><button class="btn" data-go="jelajah">Jelajahi 60 Karya</button></div>`
   }
 
-  <div class="sec"><h2>Karya per fakultas</h2>
+  <div class="sec"><h2>Distribusi Fakultas</h2><p class="lead">Jumlah karya terdaftar dari masing-masing fakultas.</p>
     <div class="card"><div class="bars">${fak.map(([n, v]) => `<button class="bar" data-filter='${JSON.stringify({ fak: n === "Belum tercantum" ? "-" : n })}'><span class="t">${esc(n.replace("Fakultas ", ""))}</span><span class="tr"><i style="width:${(v / maxF) * 100}%"></i></span><span class="v num">${v}</span></button>`).join("")}</div></div></div>
 
-  <div class="sec"><h2>Sumber pendanaan</h2>
+  <div class="sec"><h2>Sumber Pendanaan</h2><p class="lead">Komposisi pendanaan internal dan hibah eksternal.</p>
     <div class="card"><div class="bars">${Object.entries(src)
       .map(
         ([n, v]) =>
@@ -1517,64 +1538,64 @@ function viewBeranda() {
       )
       .join("")}</div></div></div>
 
-  <div class="sec"><h2>Kehadiran hari ini</h2>
-    <div class="card"><div class="big"><b class="num">${S.att.total}</b><span>${S.att.demo ? "pengunjung (data contoh)" : "pengunjung tercatat"}</span></div>
-    <div class="row" style="margin-top:12px">${S.checked ? "" : '<button class="btn gold" data-act="gate">Daftar hadir</button>'}<button class="btn ghost" data-go="hadir">Lihat rincian</button></div></div></div>`;
+  <div class="sec"><h2>Presensi Pengunjung</h2><p class="lead">Catatan kehadiran pengunjung pameran hari ini.</p>
+    <div class="card"><div class="big"><b class="num">${S.att.total}</b><span>${S.att.demo ? "Pengunjung (data contoh)" : "Pengunjung tercatat"}</span></div>
+    <div class="row" style="margin-top:12px">${S.checked ? "" : '<button class="btn gold" data-act="gate">Daftar Hadir</button>'}<button class="btn ghost" data-go="hadir">Lihat Rincian</button></div></div></div>`;
 }
 function journeyCard() {
   const seen = store.get("dilihat", []).length;
   const steps = [
     {
       ok: S.checked,
-      t: "Daftar hadir",
+      t: "Daftar Hadir",
       s: S.checked
-        ? "Anda sudah tercatat hadir"
-        : "Langkah pertama, hanya satu kali",
+        ? "Kehadiran Anda sudah tercatat"
+        : "Presensi pengunjung satu kali",
       a: 'data-act="gate"',
       b: "Daftar",
     },
     {
       ok: seen > 0,
-      t: "Jelajahi karya",
+      t: "Jelajahi Karya",
       s: seen
-        ? seen + " karya sudah Anda buka"
-        : "Cari menurut bidang, SDGs, atau kata kunci",
+        ? seen + " karya sudah dibuka"
+        : "Eksplorasi 60 riset & pengabdian",
       a: 'data-go="jelajah"',
       b: "Jelajah",
     },
     {
       ok: Object.keys(S.stamp).length >= BOOTH_N,
-      t: "Pindai QR " + BOOTH_N + " booth",
+      t: "Pindai QR Booth",
       s:
         Object.keys(S.stamp).length +
         " dari " +
         BOOTH_N +
-        " booth · syarat undian " +
+        " booth · Syarat undian " +
         CONFIG.undian.hadiah,
       a: 'data-act="scan"',
       b: "Pindai",
     },
     {
       ok: S.rute.length > 0,
-      t: "Susun rute kunjungan",
+      t: "Susun Rute Kunjungan",
       s: S.rute.length
         ? S.rute.length + " karya di rute Anda"
-        : "Simpan karya yang ingin ditemui, lihat posisinya di denah",
+        : "Tandai karya dan pantau di denah",
       a: 'data-go="rute"',
       b: "Rute",
     },
     {
       ok: S.fbDone,
-      t: "Beri umpan balik",
+      t: "Beri Umpan Balik",
       s: S.fbDone
-        ? "Terima kasih atas masukan Anda"
-        : "Sebelum pulang, empat isian singkat",
+        ? "Terima kasih atas penilaian Anda"
+        : "Evaluasi singkat 1 menit",
       a: 'data-go="umpan"',
       b: "Isi",
     },
   ];
   const next = steps.findIndex((x) => !x.ok);
-  return `<div class="card"><h2 style="font-size:16px;margin-bottom:10px">Alur kunjungan Anda</h2><ol class="jr">${steps.map((x, i) => `<li class="${x.ok ? "done" : i === next ? "next" : ""}"><span class="n">${x.ok ? "✓" : i + 1}</span><span><span class="t">${x.t}</span><br><span class="s">${x.s}</span></span><button class="btn sm ${i === next ? "gold" : "ghost"}" ${x.a}>${x.ok ? "Buka" : x.b}</button></li>`).join("")}</ol></div>`;
+  return `<div class="card"><h2 style="font-size:16px;margin-bottom:10px">Alur Kunjungan Anda</h2><ol class="jr">${steps.map((x, i) => `<li class="${x.ok ? "done" : i === next ? "next" : ""}"><span class="n">${x.ok ? "✓" : i + 1}</span><span><span class="t">${x.t}</span><br><span class="s">${x.s}</span></span><button class="btn sm ${i === next ? "gold" : "ghost"}" ${x.a}>${x.ok ? "Buka" : x.b}</button></li>`).join("")}</ol></div>`;
 }
 function viewUmpan() {
   const seen = store.get("dilihat", []).length;
@@ -3113,9 +3134,9 @@ function stampCard() {
   const n = Object.keys(S.stamp).length,
     done = store.get("undian", null);
   return `<div class="card stamp"><div class="row" style="justify-content:space-between;flex-wrap:nowrap;align-items:baseline"><h2 style="font-size:16px">Undian ${esc(CONFIG.undian.hadiah)}</h2><b class="num" style="font-size:24px;color:var(--ok)">${n}/${BOOTH_N}</b></div>
-    <p style="margin:4px 0 0;color:var(--mut);font-size:14px">Pindai QR di bawah poster setiap booth. Pengunjung yang melengkapi ${BOOTH_N} booth berhak ikut undian.</p>
+    <p style="margin:4px 0 0;color:var(--mut);font-size:14px">Pindai QR booth untuk kumpulkan stempel. Lengkapi ${BOOTH_N} booth untuk berhak ikut undian doorprize.</p>
     <div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="${BOOTH_N}" aria-valuenow="${n}" aria-label="Booth dikunjungi"><i style="width:${(n / BOOTH_N) * 100}%"></i></div>
-    <div class="row"><button class="btn gold" data-act="scan">Pindai QR booth</button>${n >= BOOTH_N && !done ? '<button class="btn" data-act="undian">Daftar undian</button>' : ""}${done ? `<button class="btn ghost" data-act="undian">Bukti undian</button>` : ""}</div></div>`;
+    <div class="row"><button class="btn gold" data-act="scan">Pindai QR Booth</button>${n >= BOOTH_N && !done ? '<button class="btn" data-act="undian">Daftar Undian</button>' : ""}${done ? `<button class="btn ghost" data-act="undian">Bukti Undian</button>` : ""}</div></div>`;
 }
 /* kamera */
 let scanState = null;
