@@ -1487,11 +1487,12 @@ function workCard(d, opt = {}) {
 }
 
 /* ---------- Beranda (Decluttered & Gamifikasi Reward) ---------- */
-function questCard() {
+function questCard(opt = {}) {
   const n = Object.keys(S.stamp).length;
   const target = BOOTH_N; // 60
   const pct = Math.min(100, Math.round((n / target) * 100));
   const done = store.get("undian", null);
+  const inJelajah = !!opt.inJelajah;
 
   // Gamifikasi 5 Level (Bite-sized Sprints @ 15 Booths - Goal-Gradient Effect)
   let level = 1;
@@ -1582,7 +1583,7 @@ function questCard() {
     </div>
 
     <div class="quest-actions">
-      <button class="btn sm ghost" data-go="jelajah">Jelajah Booth</button>
+      ${!inJelajah ? '<button class="btn sm ghost" data-go="jelajah">Jelajah Booth</button>' : '<button class="btn sm ghost" data-go="denah">Lihat Denah</button>'}
       <button class="btn sm gold" data-act="scan">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-right:4px"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path></svg>
         Pindai QR
@@ -3378,8 +3379,9 @@ function recordStamp(raw) {
   store.set("lastStamp", Date.now());
   Undi.sync();
   renderMapSafe();
+  if ($("#stampj")) $("#stampj").innerHTML = questCard({ inJelajah: true });
   const n = Object.keys(S.stamp).length;
-  const target = (CONFIG.undian && CONFIG.undian.target) || 10;
+  const target = BOOTH_N;
   return {
     ok: true,
     p,
@@ -3388,12 +3390,12 @@ function recordStamp(raw) {
       nama +
       " tercatat! Total " +
       n +
-      " stempel" +
+      "/" +
+      target +
+      " booth" +
       (n >= target
-        ? n >= BOOTH_N
-          ? " · Lengkap seluruh 60 booth!"
-          : " · Kupon Undian Terbuka!"
-        : " (butuh " + (target - n) + " lagi untuk undian)"),
+        ? " · Lengkap seluruh 60 booth! Kupon Undian Terbuka!"
+        : " (Tinggal " + (target - n) + " booth lagi ke undian)"),
   };
 }
 function renderMapSafe() {
@@ -3411,12 +3413,7 @@ function handleDeepCode(raw, fromStart) {
   }, 300);
 }
 function stampCard() {
-  const n = Object.keys(S.stamp).length,
-    done = store.get("undian", null);
-  return `<div class="card stamp"><div class="row" style="justify-content:space-between;flex-wrap:nowrap;align-items:baseline"><h2 style="font-size:16px">Undian ${esc(CONFIG.undian.hadiah)}</h2><b class="num" style="font-size:24px;color:var(--ok)">${n}/${BOOTH_N}</b></div>
-    <p style="margin:4px 0 0;color:var(--mut);font-size:14px">Pindai QR booth untuk kumpulkan stempel. Lengkapi ${BOOTH_N} booth untuk berhak ikut undian doorprize.</p>
-    <div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="${BOOTH_N}" aria-valuenow="${n}" aria-label="Booth dikunjungi"><i style="width:${(n / BOOTH_N) * 100}%"></i></div>
-    <div class="row"><button class="btn gold" data-act="scan">Pindai QR</button>${n >= BOOTH_N && !done ? '<button class="btn" data-act="undian">Daftar Undian</button>' : ""}${done ? `<button class="btn ghost" data-act="undian">Bukti Undian</button>` : ""}</div></div>`;
+  return questCard({ inJelajah: true });
 }
 /* kamera */
 let scanState = null;
@@ -3526,11 +3523,11 @@ function scanResult(r) {
   try {
     navigator.vibrate && navigator.vibrate(r.ok ? [60] : [30, 40, 30]);
   } catch (e) {}
-  const target = (CONFIG.undian && CONFIG.undian.target) || 10;
+  const target = BOOTH_N;
   const p = $("#sc-p");
   if (p)
     p.textContent =
-      "Stempel " + Object.keys(S.stamp).length + " dari " + target + " (Target Kupon)";
+      "Stempel " + Object.keys(S.stamp).length + " dari " + target + " booth";
   if (r.ok && r.n >= target && !store.get("undian", null)) {
     closeScan();
     setTimeout(openUndian, 300);

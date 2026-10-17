@@ -164,7 +164,15 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 
 ---
 
+### Milestone 17: Kartu Misi Reusable Berwarna Biru untuk #beranda dan #jelajah
+- [x] Refaktor komponen kartu misi undian menjadi fungsi tunggal yang dapat digunakan kembali (*reusable component* `questCard(opt)`), menghapus duplikasi markup dan hardcoded yang sebelumnya ada di `stampCard()`.
+- [x] Terapkan warna gradasi biru royal pekat (`linear-gradient(145deg, #071c46 0%, #0d347f 50%, #15459e 100%)`) pada `.quest-card`, dengan aksen emas murni (`#f5a800`) dan tipografi kontras tinggi (`#ffffff` dan `#ffd36b`).
+- [x] Sinkronisasi kedua halaman: `#beranda` dan `#jelajah` kini memanggil komponen yang sama secara konsisten (`questCard({ inJelajah: true })`), hemat memori, mudah di-maintain, dan live-sync saat stempel bertambah.
+- [x] Update visual dan styles pada `mockup-beranda-gamifikasi.html`.
+
+---
+
 ### Milestone 7: QA Polish, Performance, & Accessibility Audit
 - [x] Pengujian visual pada resolusi mobile sempit (360px), standar (390px - 412px), dan desktop.
-- [x] Verifikasi kontras teks WCAG AAA pada latar putih bersih dan dock aktif.
+- [x] Verifikasi kontras teks WCAG AAA pada kartu biru dan dock aktif.
 - [x] Audit performa: zero layout shift (CLS 0) dan transisi responsif 60fps.
