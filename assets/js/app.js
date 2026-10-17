@@ -2240,7 +2240,8 @@ async function submitForm(ev) {
   const btn = ev.target.querySelector("button[type=submit]");
   btn.disabled = true;
   try {
-    await Att.submit({ nama, peran, asal, t: new Date().toISOString() });
+    const uid = Undi.id();
+    await Att.submit({ nama, peran, asal, uid, t: new Date().toISOString() });
     const wasGate = !!$(".gate");
     S.checked = true;
     store.set("hadir", true);
@@ -2282,8 +2283,9 @@ function openFeedback() {
     `<div class="scrim" data-close="1"><form class="sheet" id="ff" role="dialog" aria-modal="true" aria-labelledby="ut" novalidate>
     <button type="button" class="x" data-close="1" aria-label="Tutup">×</button>
     <h2 id="ut">Umpan balik</h2>
-    <p style="color:var(--mut);margin:6px 0 14px;font-size:14px">Tidak perlu nama. Hanya penilaian bintang yang wajib.</p>
+    <p style="color:var(--mut);margin:6px 0 14px;font-size:14px">Masukan Anda sangat berharga bagi evaluasi pameran dan tindak lanjut karya.</p>
     <div class="kv" style="margin-top:0;gap:14px">
+      <label class="f">Nama Anda<input class="txt" id="ff-nama" autocomplete="name" placeholder="Nama Anda" value="${esc(store.get("nama", ""))}" required></label>
       <div><span class="k">Anda hadir sebagai</span><div class="roles" role="radiogroup" aria-label="Peran" style="margin-top:6px">${Object.entries(
         PERAN,
       )
@@ -2308,11 +2310,18 @@ async function submitFeedback(ev) {
     e.hidden = false;
   };
   if (!S.nilai) return err("Pilih penilaian 1 sampai 5.");
+  const namaInput = $("#ff-nama") ? $("#ff-nama").value.trim() : "";
+  const nama = namaInput || store.get("nama", "") || "Anonim";
+  if (namaInput) store.set("nama", namaInput);
+
   const row = {
-    peran: S.peran || "",
+    nama: nama,
+    peran: S.peran || store.get("peran", "") || "umum",
+    asal: store.get("asal", "-"),
     nilai: S.nilai,
     karya: +($("#fk").value || 0) || 0,
     komentar: ($("#fc").value || "").trim().slice(0, 500),
+    uid: Undi.id(),
     t: new Date().toISOString(),
   };
   const btn = ev.target.querySelector("button[type=submit]");
@@ -2954,7 +2963,7 @@ const Undi = {
     if (S.att.uid) return S.att.uid;
     let v = store.get("lid", "");
     if (!v) {
-      v = Math.random().toString(36).slice(2, 12);
+      v = "UP60-" + Math.random().toString(36).slice(2, 8).toUpperCase();
       store.set("lid", v);
     }
     return v;
@@ -3049,6 +3058,7 @@ async function submitUndian(ev) {
           boothCount: Object.keys(S.stamp).length,
           peran: S.peran || "",
           asal: store.get("asal", ""),
+          uid: Undi.id(),
         }),
       });
     } catch (e) {}
