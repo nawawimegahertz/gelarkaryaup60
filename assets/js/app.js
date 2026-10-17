@@ -1996,7 +1996,7 @@ function promptPanitiaPin(onSuccess, onCancel) {
     <p style="color:var(--mut);margin:6px 0 14px;font-size:14px">Fitur cetak QR booth dan undian doorprize hanya dapat diakses oleh panitia pelaksana.</p>
     <form id="pinf" novalidate>
       <label class="f">PIN Panitia
-        <input class="txt" id="pin-val" type="password" inputmode="numeric" placeholder="Masukkan PIN (Default: 1966)" autocomplete="off" required>
+        <input class="txt" id="pin-val" type="password" inputmode="numeric" placeholder="Masukkan PIN" autocomplete="on" required>
       </label>
       <p id="pin-err" style="color:var(--err);margin:8px 0 0;font-size:13.5px" hidden></p>
       <div class="row" style="margin-top:16px">
