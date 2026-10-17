@@ -1258,7 +1258,7 @@ const ink = (hex) => {
   return 0.299 * r + 0.587 * g + 0.114 * b > 170 ? "#1a1a1a" : "#fff";
 };
 const sdgChip = (n) =>
-  `<img class="sdg" src="assets/img/sdgs_logo/sdg-${n}.png" alt="SDGs ${n}: ${esc(SDGINFO[n]?.[0] || "")}" title="SDGs ${n}: ${esc(SDGINFO[n]?.[0] || "")}" width="26" height="26" loading="lazy" />`;
+  `<img class="sdg" src="assets/img/sdgs_logo/sdg-${n}.webp" alt="SDGs ${n}: ${esc(SDGINFO[n]?.[0] || "")}" title="SDGs ${n}: ${esc(SDGINFO[n]?.[0] || "")}" width="26" height="26" loading="lazy" />`;
 const terapan = (d) =>
   d.hibah === "Hilirisasi" ||
   d.hibah === "RIIM" ||
@@ -1683,7 +1683,7 @@ function viewSdgs() {
       const v = c[n] || 0;
       return `<button class="sdgt ${v ? "" : "zero"}" ${v ? `data-filter='${JSON.stringify({ sdg: n })}'` : "disabled"}>
         <div class="sdgt-head">
-          <img src="assets/img/sdgs_logo/sdg-${n}.png" alt="SDGs ${n}: ${esc(l)}" class="sdgt-icon" width="52" height="52" loading="lazy" />
+          <img src="assets/img/sdgs_logo/sdg-${n}.webp" alt="SDGs ${n}: ${esc(l)}" class="sdgt-icon" width="52" height="52" loading="lazy" />
           <span class="c">${v ? v + " karya" : "0 karya"}</span>
         </div>
         <div class="sdgt-body">
