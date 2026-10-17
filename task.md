@@ -176,6 +176,12 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 - [x] Buat deskripsi tantangan jauh lebih ringkas, padat aksi (*action-oriented*), dan hilangkan pengulangan matematika kuota sisa booth yang sudah disampaikan di sprint badge.
 - [x] Sinkronisasi nama milestone checkpoint titik stempel (15 Pantang Nyerah, 30 Panutan, 45 Hampir Juara, 60 Undian 🏆) di `assets/js/app.js` dan `mockup-beranda-gamifikasi.html`.
 
+### Milestone 19: Penyelarasan Tipografi & Warna Teks Placeholder Formulir
+- [x] Identifikasi akar masalah: ukuran `16px` dari deklarasi formulir global sebelumnya terwarisi (*inherited*) ke `::placeholder` tanpa aturan pseudo-element spesifik, sehingga teks placeholder tampak lebih besar daripada label (`13px-14px`) dan terlalu tebal/mencolok.
+- [x] Terapkan aturan standar industri (*modern UI/UX best practices*): `::placeholder` dengan ukuran proporsional (`13.5px`), bobot normal (`font-weight: 400`), dan warna redup/subtle (`#94a3b8`) dengan `opacity: 1`.
+- [x] Berikan padding nyaman (`10px 14px`) dan `line-height: 1.5` pada `textarea.txt` dan `input.txt` di bottom sheet (Presensi, Feedback, Undian, PIN, Pencarian) agar teks placeholder bernapas lega dan tidak mepet tepi atas-kiri.
+- [x] Pastikan hierarki visual jelas: Label (tegas & jelas) > Nilai Input (kontras tinggi saat diketik) > Placeholder (redup & sebagai penunjuk).
+
 ---
 
 ### Milestone 7: QA Polish, Performance, & Accessibility Audit

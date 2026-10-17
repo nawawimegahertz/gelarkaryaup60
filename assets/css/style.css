@@ -139,6 +139,8 @@
   color: #10213f !important;
   border: 1.5px solid #cbd5e1 !important;
   border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 15px;
 }
 
 .sheet input.txt:focus,
@@ -152,6 +154,80 @@
   border-color: #1857c4 !important;
   box-shadow: 0 0 0 3px rgba(24, 87, 196, 0.15) !important;
   outline: none;
+}
+
+/* ==========================================================================
+   Form Placeholder Styling (Modern UI/UX: Ukuran Proporsional & Redup)
+   ========================================================================== */
+::placeholder {
+  color: #94a3b8;
+  font-size: 13.5px;
+  font-weight: 400;
+  line-height: normal;
+  opacity: 1;
+  text-overflow: ellipsis;
+  letter-spacing: normal;
+}
+
+::-webkit-input-placeholder {
+  color: #94a3b8;
+  font-size: 13.5px;
+  font-weight: 400;
+  line-height: normal;
+  opacity: 1;
+  text-overflow: ellipsis;
+  letter-spacing: normal;
+}
+
+::-moz-placeholder {
+  color: #94a3b8;
+  font-size: 13.5px;
+  font-weight: 400;
+  line-height: normal;
+  opacity: 1;
+  text-overflow: ellipsis;
+  letter-spacing: normal;
+}
+
+/* Khusus Bottom Sheet, Detail Sheet, Dialog Modal, dan Input Form */
+.sheet input::placeholder,
+.sheet textarea::placeholder,
+.detail-sheet input::placeholder,
+.detail-sheet textarea::placeholder,
+.dialog input::placeholder,
+.gate input::placeholder,
+.scan-man input::placeholder,
+.search input::placeholder,
+input.txt::placeholder,
+textarea.txt::placeholder {
+  color: #94a3b8 !important;
+  font-size: 13.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.45 !important;
+  opacity: 1 !important;
+}
+
+.sheet input::-webkit-input-placeholder,
+.sheet textarea::-webkit-input-placeholder,
+.detail-sheet input::-webkit-input-placeholder,
+.detail-sheet textarea::-webkit-input-placeholder,
+.dialog input::-webkit-input-placeholder,
+.gate input::-webkit-input-placeholder,
+.scan-man input::-webkit-input-placeholder,
+.search input::-webkit-input-placeholder,
+input.txt::-webkit-input-placeholder,
+textarea.txt::-webkit-input-placeholder {
+  color: #94a3b8 !important;
+  font-size: 13.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.45 !important;
+  opacity: 1 !important;
+}
+
+/* Adaptif Tema Gelap (hanya untuk area di luar bottom sheet putih) */
+:root[data-theme="dark"] input:not(.sheet *):not(.detail-sheet *)::placeholder,
+:root[data-theme="dark"] textarea:not(.sheet *):not(.detail-sheet *)::placeholder {
+  color: #64748b !important;
 }
 
 
@@ -1475,13 +1551,16 @@ ol.steps {
 }
 
 input.txt,
-select.txt {
+select.txt,
+textarea.txt {
   width: 100%;
   min-height: 46px;
   border: 1.5px solid var(--line);
   border-radius: 12px;
-  padding: 8px 12px;
+  padding: 10px 14px;
   background: var(--surface);
+  font-size: 15px;
+  color: var(--ink);
 }
 
 label.f {
@@ -2490,6 +2569,10 @@ textarea.txt {
   min-height: 96px;
   resize: vertical;
   font: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 10px 14px;
+  border-radius: 12px;
 }
 
 select.txt {

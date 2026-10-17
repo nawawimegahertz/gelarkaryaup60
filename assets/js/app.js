@@ -1511,23 +1511,23 @@ function questCard(opt = {}) {
     level = 4;
     levelTitle = "Level 4: Hampir Juara";
     const sisa = 60 - n;
-    sprintMsg = `🔥 Sprint Akhir: Tinggal <b>${sisa} booth lagi</b> menuju Kupon Undian!`;
+    sprintMsg = `🔥 Sprint akhir: Tinggal <b>${sisa} booth lagi</b> menuju Kupon Undian!`;
     desc = `Tinggal selangkah lagi untuk mengaktifkan kupon undian doorprize ${esc(CONFIG.undian.hadiah)}.`;
   } else if (n >= 30) {
     level = 3;
     levelTitle = "Level 3: Panutan";
     const sisa = 45 - n;
-    sprintMsg = `⚡ Separuh Tuntas! Tinggal <b>${sisa} booth lagi</b> menuju Level 4.`;
+    sprintMsg = `⚡ Separuh tuntas! Tinggal <b>${sisa} booth lagi</b> menuju Level 4.`;
     desc = `Lebih dari separuh pameran telah dijelajahi. Teruskan langkah ke babak penentuan!`;
   } else if (n >= 15) {
     level = 2;
     levelTitle = "Level 2: Pantang Nyerah";
     const sisa = 30 - n;
-    sprintMsg = `✨ Momentum Bagus! Tinggal <b>${sisa} booth lagi</b> menuju Titik Separuh (30 Booth).`;
+    sprintMsg = `✨ Momentum bagus! Tinggal <b>${sisa} booth lagi</b> menuju Titik Separuh (30 Booth).`;
     desc = `Pertahankan ritme jelajah Anda dan temukan berbagai inovasi karya menarik.`;
   } else if (n > 0) {
     const sisa = 15 - n;
-    sprintMsg = `🚀 Langkah Awal! Tinggal <b>${sisa} booth lagi</b> menuju Level 2.`;
+    sprintMsg = `🚀 Langkah awal! Tinggal <b>${sisa} booth lagi</b> menuju Level 2.`;
     desc = `Pindai QR di bawah poster setiap booth untuk kumpulkan stempel undian doorprize.`;
   }
 
@@ -1564,7 +1564,7 @@ function questCard(opt = {}) {
         <div class="quest-milestones-row">
           <div class="quest-milestone-item ${n >= 15 ? "reached" : level === 1 ? "current" : ""}">
             <span class="m-dot"></span>
-            <span>15 (Pantang Nyerah)</span>
+            <span>15 (Pemula)</span>
           </div>
           <div class="quest-milestone-item ${n >= 30 ? "reached" : level === 2 ? "current" : ""}">
             <span class="m-dot"></span>
@@ -1572,7 +1572,7 @@ function questCard(opt = {}) {
           </div>
           <div class="quest-milestone-item ${n >= 45 ? "reached" : level === 3 ? "current" : ""}">
             <span class="m-dot"></span>
-            <span>45 (Hampir Juara)</span>
+            <span>45 (Hampir)</span>
           </div>
           <div class="quest-milestone-item ${n >= 60 ? "reached" : level === 4 ? "current" : ""}">
             <span class="m-dot"></span>
