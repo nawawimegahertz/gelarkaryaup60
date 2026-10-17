@@ -8,7 +8,7 @@ Dokumen pelacak progres pengerjaan refactoring antarmuka mobile-first Gelar Kary
 - [x] **Batch 1: Sistem Tipografi & Spacing Fluid** (Selesai)
 - [x] **Batch 2: Hero Header & Bottom Navigation Bar** (Selesai)
 - [x] **Batch 3: Kartu Karya (Jelajah), Filter Sticky & Search** (Selesai)
-- [ ] **Batch 4: Modal Bottom Sheet, Denah & Scanner**
+- [x] **Batch 4: Modal Bottom Sheet, Denah & Scanner** (Selesai)
 
 ---
 
@@ -35,8 +35,8 @@ Dokumen pelacak progres pengerjaan refactoring antarmuka mobile-first Gelar Kary
 - [x] Rapikan matriks kategori dan SDG cards agar tidak berjejal di layar 360px dengan `overflow-x: auto` dan typography fluid.
 
 ### Batch 4: Modal Bottom Sheet, Denah & Scanner
-- [ ] Ubah modal dialog `.sheet` menjadi bottom sheet mobile native lengkap dengan drag handle indicator.
-- [ ] Perhalus tampilan gerbang registrasi `.gate` dan form umpan balik `.sheet`.
-- [ ] Tingkatkan kenyamanan sentuh tombol tutup ('×') dan aksi simpan/batal.
-- [ ] Rapikan denah pameran dan panduan rute di layar sempit.
-- [ ] Uji responsivitas viewfinder kamera scanner QR.
+- [x] Ubah modal dialog `.sheet` menjadi bottom sheet mobile native lengkap dengan drag handle indicator (`.sheet::before`).
+- [x] Perhalus tampilan gerbang registrasi `.gate` dan form umpan balik `.sheet`.
+- [x] Tingkatkan kenyamanan sentuh tombol tutup ('×') 40px dan aksi simpan/batal dengan safe area insets.
+- [x] Rapikan denah pameran (`.mapwrap`) dan panduan rute dengan container overscroll yang terisolasi.
+- [x] Lengkapi viewfinder kamera scanner QR dengan targeting frame dan animasi laser scanning (`scanLaser`).
