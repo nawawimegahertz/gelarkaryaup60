@@ -2155,6 +2155,23 @@ function renderDyn(focus) {
   if (!h && p)
     h = `<p style="margin:0;color:var(--mut);font-size:14px">Tidak ada isian tambahan. Ketuk tombol di bawah untuk mencatat kehadiran.</p>`;
   box.innerHTML = h;
+
+  // Isi otomatis dari riwayat localStorage
+  const savedNama = store.get("nama", ""),
+    savedAsal = store.get("asal", ""),
+    savedFak = store.get("fakultas", ""),
+    savedJenis = store.get("jenisMitra", ""),
+    savedInstansi = store.get("instansi", "");
+
+  const fa = $("#fa");
+  if (fa && (savedFak || savedAsal)) fa.value = savedFak || savedAsal;
+  const fj = $("#fj");
+  if (fj && savedJenis) fj.value = savedJenis;
+  const fi = $("#fi");
+  if (fi && savedInstansi) fi.value = savedInstansi;
+  const fn = $("#fn");
+  if (fn && savedNama) fn.value = savedNama;
+
   const b = $("#fs");
   if (b) b.hidden = !p;
   box.classList.remove("in");
@@ -2206,15 +2223,18 @@ async function submitForm(ev) {
   if (!peran) return err("Pilih peran Anda.");
   let asal = "";
   if (peran === "mahasiswa" || peran === "dosen") {
-    asal = $("#fa").value;
+    asal = $("#fa") ? $("#fa").value : "";
     if (!asal) return err("Pilih fakultas asal Anda.");
+    store.set("fakultas", asal);
   }
   if (peran === "mitra") {
-    const j = $("#fj").value,
-      n = ($("#fi").value || "").trim();
+    const j = $("#fj") ? $("#fj").value : "",
+      n = $("#fi") ? ($("#fi").value || "").trim() : "";
     if (!j) return err("Pilih jenis mitra.");
     if (!n) return err("Isi nama instansi.");
     asal = j + " - " + n;
+    store.set("jenisMitra", j);
+    store.set("instansi", n);
   }
   if ($("#fn") && !nama) return err("Isi nama Anda.");
   const btn = ev.target.querySelector("button[type=submit]");
@@ -2225,6 +2245,7 @@ async function submitForm(ev) {
     S.checked = true;
     store.set("hadir", true);
     store.set("peran", S.peran);
+    store.set("nama", nama);
     store.set("asal", asal);
     Undi.sync();
     closeLayer();
@@ -2314,6 +2335,22 @@ async function submitFeedback(ev) {
 }
 const Fb = {
   watch() {
+    if (S.att.mode === "gas-api") {
+      fetch(CONFIG.gasUrl + "?action=fbStats")
+        .then((r) => r.json())
+        .then((res) => {
+          if (res) {
+            S.fb = res;
+            if (
+              !$("#layer").innerHTML &&
+              (S.tab === "umpan" || S.tab === "beranda")
+            )
+              render(S.tab);
+          }
+        })
+        .catch(() => {});
+      return;
+    }
     if (S.att.mode === "gas") {
       google.script.run
         .withSuccessHandler((res) => {
@@ -2362,9 +2399,19 @@ const Fb = {
         await fetch(CONFIG.gasUrl, {
           method: "POST",
           mode: "no-cors",
-          body: JSON.stringify({ action: "attendance", ...row }),
+          body: JSON.stringify({ action: "feedback", ...row }),
         });
-        setTimeout(() => this.pollGasApi(), 1200);
+        setTimeout(() => {
+          fetch(CONFIG.gasUrl + "?action=fbStats")
+            .then((r) => r.json())
+            .then((res) => {
+              if (res) {
+                S.fb = res;
+                renderStats();
+              }
+            })
+            .catch(() => {});
+        }, 1200);
       } catch (e) {}
       return;
     }
@@ -2989,6 +3036,22 @@ async function submitUndian(ev) {
           });
       });
     } catch (e) {}
+  } else if (S.att.mode === "gas-api") {
+    try {
+      await fetch(CONFIG.gasUrl, {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify({
+          action: "undian",
+          nama,
+          wa,
+          kode,
+          boothCount: Object.keys(S.stamp).length,
+          peran: S.peran || "",
+          asal: store.get("asal", ""),
+        }),
+      });
+    } catch (e) {}
   } else {
     await Undi.sync();
     const C = CONFIG.undian;
@@ -3038,6 +3101,30 @@ function undianPanel() {
     <div class="row" style="margin-top:12px"><button class="btn ghost" data-act="qrbooth">QR booth untuk dicetak</button>${adm ? '<button class="btn gold" data-act="draw">Undi pemenang</button>' : ""}</div></div></div>`;
 }
 function drawWinner() {
+  if (S.att.mode === "gas-api") {
+    fetch(CONFIG.gasUrl + "?action=draw")
+      .then((r) => r.json())
+      .then((res) => {
+        if (!res || res.status !== "success") {
+          toast(
+            res && res.message
+              ? res.message
+              : "Belum ada peserta undian yang terdaftar.",
+          );
+          return;
+        }
+        const w = res.winner;
+        $("#layer").innerHTML =
+          `<div class="scrim" data-close="1"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="wt"><button class="x" data-close="1" aria-label="Tutup">×</button><h2 id="wt">Pemenang undian</h2>
+          <div class="loc" style="margin-top:14px"><b>★</b><span><b style="font-size:20px;color:#FFD36B">${esc(w.nama)}</b><br>${esc(w.wa)} · ${esc(w.kode)}<br>${esc(w.asal || "")}</span></div>
+          <p style="color:var(--mut);font-size:14px">Pemenang diundi acak langsung dari sheet "Undian". Panggil nama pemenang di aula dan cocokkan kodenya.</p>
+          <div class="row"><button class="btn gold" data-act="draw">Undi lagi</button></div></div></div>`;
+      })
+      .catch(() =>
+        toast("Gagal mengundi. Periksa koneksi ke Google Apps Script."),
+      );
+    return;
+  }
   if (S.att.mode === "gas") {
     google.script.run
       .withSuccessHandler((res) => {
