@@ -6,7 +6,7 @@ Dokumen pelacak progres pengerjaan refactoring antarmuka mobile-first Gelar Kary
 
 ## 📌 Status Keseluruhan
 - [x] **Batch 1: Sistem Tipografi & Spacing Fluid** (Selesai)
-- [ ] **Batch 2: Hero Header & Bottom Navigation Bar**
+- [x] **Batch 2: Hero Header & Bottom Navigation Bar** (Selesai)
 - [ ] **Batch 3: Kartu Karya (Jelajah), Filter Sticky & Search**
 - [ ] **Batch 4: Modal Bottom Sheet, Denah & Scanner**
 
@@ -22,11 +22,11 @@ Dokumen pelacak progres pengerjaan refactoring antarmuka mobile-first Gelar Kary
 - [x] Validasi kontras teks gelap/terang dan keterbacaan di layar kecil (360px).
 
 ### Batch 2: Hero Header & Bottom Navigation Bar
-- [ ] Redesain layout `.hero .wrap` menjadi mobile-first stack yang ringkas.
-- [ ] Format counter kartu `.stat` agar seimbang (tidak ada kartu melompong ganjil).
-- [ ] Buat navigasi bawah `.tabs` model floating dock dengan touch target min 48px dan indikator pill aktif.
-- [ ] Optimalkan touch target kartu peran `.roles` (Dosen, Mahasiswa, Mitra, Umum).
-- [ ] Tambahkan animasi mikro transisi aktif yang halus.
+- [x] Redesain layout `.hero .wrap` menjadi mobile-first stack yang ringkas.
+- [x] Format counter kartu `.stat` agar seimbang (tidak ada kartu melompong ganjil, 2x2 + 1 featured live attendance card).
+- [x] Buat navigasi bawah `.tabs` model floating dock dengan touch target min 48px dan indikator pill aktif.
+- [x] Optimalkan touch target kartu peran `.roles` (Dosen, Mahasiswa, Mitra, Umum) dalam grid 2x2 mobile.
+- [x] Tambahkan animasi mikro transisi aktif yang halus (`livePulse`, active scale, active indicators).
 
 ### Batch 3: Kartu Karya (Jelajah), Filter Sticky & Search
 - [ ] Redesain kartu katalog karya (`.item` & `.card`): hierarki badge, judul, peneliti, dan tombol aksi.
