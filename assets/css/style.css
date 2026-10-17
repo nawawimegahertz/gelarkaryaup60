@@ -1017,18 +1017,19 @@ main {
 }
 
 .seg {
-  --seg-outer-radius: var(--tools-inner-radius, 13px);
+  --seg-outer-radius: 14px;
   --seg-pad: 4px;
-  /* Aturan Emas: inner radius = outer radius - [padding / 2] = 13px - 2px = 11px */
+  /* Aturan Emas: inner radius = outer radius - [padding / 2] = 14px - 2px = 12px */
   --seg-inner-radius: calc(
     var(--seg-outer-radius) - (var(--seg-pad) / 2)
-  ); /* 11px */
+  ); /* 12px */
 
   display: flex;
-  gap: 4px;
+  gap: 6px;
   background: var(--tint);
   padding: var(--seg-pad);
   border-radius: var(--seg-outer-radius);
+  border: 1px solid var(--line);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -1041,19 +1042,24 @@ main {
 
 .seg button {
   flex: 1 0 auto;
-  min-width: 68px;
+  min-width: 72px;
   border: 0;
   background: transparent;
-  border-radius: var(--seg-inner-radius, 11px);
-  min-height: 40px;
+  border-radius: var(--seg-inner-radius, 12px);
+  min-height: 42px;
   font-weight: 700;
   font-size: var(--text-xs);
-  padding: 6px 12px;
+  padding: 8px 14px;
   color: var(--mut);
   cursor: pointer;
   touch-action: manipulation;
   scroll-snap-align: start;
-  transition: all 0.15s ease;
+  transition: all 0.16s ease;
+}
+
+.seg button:hover {
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.45);
 }
 
 .seg button:active {
@@ -1064,7 +1070,7 @@ main {
   background: var(--surface);
   color: var(--primary);
   font-weight: 800;
-  box-shadow: 0 2px 6px rgba(10, 42, 102, 0.12);
+  box-shadow: 0 2px 8px rgba(10, 42, 102, 0.1), 0 1px 2px rgba(10, 42, 102, 0.04);
 }
 
 .sels {
@@ -1478,11 +1484,10 @@ label.f {
 }
 
 .kv .k {
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
-  color: var(--mut);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  color: var(--ink);
+  letter-spacing: -0.01em;
 }
 
 .kv .hi {
@@ -1841,11 +1846,10 @@ label.f {
 }
 
 .sheet.detail-sheet .info-card-label {
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
   color: var(--mut);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  letter-spacing: -0.01em;
 }
 
 .sheet.detail-sheet .info-card-content {

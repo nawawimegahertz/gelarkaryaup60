@@ -2376,8 +2376,8 @@ function makeQR() {
   });
 }
 function formFields(gate) {
-  return `<div><span class="k" style="font-size:12px;font-weight:700;color:var(--mut);letter-spacing:.04em;text-transform:uppercase">Anda datang sebagai</span>
-        <div class="roles" id="fr" role="radiogroup" aria-label="Peran" style="margin-top:6px">${Object.entries(
+  return `<div><span class="k" style="font-size:12.5px;font-weight:700;color:var(--ink);letter-spacing:0.01em;">Anda Datang Sebagai</span>
+        <div class="roles" id="fr" role="radiogroup" aria-label="Peran" style="margin-top:8px">${Object.entries(
           PERAN,
         )
           .map(
@@ -2387,7 +2387,7 @@ function formFields(gate) {
           .join("")}</div></div>
       <div id="dyn" class="kv" style="margin-top:0;gap:14px" aria-live="polite"></div>
       <p id="fe" style="color:var(--err);margin:0;font-size:14px" role="alert" hidden></p>
-      <button class="btn gold" type="submit" id="fs" hidden>Catat kehadiran</button>`;
+      <button class="btn gold" type="submit" id="fs" hidden>Catat Kehadiran</button>`;
 }
 const opts = (arr, ph) =>
   `<option value="">${ph}</option>` +
@@ -2399,11 +2399,11 @@ function renderDyn(focus) {
     needName = S.att.mode !== "db";
   let h = "";
   if (p === "mahasiswa" || p === "dosen")
-    h += `<label class="f">Fakultas asal<select class="txt" id="fa" required>${opts(CONFIG.fakultas, "Pilih fakultas")}</select></label>`;
+    h += `<label class="f">Fakultas Asal<select class="txt" id="fa" required>${opts(CONFIG.fakultas, "Pilih fakultas")}</select></label>`;
   else if (p === "mitra")
-    h += `<label class="f">Jenis mitra<select class="txt" id="fj" required>${opts(CONFIG.jenisMitra, "Pilih jenis mitra")}</select></label><label class="f">Nama instansi<input class="txt" id="fi" autocomplete="organization" required></label>`;
+    h += `<label class="f">Jenis Mitra<select class="txt" id="fj" required>${opts(CONFIG.jenisMitra, "Pilih jenis mitra")}</select></label><label class="f">Nama Instansi<input class="txt" id="fi" autocomplete="organization" required></label>`;
   if (needName)
-    h += `<label class="f">${p === "mitra" ? "Nama Anda" : "Nama"}<input class="txt" id="fn" autocomplete="name" required></label>`;
+    h += `<label class="f">${p === "mitra" ? "Nama Anda" : "Nama Lengkap"}<input class="txt" id="fn" autocomplete="name" required></label>`;
   if (!h && p)
     h = `<p style="margin:0;color:var(--mut);font-size:14px">Tidak ada isian tambahan. Ketuk tombol di bawah untuk mencatat kehadiran.</p>`;
   box.innerHTML = h;
@@ -2437,12 +2437,33 @@ function renderDyn(focus) {
 }
 function openForm() {
   lastFocus = document.activeElement;
-  $("#layer").innerHTML =
-    `<div class="scrim" data-close="1"><form class="sheet" id="hf" role="dialog" aria-modal="true" aria-labelledby="ft" novalidate>
-    <button type="button" class="x" data-close="1" aria-label="Tutup">×</button>
-    <h2 id="ft">Daftar hadir</h2>
-    <p style="color:var(--mut);margin:6px 0 14px;font-size:14px">Untuk mencatat pengunjung tambahan atau mengganti peran. Isian menyesuaikan peran yang dipilih.</p>
-    <div class="kv" style="margin-top:0;gap:14px">${formFields(false)}</div></form></div>`;
+  $("#layer").innerHTML = `
+    <div class="scrim" data-close="1">
+      <form class="sheet detail-sheet" id="hf" role="dialog" aria-modal="true" aria-labelledby="ft" novalidate style="max-height:90vh;">
+        <div class="sheet-handle-bar"></div>
+        <div class="sheet-top-bar">
+          <div class="sheet-badge-group">
+            <span class="tag-pill"><i class="dot"></i>Presensi</span>
+            <span class="tag-panel">Daftar Hadir</span>
+          </div>
+          <button type="button" class="close-btn" data-close="1" aria-label="Tutup Dialog">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="sheet-scroll-body">
+          <div class="hero-card">
+            <h2 id="ft" class="hero-title">Presensi Pengunjung</h2>
+            <p style="color:var(--mut);margin:0;font-size:13.5px;line-height:1.5">Untuk mencatat pengunjung tambahan atau mengganti peran. Isian menyesuaikan peran yang dipilih.</p>
+          </div>
+          <div class="info-card">
+            <div class="kv" style="margin-top:0;gap:14px">${formFields(false)}</div>
+          </div>
+        </div>
+      </form>
+    </div>`;
   renderDyn(false);
   const first = $("#fr button");
   if (first) first.focus();
@@ -2522,7 +2543,7 @@ async function submitForm(ev) {
 function fbCard() {
   const f = S.fb;
   return `<div class="sec"><h2>Umpan balik pameran</h2><div class="card">
-    <p style="margin:0 0 12px;color:var(--mut);font-size:14.5px">Empat isian singkat. Masukan Anda dipakai panitia untuk menilai pameran dan menindaklanjuti karya yang diminati.</p>
+    <p style="margin:0 0 12px;color:var(--mut);font-size:14.5px">Masukan singkat Anda dipakai panitia untuk menilai penyelenggaraan pameran dan apresiasi karya.</p>
     ${f.n ? `<div class="big" style="margin-bottom:12px"><b class="num" style="font-size:40px">${f.avg.toFixed(1).replace(".", ",")}</b><span>rata-rata dari ${f.n} penilaian (skala 5)</span></div>` : ""}
     <div class="row">${S.fbDone ? '<span class="added">Umpan balik Anda sudah terkirim</span>' : ""}<button class="btn ${S.fbDone ? "ghost" : "gold"}" data-act="umpan">${S.fbDone ? "Kirim lagi" : "Beri umpan balik"}</button></div>
   </div></div>`;
@@ -2530,29 +2551,87 @@ function fbCard() {
 const NILAI = ["Kurang", "Cukup", "Baik", "Sangat baik", "Luar biasa"];
 function openFeedback() {
   lastFocus = document.activeElement;
-  S.nilai = 0;
-  $("#layer").innerHTML =
-    `<div class="scrim" data-close="1"><form class="sheet" id="ff" role="dialog" aria-modal="true" aria-labelledby="ut" novalidate>
-    <button type="button" class="x" data-close="1" aria-label="Tutup">×</button>
-    <h2 id="ut">Umpan balik</h2>
-    <p style="color:var(--mut);margin:6px 0 14px;font-size:14px">Masukan Anda sangat berharga bagi evaluasi pameran dan tindak lanjut karya.</p>
-    <div class="kv" style="margin-top:0;gap:14px">
-      <label class="f">Nama Anda<input class="txt" id="ff-nama" autocomplete="name" placeholder="Nama Anda" value="${esc(store.get("nama", ""))}" required></label>
-      <div><span class="k">Anda hadir sebagai</span><div class="roles" role="radiogroup" aria-label="Peran" style="margin-top:6px">${Object.entries(
-        PERAN,
-      )
-        .map(
-          ([k, p]) =>
-            `<button type="button" class="role" role="radio" aria-checked="${S.peran === k}" data-fr="${k}">${p.nama}</button>`,
-        )
-        .join("")}</div></div>
-      <div><span class="k">Penilaian pameran</span><div class="stars" role="radiogroup" aria-label="Penilaian 1 sampai 5" style="margin-top:6px">${NILAI.map((l, i) => `<button type="button" class="star" role="radio" aria-checked="false" data-nilai="${i + 1}"><span aria-hidden="true">${i + 1}</span><small>${l}</small></button>`).join("")}</div></div>
-      <label class="f">Karya yang paling berkesan (opsional)<select class="txt" id="fk"><option value="">Tidak memilih</option>${DATA.map((d) => `<option value="${d.no}">${d.no}. ${esc(d.judul.length > 70 ? d.judul.slice(0, 70) + "…" : d.judul)}</option>`).join("")}</select></label>
-      <label class="f">Komentar (opsional)<textarea class="txt" id="fc" maxlength="500" placeholder="Saran atau kesan Anda"></textarea></label>
-      <p id="fe" style="color:var(--err);margin:0;font-size:14px" role="alert" hidden></p>
-      <button class="btn gold" type="submit">Kirim umpan balik</button>
-    </div></form></div>`;
-  $(".stars .star").focus();
+  S.nilai = 5;
+  const currentNama = store.get("nama", "") || "Pengunjung";
+  $("#layer").innerHTML = `
+    <div class="scrim" data-close="1">
+      <form class="sheet detail-sheet" id="ff" role="dialog" aria-modal="true" aria-labelledby="ut" novalidate style="max-height:90vh;">
+        <div class="sheet-handle-bar"></div>
+
+        <div class="sheet-top-bar">
+          <div class="sheet-badge-group">
+            <span class="tag-pill">
+              <i class="dot"></i>
+              Umpan Balik
+            </span>
+            <span class="tag-panel">
+              Evaluasi Pameran
+            </span>
+          </div>
+          <button type="button" class="close-btn" data-close="1" aria-label="Tutup Dialog">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="sheet-scroll-body">
+          <div class="hero-card">
+            <h2 id="ut" class="hero-title">Beri Masukan & Evaluasi</h2>
+            <p style="color:var(--mut);margin:0;font-size:13.5px;line-height:1.5">Masukan Anda sangat berharga bagi evaluasi pameran Gelar Karya UP 60 dan pengembangan karya berikutnya.</p>
+          </div>
+
+          <!-- Hidden identification (Nama & Peran disembunyikan sesuai preferensi) -->
+          <input type="hidden" id="ff-nama" value="${esc(currentNama)}">
+
+          <!-- Rating Card (Default: 5 Luar Biasa) -->
+          <div class="info-card">
+            <div class="info-card-header">
+              <span class="info-card-label">Penilaian Pameran</span>
+            </div>
+            <p style="font-size:12.5px;color:var(--mut);margin:0 0 10px">Tingkat kepuasan Anda terhadap penyelenggaraan pameran:</p>
+            <div class="stars" role="radiogroup" aria-label="Penilaian 1 sampai 5">
+              ${NILAI.map((l, i) => {
+                const n = i + 1;
+                const isChecked = n === 5;
+                return `<button type="button" class="star" role="radio" aria-checked="${isChecked}" data-nilai="${n}"><span aria-hidden="true">${n}</span><small>${l}</small></button>`;
+              }).join("")}
+            </div>
+          </div>
+
+          <!-- Pilihan Karya & Komentar -->
+          <div class="info-card">
+            <div class="info-card-header">
+              <span class="info-card-label">Karya Berkesan & Masukan</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;margin-top:2px;">
+              <label class="f" style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:var(--ink);">
+                Karya yang Paling Berkesan (Opsional)
+                <select class="txt" id="fk" style="margin-top:2px;">
+                  <option value="">Tidak memilih</option>
+                  ${DATA.map((d) => `<option value="${d.no}">Booth #${String(d.no).padStart(2, "0")} · ${esc(d.judul.length > 60 ? d.judul.slice(0, 60) + "…" : d.judul)}</option>`).join("")}
+                </select>
+              </label>
+
+              <label class="f" style="display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:var(--ink);">
+                Komentar atau Saran (Opsional)
+                <textarea class="txt" id="fc" maxlength="500" placeholder="Tuliskan saran atau apresiasi Anda selama berkunjung..." style="margin-top:2px;min-height:90px;"></textarea>
+              </label>
+            </div>
+          </div>
+
+          <p id="fe" style="color:var(--err);margin:0;font-size:13px;padding:8px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;" role="alert" hidden></p>
+        </div>
+
+        <div class="sheet-footer-bar">
+          <button type="button" class="btn-action-map" data-close="1">Batal</button>
+          <button type="submit" class="btn-action-route" style="flex:1.4;">Kirim Umpan Balik</button>
+        </div>
+      </form>
+    </div>`;
+  const star5 = document.querySelector('.star[data-nilai="5"]');
+  if (star5) star5.focus();
 }
 async function submitFeedback(ev) {
   ev.preventDefault();
@@ -2561,9 +2640,9 @@ async function submitFeedback(ev) {
     e.textContent = m;
     e.hidden = false;
   };
-  if (!S.nilai) return err("Pilih penilaian 1 sampai 5.");
+  if (!S.nilai) S.nilai = 5;
   const namaInput = $("#ff-nama") ? $("#ff-nama").value.trim() : "";
-  const nama = namaInput || store.get("nama", "") || "Anonim";
+  const nama = namaInput || store.get("nama", "") || "Pengunjung";
   if (namaInput) store.set("nama", namaInput);
 
   const row = {
