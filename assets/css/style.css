@@ -171,6 +171,19 @@
     color: #10213f !important;
     border-color: #cbd5e1 !important;
   }
+
+  :root:not([data-theme="light"]) .sheet input.txt,
+  :root:not([data-theme="light"]) .sheet select.txt,
+  :root:not([data-theme="light"]) .sheet textarea.txt,
+  :root:not([data-theme="light"]) .sheet .txt,
+  :root:not([data-theme="light"]) .detail-sheet input.txt,
+  :root:not([data-theme="light"]) .detail-sheet select.txt,
+  :root:not([data-theme="light"]) .detail-sheet textarea.txt,
+  :root:not([data-theme="light"]) .detail-sheet .txt {
+    background: #ffffff !important;
+    color: #10213f !important;
+    border-color: #cbd5e1 !important;
+  }
 }
 
 :root[data-theme="dark"] .sheet,
@@ -223,6 +236,47 @@
   background: #f1f5f9 !important;
   border-color: #cbd5e1 !important;
   color: #334155 !important;
+}
+
+:root[data-theme="dark"] .sheet input.txt,
+:root[data-theme="dark"] .sheet select.txt,
+:root[data-theme="dark"] .sheet textarea.txt,
+:root[data-theme="dark"] .sheet .txt,
+:root[data-theme="dark"] .detail-sheet input.txt,
+:root[data-theme="dark"] .detail-sheet select.txt,
+:root[data-theme="dark"] .detail-sheet textarea.txt,
+:root[data-theme="dark"] .detail-sheet .txt {
+  background: #ffffff !important;
+  color: #10213f !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Base sheet and detail-sheet form input styling */
+.sheet input.txt,
+.sheet select.txt,
+.sheet textarea.txt,
+.sheet .txt,
+.detail-sheet input.txt,
+.detail-sheet select.txt,
+.detail-sheet textarea.txt,
+.detail-sheet .txt {
+  background: #ffffff !important;
+  color: #10213f !important;
+  border: 1.5px solid #cbd5e1 !important;
+  border-radius: 12px;
+}
+
+.sheet input.txt:focus,
+.sheet select.txt:focus,
+.sheet textarea.txt:focus,
+.sheet .txt:focus,
+.detail-sheet input.txt:focus,
+.detail-sheet select.txt:focus,
+.detail-sheet textarea.txt:focus,
+.detail-sheet .txt:focus {
+  border-color: #1857c4 !important;
+  box-shadow: 0 0 0 3px rgba(24, 87, 196, 0.15) !important;
+  outline: none;
 }
 
 
@@ -1182,9 +1236,9 @@ main {
 .sdgt-icon {
   width: 52px;
   height: 52px;
-  border-radius: var(--sdgt-inner-radius, 12px);
+  border-radius: 6px;
   object-fit: cover;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
   flex-shrink: 0;
 }
 
@@ -1912,7 +1966,7 @@ label.f {
 .sheet.detail-sheet .sdg-chip-left img {
   width: 28px;
   height: 28px;
-  border-radius: 6px;
+  border-radius: 4px;
   object-fit: cover;
   flex-shrink: 0;
 }
@@ -1963,7 +2017,7 @@ label.f {
 .sdg-header-hero img {
   width: 48px;
   height: 48px;
-  border-radius: 8px;
+  border-radius: 6px;
   object-fit: cover;
   flex-shrink: 0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
@@ -2017,6 +2071,14 @@ label.f {
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
+}
+
+.sdg-tab-btn img {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
 .sdg-tab-btn.active {

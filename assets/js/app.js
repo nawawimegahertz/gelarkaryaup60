@@ -1676,15 +1676,16 @@ function viewSdgs() {
     DATA.flatMap((d) => d.sdg),
     (x) => x,
   );
+  const activeEntries = Object.entries(SDGINFO).filter(([n]) => (c[n] || 0) > 0);
   $("#v-sdgs").innerHTML =
-    `<div class="sec" style="margin-top:0"><h2>Keterkaitan dengan SDGs</h2><p class="lead">${Object.keys(c).length} dari 17 tujuan terhubung dengan karya yang dipamerkan. Satu karya dapat terhubung ke lebih dari satu tujuan. Ketuk satu tujuan untuk melihat karyanya.</p></div>
-  <div class="sdgs">${Object.entries(SDGINFO)
+    `<div class="sec" style="margin-top:0"><h2>Keterkaitan dengan SDGs</h2><p class="lead">${activeEntries.length} dari 17 tujuan terhubung dengan 60 karya yang dipamerkan. Ketuk salah satu tujuan untuk melihat daftar booth terkait.</p></div>
+  <div class="sdgs">${activeEntries
     .map(([n, [l]]) => {
       const v = c[n] || 0;
-      return `<button class="sdgt ${v ? "" : "zero"}" ${v ? `data-filter='${JSON.stringify({ sdg: n })}'` : "disabled"}>
+      return `<button class="sdgt" data-filter='${JSON.stringify({ sdg: n })}' aria-label="SDGs ${n}: ${esc(l)}, ${v} karya">
         <div class="sdgt-head">
           <img src="assets/img/sdgs_logo/sdg-${n}.webp" alt="SDGs ${n}: ${esc(l)}" class="sdgt-icon" width="52" height="52" loading="lazy" />
-          <span class="c">${v ? v + " karya" : "0 karya"}</span>
+          <span class="c">${v} karya</span>
         </div>
         <div class="sdgt-body">
           <span class="n num">SDGs ${n}</span>
