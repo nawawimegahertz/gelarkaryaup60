@@ -1288,7 +1288,6 @@ const S = {
     counts: { dosen: 0, mahasiswa: 0, mitra: 0, umum: 0 },
     hours: {},
     total: 0,
-    demo: false,
     ready: false,
     canWrite: true,
     uid: null,
@@ -1367,8 +1366,8 @@ function renderStats() {
   const pen = DATA.filter((d) => d.kat === "Penelitian").length;
   const pkm = DATA.length - pen;
   const att = effective().total;
-  const isLive = S.att.mode !== "local" && !S.att.demo;
-  const attLabel = S.att.demo ? "Pengunjung (data contoh)" : "Pengunjung hadir hari ini";
+  const isLive = S.att.mode !== "local";
+  const attLabel = "Pengunjung hadir hari ini";
 
   $("#stats").innerHTML = `
     <div class="stats-grid">
@@ -2555,18 +2554,8 @@ function promptPanitiaPin(onSuccess, onCancel) {
 }
 
 /* ---------- Kehadiran ---------- */
-const DEMO = {
-  counts: { dosen: 41, mahasiswa: 126, mitra: 23, umum: 38 },
-  hours: { 8: 18, 9: 46, 10: 51, 11: 33, 12: 12, 13: 29, 14: 34, 15: 5, 16: 0 },
-};
 function effective() {
-  return S.att.demo
-    ? {
-        counts: DEMO.counts,
-        hours: DEMO.hours,
-        total: Object.values(DEMO.counts).reduce((a, b) => a + b, 0),
-      }
-    : S.att;
+  return S.att;
 }
 function viewHadir() {
   const a = effective(),
@@ -2585,18 +2574,18 @@ function viewHadir() {
   const url = getPublicUrl();
   $("#v-hadir").innerHTML = `
   <button class="link" data-go="beranda">← Kembali ke beranda</button>
-  <div class="sec" style="margin-top:0"><h2>Kehadiran pengunjung</h2></div>
+  <div class="sec" style="margin-top:0"><h2>Kehadiran Pengunjung</h2></div>
   <div class="card">
-    <div class="row" style="justify-content:space-between"><span class="pill">${S.att.demo ? "Data contoh" : esc(modeLbl)}</span>${S.checked ? '<span class="added">Anda sudah tercatat hadir</span>' : ""}</div>
-    <div class="big" style="margin-top:10px"><b class="num">${tot}</b><span>${S.att.demo ? "pengunjung (data contoh)" : "pengunjung tercatat"}</span></div>
-    ${tot === 0 && !S.att.demo ? `<p style="color:var(--mut);margin:8px 0 0;font-size:14px">Belum ada pengunjung tercatat. Angka bertambah saat peserta memindai QR daftar hadir.</p>` : ""}
+    <div class="row" style="justify-content:space-between"><span class="pill">${esc(modeLbl || "Sistem Presensi")}</span>${S.checked ? '<span class="added">Anda sudah tercatat hadir</span>' : ""}</div>
+    <div class="big" style="margin-top:10px"><b class="num">${tot}</b><span>pengunjung tercatat</span></div>
+    ${tot === 0 ? `<p style="color:var(--mut);margin:8px 0 0;font-size:14px">Belum ada pengunjung tercatat. Angka bertambah saat peserta memindai QR daftar hadir.</p>` : ""}
     ${Object.entries(PERAN)
       .map(
         ([k, p]) =>
           `<div class="rolebar"><span>${p.nama}</span><span class="tr"><i style="width:${((a.counts[k] || 0) / max) * 100}%;background:${p.warna}"></i></span><b class="num" style="text-align:right">${a.counts[k] || 0}</b></div>`,
       )
       .join("")}
-    <div class="row" style="margin-top:16px"><button class="btn gold" data-act="form">${S.checked ? "Isi lagi untuk orang lain" : "Isi daftar hadir"}</button>${tot === 0 || S.att.demo ? `<button class="btn ghost" data-act="demo">${S.att.demo ? "Sembunyikan contoh" : "Lihat contoh tampilan"}</button>` : ""}</div>
+    <div class="row card-actions" style="margin-top:16px;justify-content:flex-end"><button class="btn gold" data-act="form">${S.checked ? "Isi lagi untuk orang lain" : "Isi daftar hadir"}</button></div>
   </div>
   <div class="sec"><h2>Kunjungan per jam</h2><div class="card"><div class="hours">${hrs
     .map((h) => {
@@ -4064,12 +4053,6 @@ document.addEventListener("click", async (e) => {
       viewRute();
       toast("Semua karya telah dihapus dari rute");
     }
-    return;
-  }
-  if (d.act === "demo") {
-    S.att.demo = !S.att.demo;
-    renderStats();
-    viewHadir();
     return;
   }
   if (d.act === "copyRute") {

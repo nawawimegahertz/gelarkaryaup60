@@ -16,6 +16,10 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 - [x] **Milestone 8: Ergonomi Sentuh Jempol Kanan Mobile (Right-Hand Thumb Ergonomics & Button Accessibility)** (Selesai)
 - [x] **Milestone 9: Penyempurnaan Visual Peta Karya & Otomatis Zoom In Denah** (Selesai)
 - [x] **Milestone 10: Gamifikasi Tantangan Berhadiah (Doorprize Rp 250.000) & Decluttering Beranda** (Selesai)
+- [x] **Milestone 11: Unifikasi Latar Belakang Putih Global & Preservasi Header Biru** (Selesai)
+- [x] **Milestone 12: Hero Quest Card "Misi Penjelajah Booth" Bergradasi Biru Mewah (Visual Anchor)** (Selesai)
+- [x] **Milestone 13: Standardisasi Kartu Putih Bersih di Seluruh Halaman & Komponen Tersembunyi** (Selesai)
+- [x] **Milestone 14: Pembersihan Total Fitur & Data Demo Presensi di app.js** (Selesai)
 - [x] **Milestone 7: QA Polish, Performance, & Accessibility Audit** (Selesai)
 
 ---
@@ -112,6 +116,34 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
   - *Detail Booth Sheet:* Dilengkapi tombol interaktif *"🎯 Klaim Stempel"* yang langsung mengaktifkan kamera pemindai QR.
   - *Sistem Tingkatan & Ambang Batas Kupon:* Target stempel minimal 10 stempel (`CONFIG.undian.target = 10`) untuk membuka formulir kupon undian resmi, serta apresiasi progres hingga 60 booth lengkap.
 - [x] **Ergonomi Aksi Cepat Jempol Kanan:** Quick nav 3 kolom (*Jelajah Booth*, *Buka Denah*, *Rute Saya*) dengan touch target nyaman.
+
+---
+
+### Milestone 11: Unifikasi Latar Belakang Putih Global & Preservasi Header Biru
+- [x] Ubah variabel `--bg` menjadi `#ffffff` murni di `assets/css/style.css`.
+- [x] Pertahankan `header` dengan gradasi biru royal Pancasila (`#0a2a66` ke `#1857c4`) dan live counter kehadiran.
+- [x] Harmonisasi transisi pembatas footer dan navigasi dock bawah (`.tab-bar`) terhadap latar putih murni.
+
+---
+
+### Milestone 12: Hero Quest Card "Misi Penjelajah Booth" Bergradasi Biru Mewah (Visual Anchor)
+- [x] Rombak kartu *"Misi Penjelajah Booth"* (`.quest-card`) menjadi berlatar gradasi biru royal eksklusif (`linear-gradient(135deg, #081d48 0%, #0f388a 50%, #1857c4 100%)`).
+- [x] Berikan kontras teks putih terang, aksen nominal hadiah emas murni (`#FFD36B`), dan badge bintang berkilau.
+- [x] Desain kotak progres translusen gelap dengan progress bar emas-ke-zamrud dan tombol aksi gold berenergi tinggi.
+
+---
+
+### Milestone 13: Standardisasi Kartu Putih Bersih di Seluruh Halaman & Komponen Tersembunyi
+- [x] Pastikan seluruh kartu karya rekomendasi, grid karya, kartu SDGs, langkah rute, dan denah berlatar putih bersih (`#ffffff`) dengan border ultra-halus (`#e2e8f0`) dan bayangan lembut.
+- [x] Terapkan konsistensi putih bersih ke seluruh dialog dan bottom sheet tersembunyi (Detail Booth, Form Kehadiran, Dialog Undian, Sheet SDGs, dan Sheet Arsip LPPM).
+
+---
+
+### Milestone 14: Pembersihan Total Fitur & Data Demo Presensi di app.js
+- [x] Hapus objek `const DEMO = { ... }` dan flag `S.att.demo` dari `assets/js/app.js`.
+- [x] Hapus label "Data contoh" di header dan halaman rincian kehadiran.
+- [x] Hapus tombol toggle `data-act="demo"` dan handler-nya di event listener.
+- [x] Pastikan hanya data riil Google Apps Script / presensi lokal yang ditampilkan.
 
 ---
 
