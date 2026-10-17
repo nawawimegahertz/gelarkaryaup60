@@ -1932,18 +1932,22 @@ function openDetail(no) {
   lastFocus = document.activeElement;
   const p = S.peran,
     inRoute = S.rute.includes(d.no);
-  const blocks = {
-    skema: `<div class="${p === "dosen" ? "hi" : ""}"><span class="k">Skema dan pendanaan</span>${esc(d.hibah)} · ${esc(d.skema)}<br>${esc(d.sumber)}${p === "dosen" || !p ? ` · <b class="num">${rp(d.dana)}</b>` : ""}</div>`,
-    sdg: `<div class="${p === "mahasiswa" ? "hi" : ""}"><span class="k">Terkait SDGs</span><div class="chips" style="margin-top:4px">${d.sdg.map((n) => `<span style="display:inline-flex;gap:6px;align-items:center;font-size:13.5px">${sdgChip(n)}${esc(SDGINFO[n][0])}</span>`).join("")}</div></div>`,
-    dampak: `<div class="${p === "mitra" || p === "umum" ? "hi" : ""}"><span class="k">${p === "umum" ? "Manfaat" : "Aspek dampak"}</span>${esc(d.dampak || "Pendanaan eksternal (" + d.sumber + "); ringkasan dampak menyusul dari peneliti.")}${p === "mitra" && terapan(d) ? '<br><span class="badge" style="display:inline-block;margin-top:6px">Orientasi terapan</span>' : ""}</div>`,
-    tim: `<div><span class="k">Ketua pengusul</span>${esc(d.ketua)}<br><span style="color:var(--mut)">${esc(fakOf(d))}</span></div>`,
-  };
-  const order = {
-    dosen: ["skema", "tim", "dampak", "sdg"],
-    mahasiswa: ["sdg", "dampak", "tim", "skema"],
-    mitra: ["dampak", "tim", "skema", "sdg"],
-    umum: ["dampak", "tim", "sdg", "skema"],
-  }[p] || ["tim", "skema", "dampak", "sdg"];
+
+  const cleanName = (d.ketua || "")
+    .replace(/(Prof|Dr|Dra|Drs|Ir|apt|H\.|Hj\.)\b/gi, "")
+    .replace(/,[^,]+$/g, "")
+    .trim();
+  const parts = cleanName.split(/\s+/).filter((w) => /^[a-zA-Z]/.test(w));
+  const initials =
+    (parts.length >= 2
+      ? parts[0][0] + parts[parts.length - 1][0]
+      : cleanName.slice(0, 2)
+    ).toUpperCase() || "UP";
+
+  const pNum = String(panelOf(d)).padStart(2, "0");
+  const pArea = panelArea(panelOf(d)) || "Pameran";
+  const isStamped = !!S.stamp[panelOf(d)];
+
   const cta =
     {
       dosen: "Catat untuk kolaborasi",
@@ -1951,15 +1955,116 @@ function openDetail(no) {
       mitra: "Catat untuk kemitraan",
       umum: "Tandai untuk dikunjungi",
     }[p] || "Tambah ke rute";
-  $("#layer").innerHTML =
-    `<div class="scrim" data-close="1"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dt">
-    <button class="x" data-close="1" aria-label="Tutup">×</button>
-    <span class="pill"><i class="dot"></i>${esc(d.kat)} · ${esc(KLASTER[d.kl])}</span>
-    <h2 id="dt" style="margin-top:10px">${esc(d.judul)}</h2>
-    <div class="loc"><b>${panelOf(d)}</b><span>Panel poster ${panelOf(d)}, ukuran A0<br>${esc(panelArea(panelOf(d)))}<br>${S.stamp[panelOf(d)] ? "✓ Kunjungan tercatat" : "Pindai QR di bawah poster untuk mencatat kunjungan"}</span></div>
-    <div class="row" style="margin-top:12px"><button class="btn ghost sm" data-map="${d.no}">Lihat di denah</button>${inRoute ? '<span class="added">Sudah ada di rute Anda</span><button class="btn ghost sm" data-del="${d.no}" data-keep="1">Hapus dari rute</button>'.replace("${d.no}", d.no) : `<button class="btn gold" data-add="${d.no}" data-keep="1">${cta}</button>`}</div>
-    <div class="kv">${order.map((k) => blocks[k]).join("")}</div>
-  </div></div>`;
+
+  const sdgHtml =
+    Array.isArray(d.sdg) && d.sdg.length
+      ? d.sdg
+          .map(
+            (n) => `
+        <div class="sdg-chip-row">
+          <img src="assets/img/sdgs_logo/sdg-${n}.webp" alt="SDGs ${n}" width="26" height="26" loading="lazy">
+          <span>SDGs ${n} · ${esc(SDGINFO[n]?.[0] || "Tujuan PBB")}</span>
+        </div>`,
+          )
+          .join("")
+      : `<div style="font-size:12px;color:var(--mut)">Tidak ada SDGs terkait yang dispesifikasikan.</div>`;
+
+  $("#layer").innerHTML = `
+    <div class="scrim" data-close="1">
+      <article class="sheet detail-sheet" role="dialog" aria-modal="true" aria-labelledby="dt">
+        <div class="sheet-handle-bar"></div>
+
+        <div class="sheet-top-bar">
+          <div class="sheet-badge-group">
+            <span class="tag-pill">
+              <i class="dot"></i>
+              ${esc(d.kat)} · ${esc(KLASTER[d.kl])}
+            </span>
+            <span class="tag-panel">
+              Booth #${pNum}
+            </span>
+          </div>
+          <button class="x close-btn" data-close="1" aria-label="Tutup Dialog">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="sheet-scroll-body">
+          <div class="hero-card">
+            <h2 class="hero-title" id="dt">${esc(d.judul)}</h2>
+            <div class="researcher-row">
+              <div class="researcher-avatar">${esc(initials)}</div>
+              <div class="researcher-meta">
+                <span class="researcher-name">${esc(d.ketua)}</span>
+                <span class="researcher-fak">${esc(fakOf(d))}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="loc-card">
+            <div class="loc-left">
+              <div class="loc-panel-num">${pNum}</div>
+              <div class="loc-info">
+                <div class="loc-info-title">Panel Poster A0 · ${esc(pArea)}</div>
+                <div class="loc-info-sub">${isStamped ? "Stempel tersimpan di profil Anda" : "Pindai QR di booth untuk stempel undian"}</div>
+              </div>
+            </div>
+            ${
+              isStamped
+                ? '<div class="loc-status-pill ok">Kunjungan Tercatat</div>'
+                : '<div class="loc-status-pill">Pindai QR untuk Stempel</div>'
+            }
+          </div>
+
+          <div class="desktop-grid">
+            <div class="info-card ${p === "dosen" ? "highlight" : ""}">
+              <div class="info-card-header">
+                <span class="info-card-label">Skema & Pendanaan</span>
+                <span class="tag-pill" style="font-size:10.5px;padding:2px 8px;">${esc(d.sumber)}</span>
+              </div>
+              <div class="info-card-content">
+                ${esc(d.hibah)} · ${esc(d.skema)}
+              </div>
+              ${d.dana ? `<div class="funding-tag">${rp(d.dana)}</div>` : ""}
+            </div>
+
+            <div class="info-card ${p === "mitra" || p === "umum" ? "highlight" : ""}">
+              <div class="info-card-header">
+                <span class="info-card-label">${p === "umum" ? "Manfaat Bagi Masyarakat" : "Fokus & Dampak Inovasi"}</span>
+                ${terapan(d) ? '<span style="font-size:11px;font-weight:700;color:var(--gold);">Orientasi Terapan</span>' : ""}
+              </div>
+              <div class="info-card-content">
+                ${esc(d.dampak || "Pendanaan eksternal (" + d.sumber + "); ringkasan dampak menyusul dari peneliti.")}
+              </div>
+            </div>
+
+            <div class="info-card ${p === "mahasiswa" ? "highlight" : ""}" style="grid-column: 1 / -1;">
+              <div class="info-card-header">
+                <span class="info-card-label">Keterkaitan SDGs</span>
+                <span style="font-size:11px;color:var(--mut);">Agenda PBB 2030</span>
+              </div>
+              <div class="sdg-chip-list">
+                ${sdgHtml}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sheet-footer-bar">
+          <button class="btn-action-map" data-map="${d.no}">
+            Lihat di Denah
+          </button>
+          ${
+            inRoute
+              ? `<button class="btn-action-route in-route" data-del="${d.no}" data-keep="1" aria-label="Hapus dari rute">Tersimpan di Rute (Hapus)</button>`
+              : `<button class="btn-action-route" data-add="${d.no}" data-keep="1" aria-label="${cta}">${cta}</button>`
+          }
+        </div>
+      </article>
+    </div>`;
   $(".sheet .x").focus();
 }
 function closeLayer() {
