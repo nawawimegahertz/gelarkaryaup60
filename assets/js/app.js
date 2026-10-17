@@ -3618,7 +3618,8 @@ document.addEventListener("click", async (e) => {
     return;
   }
   if (d.close) {
-    if (e.target === t || t.classList.contains("x")) closeLayer();
+    if (t.classList.contains("scrim") && e.target !== t) return;
+    closeLayer();
     return;
   }
   if (d.go) {

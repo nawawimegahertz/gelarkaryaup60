@@ -1693,7 +1693,8 @@ label.f {
 
 .sheet.detail-sheet .close-btn {
   position: absolute;
-  top: 10px;
+  top: 50%;
+  transform: translateY(-50%);
   right: 16px;
   width: 36px;
   height: 36px;
@@ -1713,10 +1714,17 @@ label.f {
   touch-action: manipulation;
 }
 
+.sheet.detail-sheet .close-btn::before {
+  content: "";
+  position: absolute;
+  inset: -6px; /* Expanded 48px hit area for maximum touch sensitivity */
+}
+
 .sheet.detail-sheet .close-btn svg {
   width: 18px;
   height: 18px;
   display: block;
+  pointer-events: none; /* Guarantees click lands on the button directly */
 }
 
 .sheet.detail-sheet .close-btn:hover {
@@ -1726,7 +1734,7 @@ label.f {
 }
 
 .sheet.detail-sheet .close-btn:active {
-  transform: scale(0.92);
+  transform: translateY(-50%) scale(0.92);
 }
 
 /* 3. Scrollable Content Area */
@@ -2250,7 +2258,8 @@ label.f {
   }
 
   .sheet.detail-sheet .close-btn {
-    top: 14px;
+    top: 50%;
+    transform: translateY(-50%);
     right: 18px;
     width: 38px;
     height: 38px;

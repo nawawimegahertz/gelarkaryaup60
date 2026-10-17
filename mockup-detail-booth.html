@@ -258,7 +258,8 @@
       }
 
       .frame-desktop .close-btn {
-        top: 14px;
+        top: 50%;
+        transform: translateY(-50%);
         right: 18px;
         width: 38px;
         height: 38px;
@@ -356,7 +357,8 @@
 
       .close-btn {
         position: absolute;
-        top: 10px;
+        top: 50%;
+        transform: translateY(-50%);
         right: 16px;
         width: 36px;
         height: 36px;
@@ -372,18 +374,30 @@
         flex-shrink: 0;
         z-index: 10;
         padding: 0;
+        touch-action: manipulation;
+      }
+
+      .close-btn::before {
+        content: "";
+        position: absolute;
+        inset: -6px;
       }
 
       .close-btn svg {
         width: 18px;
         height: 18px;
         display: block;
+        pointer-events: none;
       }
 
       .close-btn:hover {
         background: #e2e8f0;
         color: var(--ink);
         border-color: var(--line-strong);
+      }
+
+      .close-btn:active {
+        transform: translateY(-50%) scale(0.92);
       }
 
       /* 3. Scrollable Content Area */
