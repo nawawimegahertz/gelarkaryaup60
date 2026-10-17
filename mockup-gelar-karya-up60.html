@@ -338,7 +338,8 @@ button,[role=button],.pn{touch-action:manipulation}
 <script>
 /* ===== KONFIGURASI PANITIA ===== */
 const CONFIG = {
-  publicUrl: "https://claude.ai/artifact/1QXqSnRjMbM5mg7gv8HD6k",            // tautan publik halaman ini; dipakai untuk QR
+  publicUrl: "https://script.google.com/macros/s/AKfycbyt1GXR_mPDL5pJo8Gqi8GNRMfNdUHhdHGnXsr4E-R-hdKGz3SgvAp-J_ngJu2PgupD/exec",
+  gasUrl: "https://script.google.com/macros/s/AKfycbyt1GXR_mPDL5pJo8Gqi8GNRMfNdUHhdHGnXsr4E-R-hdKGz3SgvAp-J_ngJu2PgupD/exec",            // tautan publik halaman ini; dipakai untuk QR
   panel: {},                // pemetaan nomor karya ke nomor panel bila berbeda, contoh {7: 12}
   jamBuka: 8, jamTutup: 16, // rentang grafik kehadiran per jam
   fakultas: ["Fakultas Ekonomi & Bisnis","Fakultas Farmasi","Fakultas Hukum","Fakultas Ilmu Komunikasi","Fakultas Pariwisata","Fakultas Psikologi","Fakultas Teknik","Sekolah Pascasarjana","Unit atau program lain"],
@@ -850,6 +851,13 @@ const Fb = {
   },
   local(){ const v=store.get("rowsFb",[]).map(r=>r.nilai); S.fb={n:v.length,avg:v.length?v.reduce((a,b)=>a+b,0)/v.length:0}; },
   async submit(row){
+    if(S.att.mode==="gas-api"){
+      try{
+        await fetch(CONFIG.gasUrl, {method:"POST",mode:"no-cors",body:JSON.stringify({action:"attendance",...row})});
+        setTimeout(()=>this.pollGasApi(), 1200);
+      }catch(e){}
+      return;
+    }
     if(S.att.mode==="gas"){
       return new Promise((resolve,reject)=>{
         google.script.run
@@ -888,6 +896,12 @@ const Att = {
       setInterval(()=>this.pollGas(), 20000);
       return;
     }
+    if(CONFIG.gasUrl){
+      S.att.mode="gas-api";
+      this.pollGasApi();
+      setInterval(()=>this.pollGasApi(), 20000);
+      return;
+    }
     try{
       const db = window.claude && await window.claude.use("db");
       if(db){
@@ -899,6 +913,19 @@ const Att = {
     }catch(e){}
     if(CONFIG.hadir.csvUrl){ S.att.mode="sheet"; this.poll(); setInterval(()=>this.poll(),30000); return; }
     S.att.mode="local"; this.ingest(store.get("rowsLocal",[]));
+  },
+  pollGasApi(){
+    fetch(CONFIG.gasUrl + "?action=stats")
+      .then(r=>r.json())
+      .then(res=>{
+        if(res && res.counts){
+          S.att.counts=res.counts;
+          S.att.hours=res.hours||{};
+          S.att.total=res.total||0;
+          S.att.ready=true;
+          refreshAtt();
+        }
+      }).catch(()=>{});
   },
   pollGas(){
     google.script.run
@@ -930,6 +957,13 @@ const Att = {
     }catch(e){}
   },
   async submit(row){
+    if(S.att.mode==="gas-api"){
+      try{
+        await fetch(CONFIG.gasUrl, {method:"POST",mode:"no-cors",body:JSON.stringify({action:"attendance",...row})});
+        setTimeout(()=>this.pollGasApi(), 1200);
+      }catch(e){}
+      return;
+    }
     if(S.att.mode==="gas"){
       return new Promise((resolve,reject)=>{
         google.script.run
