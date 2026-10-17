@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Mockup Beranda Gamifikasi — Gelar Karya UP 60</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #1857c4;
+        --primary-dark: #0f3d8f;
+        --gold: #ebb338;
+        --gold-glow: rgba(235, 179, 56, 0.25);
+        --ok: #0e8f82;
+        --ok-light: #e6f7f5;
+        --ink: #0f172a;
+        --txt: #1e293b;
+        --mut: #64748b;
+        --line: #e2e8f0;
+        --surface: #ffffff;
+        --surface-soft: #f8fafc;
+        --bg: #f1f5f9;
+        --card-radius: 18px;
+        --inner-radius: 10px;
+        --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+        --shadow-md: 0 4px 16px -2px rgba(15, 23, 42, 0.08);
+        --shadow-gold: 0 6px 20px -2px rgba(235, 179, 56, 0.35);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--txt);
+        line-height: 1.5;
+        padding-bottom: 96px;
+      }
+
+      .wrap {
+        width: 100%;
+        max-width: 680px;
+        margin-inline: auto;
+        padding-inline: 16px;
+      }
+
+      /* ===== 1. HERO HEADER ===== */
+      .hero {
+        background:
+          radial-gradient(ellipse 90% 70% at 85% -10%, rgba(235, 179, 56, 0.18) 0%, transparent 60%),
+          linear-gradient(175deg, #0a1936 0%, #0f2c63 55%, #163d89 100%);
+        color: #ffffff;
+        padding-block: 20px 22px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .hero .top-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .hero img {
+        width: 74px;
+        height: auto;
+        flex-shrink: 0;
+        filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.35));
+      }
+
+      .hero .eyebrow {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #ffd36b;
+        margin-bottom: 3px;
+        display: inline-block;
+      }
+
+      .hero h1 {
+        font-size: 18px;
+        line-height: 1.25;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        text-wrap: balance;
+        color: #ffffff;
+      }
+
+      .hero-date {
+        font-size: 12px;
+        color: #cbd5e1;
+        margin-top: 5px;
+        font-weight: 500;
+      }
+
+      /* Live Attend Pill in Hero */
+      .live-badge-hero {
+        margin-top: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(70, 214, 140, 0.35);
+        border-radius: 12px;
+        padding: 9px 14px;
+        font-size: 12.5px;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+
+      .live-badge-hero .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #46d68c;
+        display: inline-block;
+        margin-right: 8px;
+        box-shadow: 0 0 0 0 rgba(70, 214, 140, 0.7);
+        animation: liveDot 2s infinite;
+      }
+
+      @keyframes liveDot {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(70, 214, 140, 0.7); }
+        70% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(70, 214, 140, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(70, 214, 140, 0); }
+      }
+
+      /* ===== 2. SPACING RHYTHM (ANTI SESAK) ===== */
+      .sec-block {
+        margin-top: 28px;
+      }
+
+      .sec-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 12px;
+      }
+
+      .sec-title {
+        font-size: 16.5px;
+        font-weight: 800;
+        color: var(--ink);
+        letter-spacing: -0.01em;
+      }
+
+      .sec-sub {
+        font-size: 13px;
+        color: var(--mut);
+        margin-top: 2px;
+      }
+
+      .sec-link {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--primary);
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      /* ===== 3. GAMIFIED HERO QUEST CARD ===== */
+      .quest-card {
+        background: linear-gradient(145deg, #0a1b3a 0%, #102e68 100%);
+        border-radius: var(--card-radius);
+        padding: 20px 18px;
+        color: #ffffff;
+        box-shadow: 0 10px 28px -6px rgba(10, 27, 58, 0.35);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .quest-card::before {
+        content: "";
+        position: absolute;
+        top: -40px;
+        right: -40px;
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(235, 179, 56, 0.25) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .quest-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .quest-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(235, 179, 56, 0.2);
+        border: 1px solid rgba(235, 179, 56, 0.45);
+        color: #ffd875;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .quest-reward {
+        font-size: 12px;
+        color: #e2e8f0;
+        font-weight: 600;
+      }
+
+      .quest-reward b {
+        color: #ffd875;
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      .quest-headline {
+        font-size: 17px;
+        line-height: 1.35;
+        font-weight: 800;
+        margin-bottom: 6px;
+        letter-spacing: -0.01em;
+      }
+
+      .quest-desc {
+        font-size: 13px;
+        color: #cbd5e1;
+        line-height: 1.45;
+        margin-bottom: 16px;
+      }
+
+      /* Interactive Progress Bar */
+      .quest-progress-box {
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+      }
+
+      .quest-progress-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12.5px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+
+      .quest-progress-track {
+        height: 10px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 999px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .quest-progress-fill {
+        height: 100%;
+        width: 35%;
+        background: linear-gradient(90deg, #ebb338, #ffda73);
+        border-radius: 999px;
+        box-shadow: 0 0 10px rgba(235, 179, 56, 0.7);
+        transition: width 0.4s ease;
+      }
+
+      .quest-milestones {
+        display: flex;
+        justify-content: space-between;
+        font-size: 11px;
+        color: #94a3b8;
+        margin-top: 6px;
+        font-weight: 600;
+      }
+
+      /* Quest Actions (Right-thumb accessible) */
+      .quest-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      .btn-quest-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        min-height: 46px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .btn-quest-primary {
+        background: linear-gradient(135deg, var(--gold), #d99a18);
+        border: 0;
+        color: #0f172a;
+        padding: 10px 18px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+        min-height: 46px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: var(--shadow-gold);
+        transition: transform 0.15s ease;
+      }
+
+      .btn-quest-primary:active {
+        transform: scale(0.97);
+      }
+
+      /* ===== 4. QUICK ACTION BAR ===== */
+      .quick-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+
+      .quick-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--card-radius);
+        padding: 14px 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        text-align: center;
+        text-decoration: none;
+        color: var(--txt);
+        box-shadow: var(--shadow-sm);
+        min-height: 68px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+
+      .quick-card:active {
+        transform: scale(0.96);
+      }
+
+      .quick-card-icon {
+        color: var(--primary);
+      }
+
+      .quick-card span {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      /* ===== 5. ROLE CHOOSER (PROPER CASE) ===== */
+      .role-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      @media (min-width: 520px) {
+        .role-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+
+      .role-chip {
+        background: var(--surface);
+        border: 1.5px solid var(--line);
+        border-radius: 12px;
+        padding: 10px 8px;
+        min-height: 54px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+
+      .role-chip.active {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(24, 87, 196, 0.25);
+      }
+
+      .role-chip .r-title {
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .role-chip .r-sub {
+        font-size: 10.5px;
+        color: var(--mut);
+      }
+
+      .role-chip.active .r-sub {
+        color: #dbeafe;
+      }
+
+      /* ===== 6. WORK CARD (CLEAN & LEGA) ===== */
+      .card-work {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--card-radius);
+        padding: 16px;
+        box-shadow: var(--shadow-sm);
+        margin-bottom: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        transition: border-color 0.15s ease;
+      }
+
+      .card-work:hover {
+        border-color: var(--primary);
+      }
+
+      .card-work-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .badge-group {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+
+      .tag-cat {
+        font-size: 11px;
+        font-weight: 700;
+        background: #f1f5f9;
+        color: var(--ink);
+        padding: 3px 8px;
+        border-radius: 6px;
+      }
+
+      .tag-panel {
+        font-size: 11px;
+        font-weight: 800;
+        background: #eef4ff;
+        color: var(--primary);
+        padding: 3px 8px;
+        border-radius: 6px;
+        border: 1px solid rgba(24, 87, 196, 0.15);
+      }
+
+      .tag-quest-done {
+        font-size: 11px;
+        font-weight: 800;
+        background: #ecfdf5;
+        color: #065f46;
+        padding: 3px 8px;
+        border-radius: 6px;
+        border: 1px solid #a7f3d0;
+      }
+
+      .card-work-title {
+        font-size: 15.5px;
+        font-weight: 700;
+        line-height: 1.4;
+        color: var(--ink);
+        text-wrap: balance;
+        cursor: pointer;
+      }
+
+      .card-work-author {
+        font-size: 12px;
+        color: var(--mut);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .card-work-foot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+        margin-top: 2px;
+      }
+
+      .map-link {
+        font-size: 12px;
+        color: var(--mut);
+        background: none;
+        border: 0;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: 600;
+      }
+
+      .card-work-actions {
+        display: flex;
+        gap: 8px;
+        margin-left: auto;
+        justify-content: flex-end;
+      }
+
+      .btn-sm-ghost {
+        background: none;
+        border: 1.5px solid var(--line);
+        color: var(--ink);
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 6px 12px;
+        cursor: pointer;
+        min-height: 36px;
+      }
+
+      .btn-sm-solid {
+        background: var(--primary);
+        border: 0;
+        color: #ffffff;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 6px 14px;
+        cursor: pointer;
+        min-height: 36px;
+      }
+
+      /* ===== 7. SIMULATOR BAR (UNTUK TEST DI BROWSER) ===== */
+      .demo-bar {
+        background: #fefce8;
+        border: 1px solid #fde047;
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-size: 12.5px;
+        color: #854d0e;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .demo-btn {
+        background: #ca8a04;
+        color: #ffffff;
+        border: 0;
+        padding: 5px 12px;
+        border-radius: 8px;
+        font-size: 11.5px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      /* ===== 8. FOOTER BERSIH ===== */
+      .site-footer {
+        margin-top: 40px;
+        padding-top: 24px;
+        border-top: 1px solid var(--line);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .footer-brand b {
+        font-size: 13.5px;
+        font-weight: 800;
+        color: var(--ink);
+      }
+
+      .footer-brand span {
+        font-size: 12px;
+        color: var(--mut);
+        display: block;
+      }
+
+      .footer-tagline {
+        font-size: 11px;
+        color: var(--mut);
+        opacity: 0.85;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- HEADER HERO RINGKAS -->
+    <header class="hero">
+      <div class="wrap">
+        <div class="top-row">
+          <img
+            src="https://lh3.googleusercontent.com/d/1-bUeaGic7PcI6EGz7-OlFdL4M82DOuOQ"
+            alt="Logo Dies Natalis ke-60 UP"
+          />
+          <div>
+            <span class="eyebrow">Gelar Karya Penelitian & PKM</span>
+            <h1>60 Tahun UP: Berakar Pancasila, Berkarya Untuk Bangsa</h1>
+            <p class="hero-date">Senin, 19 Okt 2026 · 08.00–16.00 WIB · Aula Masjid At-Taqwa UP</p>
+          </div>
+        </div>
+
+        <div class="live-badge-hero">
+          <span><span class="dot"></span><b>228</b> Pengunjung Tercatat Hari Ini</span>
+          <span style="font-weight:700; color:#46d68c; font-size:11.5px">LIVE PRESENSI →</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap" style="padding-top: 20px;">
+      <!-- SIMULATOR CONTROL BAR -->
+      <div class="demo-bar">
+        <span><b>Mode Preview Gamifikasi:</b> Coba simulasi scan QR booth</span>
+        <button class="demo-btn" id="btnDemoScan">+1 Stempel QR</button>
+      </div>
+
+      <!-- ===== 1. HERO QUEST CARD (GAMIFIKASI UTAMA) ===== -->
+      <section class="quest-card">
+        <div class="quest-top">
+          <span class="quest-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            Misi Penjelajah Booth
+          </span>
+          <span class="quest-reward">Hadiah: <b>Saldo Rp250.000</b></span>
+        </div>
+
+        <h2 class="quest-headline">Kumpulkan 10 Stempel, Buka Peluang Doorprize!</h2>
+        <p class="quest-desc">
+          Kunjungi booth pameran, temukan QR code pada poster penelitian, dan kumpulkan stempel untuk mengaktifkan kupon undian Anda.
+        </p>
+
+        <!-- Progress Box -->
+        <div class="quest-progress-box">
+          <div class="quest-progress-labels">
+            <span>Stempel Terkumpul</span>
+            <span id="stampCountText"><b style="color:#ffd875; font-size:15px;">4</b> / 10 Booth</span>
+          </div>
+          <div class="quest-progress-track">
+            <div class="quest-progress-fill" id="stampFill" style="width: 40%;"></div>
+          </div>
+          <div class="quest-milestones">
+            <span>Mulai</span>
+            <span>Target: 10 Booth (Syarat Undian)</span>
+            <span>Kupon Siap</span>
+          </div>
+        </div>
+
+        <!-- Quest Actions (Ergonomis Jempol Kanan) -->
+        <div class="quest-actions">
+          <button class="btn-quest-secondary" id="btnPanduan">
+            Panduan Misi
+          </button>
+          <button class="btn-quest-primary" id="btnScanAction">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 7V4h3"></path><path d="M20 7V4h-3"></path><path d="M4 17v3h3"></path><path d="M20 17v3h-3"></path><rect x="9" y="9" width="6" height="6"></rect></svg>
+            Pindai QR Booth
+          </button>
+        </div>
+      </section>
+
+      <!-- ===== 2. QUICK ACTIONS BAR ===== -->
+      <section class="sec-block">
+        <div class="quick-grid">
+          <div class="quick-card">
+            <svg class="quick-card-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <span>Jelajah Karya</span>
+          </div>
+          <div class="quick-card">
+            <svg class="quick-card-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+            <span>Denah Booth</span>
+          </div>
+          <div class="quick-card">
+            <svg class="quick-card-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a4.5 4.5 0 0 0 0-9H7"></path><polyline points="10 6 7 9 10 12"></polyline></svg>
+            <span>Rute Misi (3)</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== 3. REKOMENDASI BERDASARKAN PERAN ===== -->
+      <section class="sec-block">
+        <div class="sec-header">
+          <div>
+            <h2 class="sec-title">Rekomendasi Berdasarkan Peran</h2>
+            <p class="sec-sub">Pilih peran Anda untuk kurasi karya yang paling relevan.</p>
+          </div>
+        </div>
+
+        <div class="role-grid">
+          <div class="role-chip active">
+            <span class="r-title">Mahasiswa</span>
+            <span class="r-sub">Topik & Inspirasi</span>
+          </div>
+          <div class="role-chip">
+            <span class="r-title">Dosen</span>
+            <span class="r-sub">Skema & Riset</span>
+          </div>
+          <div class="role-chip">
+            <span class="r-title">Mitra</span>
+            <span class="r-sub">Hilirisasi Industri</span>
+          </div>
+          <div class="role-chip">
+            <span class="r-title">Umum</span>
+            <span class="r-sub">Inovasi Publik</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== 4. KURASI KARYA PILIHAN (DILENGKAPI STATUS STEMPEL) ===== -->
+      <section class="sec-block">
+        <div class="sec-header">
+          <div>
+            <h2 class="sec-title">Karya Unggulan untuk Anda</h2>
+            <p class="sec-sub">Kunjungi booth ini untuk mendapatkan stempel misi undian.</p>
+          </div>
+          <span class="sec-link">Lihat Semua 60 →</span>
+        </div>
+
+        <!-- Sample Card 1 (Sudah Ada Stempel) -->
+        <article class="card-work">
+          <div class="card-work-top">
+            <div class="badge-group">
+              <span class="tag-cat">Penelitian · Farmasi</span>
+              <span class="tag-panel">Panel 07</span>
+            </div>
+            <span class="tag-quest-done">✓ Stempel Terkumpul</span>
+          </div>
+          <h3 class="card-work-title">Formulasi Gel Ekstrak Daun Kelor untuk Mempercepat Penyembuhan Luka</h3>
+          <div class="card-work-author">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            Dr. Apt. Nurul Fatimah · Fak. Farmasi
+          </div>
+          <div class="card-work-foot">
+            <button class="map-link">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon></svg>
+              <u>Lihat di Denah</u>
+            </button>
+            <div class="card-work-actions">
+              <button class="btn-sm-ghost">+ Rute</button>
+              <button class="btn-sm-solid">Detail</button>
+            </div>
+          </div>
+        </article>
+
+        <!-- Sample Card 2 (Belum Dikunjungi - Target Misi) -->
+        <article class="card-work">
+          <div class="card-work-top">
+            <div class="badge-group">
+              <span class="tag-cat">PKM · Teknik Mesin</span>
+              <span class="tag-panel">Panel 18</span>
+            </div>
+            <span style="font-size:11px; font-weight:700; color:var(--mut);">Belum Dikunjungi</span>
+          </div>
+          <h3 class="card-work-title">Rancang Bangun Alat Pengering Biji Kopi Berbasis Energi Surya Hibrida</h3>
+          <div class="card-work-author">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            Ir. Bambang Sudarsono, M.T. · Fak. Teknik
+          </div>
+          <div class="card-work-foot">
+            <button class="map-link">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon></svg>
+              <u>Lihat di Denah</u>
+            </button>
+            <div class="card-work-actions">
+              <button class="btn-sm-ghost">+ Rute</button>
+              <button class="btn-sm-solid">Detail</button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- ===== 5. FOOTER BERSIH & PROPOSIONAL ===== -->
+      <footer class="site-footer">
+        <div class="footer-brand">
+          <b>Gelar Karya Penelitian & PKM 2026</b>
+          <span>Dies Natalis ke-60 Universitas Pancasila</span>
+        </div>
+        <p class="footer-tagline">Berakar Pancasila, Berkarya untuk Bangsa</p>
+      </footer>
+    </main>
+
+    <!-- SCRIPT SIMULATOR INTERAKTIF -->
+    <script>
+      let currentStamps = 4;
+      const targetStamps = 10;
+      const btnScan = document.getElementById("btnDemoScan");
+      const btnScanAction = document.getElementById("btnScanAction");
+      const textCount = document.getElementById("stampCountText");
+      const fillBar = document.getElementById("stampFill");
+
+      function addStamp() {
+        if (currentStamps < targetStamps) {
+          currentStamps++;
+          const pct = Math.min(100, Math.round((currentStamps / targetStamps) * 100));
+          fillBar.style.width = pct + "%";
+          textCount.innerHTML = `<b style="color:#ffd875; font-size:15px;">${currentStamps}</b> / ${targetStamps} Booth`;
+          
+          if (currentStamps === targetStamps) {
+            alert("SELAMAT! Misi Jelajah Selesai!\nAnda telah mengumpulkan 10 stempel booth. Kupon undian Doorprize Rp250.000 kini telah AKTIF!");
+          }
+        } else {
+          alert("Misi sudah selesai (10/10 stempel lengkap)!");
+        }
+      }
+
+      btnScan.addEventListener("click", addStamp);
+      btnScanAction.addEventListener("click", () => {
+        alert("Kamera Pemindai QR aktif! Pada aplikasi asli, mengarahkan kamera ke QR booth akan menambah stempel misi ini.");
+      });
+
+      // Role chip toggle demo
+      document.querySelectorAll(".role-chip").forEach(chip => {
+        chip.addEventListener("click", () => {
+          document.querySelectorAll(".role-chip").forEach(c => c.classList.remove("active"));
+          chip.classList.add("active");
+        });
+      });
+    </script>
+  </body>
+</html>

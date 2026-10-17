@@ -3421,3 +3421,242 @@ button,
     font-size: 10pt;
   }
 }
+
+/* ==========================================================================
+   Gamifikasi Quest Card, Spacing Beranda Lega, & Arsip LPPM
+   ========================================================================== */
+
+.beranda-flow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl, 32px);
+}
+
+.quest-card {
+  background: var(--surface, #ffffff);
+  border: 1.5px solid var(--line, #e2e8f0);
+  border-radius: var(--radius-lg, 20px);
+  padding: var(--space-lg, 20px);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.quest-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--gold, #f59e0b), var(--primary, #2563eb));
+}
+
+.quest-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.quest-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill, 9999px);
+}
+
+.quest-reward {
+  text-align: right;
+  font-size: 12px;
+  color: var(--mut);
+}
+
+.quest-reward .reward-val {
+  display: block;
+  font-size: 15.5px;
+  font-weight: 800;
+  color: var(--gold, #d97706);
+  letter-spacing: -0.01em;
+}
+
+.quest-headline-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.quest-title {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 0;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+}
+
+.quest-tier-pill {
+  font-size: 11px;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.quest-tier-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 4px 0 2px;
+}
+
+.quest-desc {
+  font-size: 13px;
+  color: var(--mut);
+  margin: 0 0 14px;
+  line-height: 1.45;
+}
+
+.quest-progress-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md, 12px);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+}
+
+.quest-prog-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12.5px;
+  margin-bottom: 6px;
+}
+
+.quest-count b {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.quest-pct {
+  font-weight: 800;
+  color: var(--gold, #d97706);
+}
+
+.quest-prog-bar {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: var(--radius-pill, 9999px);
+  overflow: hidden;
+}
+
+.quest-prog-bar > i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #10b981);
+  border-radius: var(--radius-pill, 9999px);
+  transition: width 0.4s ease;
+}
+
+.quest-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.quest-badge-tag {
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border-radius: 6px;
+  padding: 2px 7px;
+}
+
+.quest-badge-tag.done {
+  background: rgba(16, 185, 129, 0.12);
+  color: #065f46;
+}
+
+.quest-badge-tag.todo {
+  background: rgba(245, 158, 11, 0.12);
+  color: #92400e;
+}
+
+/* Arsip & Banner LPPM */
+.lppm-banner-card {
+  background: #f8fafc;
+  border: 1.5px dashed var(--line, #cbd5e1);
+  border-radius: var(--radius-lg, 20px);
+  padding: var(--space-md, 16px);
+}
+
+.lppm-badge {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--mut);
+  margin-bottom: 4px;
+}
+
+.lppm-title {
+  font-size: 15px;
+  font-weight: 800;
+  margin: 0 0 4px;
+  color: var(--ink);
+}
+
+.lppm-desc {
+  font-size: 13px;
+  color: var(--mut);
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* Mode Gelap untuk Gamifikasi & Arsip */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .quest-card {
+    background: var(--surface);
+    border-color: var(--line);
+  }
+  :root:not([data-theme="light"]) .quest-progress-box {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: var(--line);
+  }
+  :root:not([data-theme="light"]) .quest-tier-pill {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--ink);
+  }
+  :root:not([data-theme="light"]) .quest-prog-bar {
+    background: rgba(255, 255, 255, 0.12);
+  }
+  :root:not([data-theme="light"]) .lppm-banner-card {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: var(--line);
+  }
+  :root:not([data-theme="light"]) .quest-badge-tag.done {
+    background: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+  }
+  :root:not([data-theme="light"]) .quest-badge-tag.todo {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fcd34d;
+  }
+}
+

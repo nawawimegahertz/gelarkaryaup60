@@ -33,7 +33,8 @@ const CONFIG = {
     fields: { nama: "", peran: "", asal: "" }, // kode entry.XXXXXXX tiap pertanyaan
   },
   undian: {
-    hadiah: "Rp 250.000", // hadiah undian bagi pengunjung yang memindai seluruh booth
+    hadiah: "Rp 250.000", // hadiah undian bagi pengunjung yang memindai booth
+    target: 10, // Target stempel untuk membuka kupon undian resmi (10 dari 60 booth)
     garam: "up60-gk-2026", // ubah sebelum mencetak QR; kode booth dihitung dari nilai ini
     jeda: 8, // detik minimal antarpindaian, mencegah pindai beruntun tanpa berkunjung
     formAction: "", // opsional: Google Form pendaftaran undian
@@ -1465,7 +1466,11 @@ function workCard(d, opt = {}) {
     <div class="top">
       <span class="pill"><i class="dot"></i>${esc(d.kat)} · ${esc(KLASTER[d.kl])}</span>
       <span class="pill stan-pill">Panel ${panelOf(d)}</span>
-      ${S.stamp[panelOf(d)] ? '<span class="pill ok">✓ Dikunjungi</span>' : ""}
+      ${
+        S.stamp[panelOf(d)]
+          ? '<span class="pill ok quest-badge-tag done"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:2px"><polyline points="20 6 9 17 4 12"></polyline></svg>Stempel Diraih</span>'
+          : '<span class="pill quest-badge-tag todo" style="opacity:0.85">🎯 Misi Booth</span>'
+      }
     </div>
     <button style="all:unset;cursor:pointer;display:block;width:100%" data-open="${d.no}" aria-label="Buka detail karya ${d.no}">
       <h3 class="work-title">${esc(d.judul)}</h3>
@@ -1482,80 +1487,231 @@ function workCard(d, opt = {}) {
   </article>`;
 }
 
-/* ---------- Beranda ---------- */
+/* ---------- Beranda (Decluttered & Gamifikasi Reward) ---------- */
+function questCard() {
+  const n = Object.keys(S.stamp).length;
+  const target = (CONFIG.undian && CONFIG.undian.target) || 10;
+  const pct = Math.min(100, Math.round((n / target) * 100));
+  const done = store.get("undian", null);
+
+  let tier = "Level 1: Penjelajah Pemula";
+  let tierDesc = `Kumpulkan minimal ${target} stempel untuk membuka Tiket Undian Resmi!`;
+  let tierBadge = "Pemula";
+  if (n >= BOOTH_N) {
+    tier = "Level 4: Penjelajah Sempurna (Master)";
+    tierDesc = "Luar biasa! Seluruh 60 booth pameran telah Anda jelajahi!";
+    tierBadge = "Master";
+  } else if (n >= 30) {
+    tier = "Level 3: Penjelajah Unggul";
+    tierDesc = "Hebat! Separuh booth telah dikunjungi. Terus jelajahi pameran!";
+    tierBadge = "Unggul";
+  } else if (n >= target) {
+    tier = "Level 2: Tiket Undian Aktif";
+    tierDesc = done
+      ? `Kupon Anda terdaftar: #${esc(done.kode)}`
+      : `Syarat tercapai! Daftarkan kupon undian ${esc(CONFIG.undian.hadiah)} Anda sekarang!`;
+    tierBadge = "Kupon Aktif";
+  } else {
+    const sisa = target - n;
+    tierDesc = `Tinggal ${sisa} stempel booth lagi untuk membuka Kupon Undian Resmi!`;
+  }
+
+  return `
+  <div class="card quest-card" role="region" aria-label="Tantangan Berhadiah Booth">
+    <div class="quest-top">
+      <div class="quest-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        <span>Misi Berhadiah</span>
+      </div>
+      <div class="quest-reward">
+        <span>Hadiah Utama</span>
+        <b class="reward-val">${esc(CONFIG.undian.hadiah)}</b>
+      </div>
+    </div>
+
+    <div class="quest-body">
+      <div class="quest-headline-row">
+        <h2 class="quest-title">Misi Penjelajah Booth</h2>
+        <span class="quest-tier-pill">${esc(tierBadge)}</span>
+      </div>
+      <div class="quest-tier-name">${esc(tier)}</div>
+      <p class="quest-desc">${tierDesc}</p>
+
+      <div class="quest-progress-box">
+        <div class="quest-prog-meta">
+          <span class="quest-count"><b>${n}</b> / ${target} stempel</span>
+          <span class="quest-pct">${pct}%</span>
+        </div>
+        <div class="prog quest-prog-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${target}" aria-valuenow="${n}">
+          <i style="width:${pct}%"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="quest-actions">
+      <button class="btn sm ghost" data-go="jelajah">Cari Booth</button>
+      <button class="btn sm gold" data-act="scan">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-right:4px"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path></svg>
+        Pindai QR Booth
+      </button>
+      ${
+        n >= target && !done
+          ? '<button class="btn sm gold" data-act="undian" style="animation: pulse 2s infinite">Daftar Undian</button>'
+          : ""
+      }
+      ${done ? '<button class="btn sm ghost" data-act="undian">Tiket Saya</button>' : ""}
+    </div>
+  </div>`;
+}
+
+function openLppmStats() {
+  const fak = Object.entries(count(DATA, fakOf)).sort((a, b) => b[1] - a[1]);
+  const maxF = Math.max(...fak.map((x) => x[1]));
+  const src = count(DATA, (d) => d.sumber);
+
+  $("#layer").innerHTML = `
+  <div class="scrim" data-close="1">
+    <div class="sheet detail-sheet" role="dialog" aria-modal="true" aria-labelledby="lppm-t" style="max-height:85vh">
+      <div class="sheet-handle-bar"></div>
+      <div class="sheet-top-bar">
+        <div class="sheet-badge-group">
+          <span class="tag-pill"><i class="dot"></i>LPPM UP 60</span>
+          <span class="tag-panel">Analisis Data</span>
+        </div>
+        <button class="x close-btn" data-close="1" aria-label="Tutup Dialog">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sheet-scroll-body" style="padding-bottom:24px">
+        <h2 id="lppm-t" style="font-size:18px;font-weight:800;margin:0 0 4px">Statistik & Arsip Pameran</h2>
+        <p style="margin:0 0 18px;color:var(--mut);font-size:14px">Distribusi karya berdasarkan fakultas pengusul dan skema sumber pendanaan.</p>
+
+        <div class="card" style="margin-bottom:18px">
+          <h3 style="font-size:15px;font-weight:700;margin:0 0 10px">Distribusi 8 Fakultas</h3>
+          <div class="bars">
+            ${fak
+              .map(
+                ([n, v]) =>
+                  `<button class="bar" data-filter='${JSON.stringify({ fak: n === "Belum tercantum" ? "-" : n })}'><span class="t">${esc(n.replace("Fakultas ", ""))}</span><span class="tr"><i style="width:${(v / maxF) * 100}%"></i></span><span class="v num">${v}</span></button>`,
+              )
+              .join("")}
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size:15px;font-weight:700;margin:0 0 10px">Komposisi Sumber Pendanaan</h3>
+          <div class="bars">
+            ${Object.entries(src)
+              .map(
+                ([n, v]) =>
+                  `<div class="bar"><span class="t">${esc(n)}</span><span class="tr"><i style="width:${(v / 60) * 100}%"></i></span><span class="v num">${v}</span></div>`,
+              )
+              .join("")}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
 function viewBeranda() {
   const el = $("#v-beranda");
   const kats = ["Penelitian", "PKM"],
     kls = ["IPTEKS", "Kesehatan", "Soshum"];
   const cnt = count(DATA, (d) => d.kat + "|" + d.kl);
-  const fak = Object.entries(count(DATA, fakOf)).sort((a, b) => b[1] - a[1]);
-  const maxF = Math.max(...fak.map((x) => x[1]));
-  const src = count(DATA, (d) => d.sumber);
   const sg = SOROT[S.peran];
+
   el.innerHTML = `
-  <nav class="quick-nav" aria-label="Aksi cepat beranda">
-    <button class="quick-btn primary" data-go="jelajah" aria-label="Mulai jelajahi 60 karya">
-      <svg class="quick-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <span>Mulai Jelajah</span>
-    </button>
-    <button class="quick-btn" data-go="denah" aria-label="Buka denah booth pameran">
-      <svg class="quick-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
-      <span>Buka Denah</span>
-    </button>
-    <button class="quick-btn" data-go="rute" aria-label="Buka rute kunjungan Anda">
-      <svg class="quick-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a4.5 4.5 0 0 0 0-9H7"></path><polyline points="10 6 7 9 10 12"></polyline></svg>
-      <span>Rute Saya${S.rute.length ? ` <b class="quick-badge">${S.rute.length}</b>` : ""}</span>
-    </button>
-  </nav>
+  <div class="beranda-flow">
+    <!-- Section 1: Hero Quest Card (Tantangan Berhadiah) -->
+    ${questCard()}
 
-  ${journeyCard()}
-  <div style="margin-top:14px">${stampCard()}</div>
-  <div class="card" style="margin-top:14px">
-    <h2 style="font-size:16px;margin-bottom:4px">Rekomendasi Berdasarkan Peran</h2>
-    <p style="margin:0 0 10px;color:var(--mut);font-size:14px">${S.peran ? esc(SOROT[S.peran].ket) + " Ketuk peran lain untuk mengganti." : "Pilih peran Anda untuk kurasi karya yang paling relevan."}</p>
-    ${roleChooser()}
-  </div>
+    <!-- Section 2: Quick Navigation Mobile (Ergonomis Jempol Kanan) -->
+    <nav class="quick-nav" aria-label="Aksi cepat beranda">
+      <button class="quick-btn primary" data-go="jelajah" aria-label="Mulai jelajahi 60 karya">
+        <svg class="quick-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <span>Jelajah Booth</span>
+      </button>
+      <button class="quick-btn" data-go="denah" aria-label="Buka denah booth pameran">
+        <svg class="quick-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
+        <span>Buka Denah</span>
+      </button>
+      <button class="quick-btn" data-go="rute" aria-label="Buka rute kunjungan Anda">
+        <svg class="quick-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a4.5 4.5 0 0 0 0-9H7"></path><polyline points="10 6 7 9 10 12"></polyline></svg>
+        <span>Rute Saya${S.rute.length ? ` <b class="quick-badge">${S.rute.length}</b>` : ""}</span>
+      </button>
+    </nav>
 
-  <div class="sec"><h2>Peta Distribusi Karya</h2><p class="lead">Pilih kombinasi kategori dan klaster untuk menyaring karya.</p>
-    <div class="card"><div class="matrix">
-      <span></span>${kls.map((k) => `<span class="h">${KLASTER[k]}</span>`).join("")}
-      ${kats
-        .map(
-          (kat) =>
-            `<span class="rl">${kat}</span>` +
-            kls
-              .map((kl) => {
-                const n = cnt[kat + "|" + kl] || 0;
-                return `<button class="cell ${n ? "" : "zero"}" data-filter='${JSON.stringify({ kat, kl })}'><b class="num">${n}</b><span>karya</span></button>`;
-              })
-              .join(""),
-        )
-        .join("")}
-    </div></div></div>
+    <!-- Section 3: Rekomendasi Berdasarkan Peran -->
+    <section class="sec" style="margin-top:0" aria-labelledby="sec-peran-title">
+      <h2 id="sec-peran-title" style="font-size:17px;font-weight:800;margin-bottom:4px">Rekomendasi Sesuai Peran</h2>
+      <p class="lead">${S.peran ? esc(SOROT[S.peran].ket) + " Ketuk peran lain untuk mengganti filter kurasi." : "Pilih peran Anda untuk mendapatkan rekomendasi booth pameran yang paling relevan."}</p>
+      <div class="card" style="margin-top:8px">
+        ${roleChooser()}
+      </div>
+    </section>
 
-  ${
-    sg
-      ? `<div class="sec"><h2>${esc(sg.judul)}</h2><p class="lead">${esc(sg.ket)}</p><div class="grid">${sg
-          .pick()
-          .map((d) => workCard(d))
-          .join("")}</div></div>`
-      : `<div class="sec"><h2>Mulai Eksplorasi</h2><p class="lead">Pilih peran di atas untuk rekomendasi khusus, atau langsung telusuri seluruh karya pameran.</p><button class="btn" data-go="jelajah">Jelajahi 60 Karya</button></div>`
-  }
+    <!-- Section 4: Sorotan Karya Terpilih (Sesuai Peran) -->
+    ${
+      sg
+        ? `<section class="sec" aria-labelledby="sec-sorot-title">
+            <h2 id="sec-sorot-title" style="font-size:17px;font-weight:800;margin-bottom:4px">${esc(sg.judul)}</h2>
+            <p class="lead">${esc(sg.ket)}</p>
+            <div class="grid">${sg.pick().map((d) => workCard(d)).join("")}</div>
+          </section>`
+        : `<section class="sec" aria-labelledby="sec-eksplor-title">
+            <h2 id="sec-eksplor-title" style="font-size:17px;font-weight:800;margin-bottom:4px">Mulai Eksplorasi Pameran</h2>
+            <p class="lead">Pilih peran di atas untuk kurasi khusus, atau langsung telusuri seluruh 60 booth karya inovasi.</p>
+            <div style="display:flex;justify-content:flex-end">
+              <button class="btn gold" data-go="jelajah">Jelajahi 60 Karya</button>
+            </div>
+          </section>`
+    }
 
-  <div class="sec"><h2>Distribusi Fakultas</h2><p class="lead">Jumlah karya terdaftar dari masing-masing fakultas.</p>
-    <div class="card"><div class="bars">${fak.map(([n, v]) => `<button class="bar" data-filter='${JSON.stringify({ fak: n === "Belum tercantum" ? "-" : n })}'><span class="t">${esc(n.replace("Fakultas ", ""))}</span><span class="tr"><i style="width:${(v / maxF) * 100}%"></i></span><span class="v num">${v}</span></button>`).join("")}</div></div></div>
+    <!-- Section 5: Peta Distribusi Zona Pameran (Matrix) -->
+    <section class="sec" aria-labelledby="sec-distribusi-title">
+      <h2 id="sec-distribusi-title" style="font-size:17px;font-weight:800;margin-bottom:4px">Peta Distribusi Karya</h2>
+      <p class="lead">Sentuh salah satu kotak zona untuk langsung menyaring karya pameran.</p>
+      <div class="card">
+        <div class="matrix">
+          <span></span>${kls.map((k) => `<span class="h">${KLASTER[k]}</span>`).join("")}
+          ${kats
+            .map(
+              (kat) =>
+                `<span class="rl">${kat}</span>` +
+                kls
+                  .map((kl) => {
+                    const n = cnt[kat + "|" + kl] || 0;
+                    return `<button class="cell ${n ? "" : "zero"}" data-filter='${JSON.stringify({ kat, kl })}'><b class="num">${n}</b><span>karya</span></button>`;
+                  })
+                  .join(""),
+            )
+            .join("")}
+        </div>
+      </div>
+    </section>
 
-  <div class="sec"><h2>Sumber Pendanaan</h2><p class="lead">Komposisi pendanaan internal dan hibah eksternal.</p>
-    <div class="card"><div class="bars">${Object.entries(src)
-      .map(
-        ([n, v]) =>
-          `<div class="bar"><span class="t">${esc(n)}</span><span class="tr"><i style="width:${(v / 60) * 100}%"></i></span><span class="v num">${v}</span></div>`,
-      )
-      .join("")}</div></div></div>
-
-  <div class="sec"><h2>Presensi Pengunjung</h2><p class="lead">Catatan kehadiran pengunjung pameran hari ini.</p>
-    <div class="card"><div class="big"><b class="num">${S.att.total}</b><span>${S.att.demo ? "Pengunjung (data contoh)" : "Pengunjung tercatat"}</span></div>
-    <div class="row" style="margin-top:12px">${S.checked ? "" : '<button class="btn gold" data-act="gate">Daftar Hadir</button>'}<button class="btn ghost" data-go="hadir">Lihat Rincian</button></div></div></div>`;
+    <!-- Section 6: Statistik & Rekapitulasi LPPM (Rapi tanpa bikin sesak) -->
+    <section class="sec lppm-archive-sec" aria-labelledby="sec-lppm-title">
+      <div class="card lppm-banner-card">
+        <div class="lppm-banner-meta">
+          <span class="lppm-badge">Arsip & Analitik</span>
+          <h3 id="sec-lppm-title" class="lppm-title">Statistik Fakultas & Sumber Pendanaan</h3>
+          <p class="lppm-desc">Data sebaran 8 fakultas pengusul dan rincian hibah penelitian/PKM LPPM Universitas Pancasila.</p>
+        </div>
+        <div class="row card-actions" style="margin-top:12px;justify-content:flex-end">
+          <button class="btn ghost sm" data-act="lppmStats">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-right:5px"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            Buka Statistik Lengkap
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>`;
 }
 function journeyCard() {
   const seen = store.get("dilihat", []).length;
@@ -2138,13 +2294,13 @@ function openDetail(no) {
               <div class="loc-panel-num">${pNum}</div>
               <div class="loc-info">
                 <div class="loc-info-title">Panel Poster A0 · ${esc(pArea)}</div>
-                <div class="loc-info-sub">${isStamped ? "Stempel tersimpan di profil Anda" : "Pindai QR di booth untuk stempel undian"}</div>
+                <div class="loc-info-sub">${isStamped ? "Stempel misi tersimpan · Menambah peluang undian " + esc(CONFIG.undian.hadiah) : "Kunjungi booth fisik ini dan pindai kode QR untuk klaim stempel!"}</div>
               </div>
             </div>
             ${
               isStamped
-                ? '<div class="loc-status-pill ok">Kunjungan Tercatat</div>'
-                : '<div class="loc-status-pill">Pindai QR untuk Stempel</div>'
+                ? '<div class="loc-status-pill ok">✓ Stempel Diraih</div>'
+                : '<button class="btn sm gold" data-act="scan" style="margin-left:auto;white-space:nowrap">🎯 Klaim Stempel</button>'
             }
           </div>
 
@@ -3200,18 +3356,21 @@ function recordStamp(raw) {
   Undi.sync();
   renderMapSafe();
   const n = Object.keys(S.stamp).length;
+  const target = (CONFIG.undian && CONFIG.undian.target) || 10;
   return {
     ok: true,
     p,
     n,
     msg:
       nama +
-      " tercatat (" +
+      " tercatat! Total " +
       n +
-      " dari " +
-      BOOTH_N +
-      ")." +
-      (n >= BOOTH_N ? " Lengkap!" : ""),
+      " stempel" +
+      (n >= target
+        ? n >= BOOTH_N
+          ? " · Lengkap seluruh 60 booth!"
+          : " · Kupon Undian Terbuka!"
+        : " (butuh " + (target - n) + " lagi untuk undian)"),
   };
 }
 function renderMapSafe() {
@@ -3344,12 +3503,14 @@ function scanResult(r) {
   try {
     navigator.vibrate && navigator.vibrate(r.ok ? [60] : [30, 40, 30]);
   } catch (e) {}
+  const target = (CONFIG.undian && CONFIG.undian.target) || 10;
   const p = $("#sc-p");
   if (p)
-    p.textContent = "Booth " + Object.keys(S.stamp).length + " dari " + BOOTH_N;
-  if (r.ok && r.n >= BOOTH_N) {
+    p.textContent =
+      "Stempel " + Object.keys(S.stamp).length + " dari " + target + " (Target Kupon)";
+  if (r.ok && r.n >= target && !store.get("undian", null)) {
     closeScan();
-    setTimeout(openUndian, 200);
+    setTimeout(openUndian, 300);
   }
 }
 function scanManual() {
@@ -3442,26 +3603,50 @@ function undianKode(nama, t) {
 }
 function openUndian() {
   const n = Object.keys(S.stamp).length,
+    target = (CONFIG.undian && CONFIG.undian.target) || 10,
     u = store.get("undian", null);
-  if (n < BOOTH_N) {
-    toast("Baru " + n + " dari " + BOOTH_N + " booth. Lanjutkan memindai.");
+  if (n < target) {
+    toast(
+      "Kumpulkan minimal " +
+        target +
+        " stempel untuk membuka kupon undian (" +
+        n +
+        "/" +
+        target +
+        ").",
+    );
     return;
   }
   if (u) {
     $("#layer").innerHTML =
-      `<div class="scrim" data-close="1"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ut"><button class="x" data-close="1" aria-label="Tutup">×</button><h2 id="ut">Anda terdaftar undian</h2>
-    <div class="loc" style="margin-top:14px"><b>${BOOTH_N}/${BOOTH_N}</b><span>${esc(u.nama)}<br>Kode undian <b style="color:#FFD36B">${esc(u.kode)}</b></span></div>
-    <p style="color:var(--mut);font-size:14px">Simpan layar ini. Pengumuman pemenang dilakukan panitia di lokasi pameran.</p></div></div>`;
+      `<div class="scrim" data-close="1"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ut"><button class="x close-btn" data-close="1" aria-label="Tutup Dialog"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button><h2 id="ut" style="font-size:18px;font-weight:800;margin:0 0 4px">Kupon Undian Aktif</h2>
+    <div class="loc" style="margin-top:14px"><b>${n}/${BOOTH_N} Stempel</b><span>${esc(u.nama)}<br>Kode Kupon: <b style="color:var(--gold);font-size:16px">${esc(u.kode)}</b></span></div>
+    <p style="color:var(--mut);font-size:14px;margin-top:14px">Simpan kupon ini. Pengundian hadiah ${esc(CONFIG.undian.hadiah)} dilakukan panitia di akhir pameran.</p></div></div>`;
     return;
   }
   $("#layer").innerHTML =
     `<div class="scrim"><form class="sheet" id="uf" role="dialog" aria-modal="true" aria-labelledby="ut" novalidate>
-    <h2 id="ut">Seluruh ${BOOTH_N} booth lengkap</h2>
-    <p style="color:var(--mut);font-size:14.5px;margin:8px 0 14px">Isi data kontak agar panitia dapat menghubungi pemenang undian ${esc(CONFIG.undian.hadiah)}.</p>
+    <div class="sheet-handle-bar"></div>
+    <div class="sheet-top-bar" style="margin-bottom:8px">
+      <div class="sheet-badge-group">
+        <span class="tag-pill"><i class="dot"></i>Kupon Resmi</span>
+        <span class="tag-panel">${n}/${BOOTH_N} Booth</span>
+      </div>
+      <button class="x close-btn" data-close="1" aria-label="Tutup Dialog">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <h2 id="ut" style="font-size:18px;font-weight:800;margin:0 0 4px">Klaim Kupon Undian ${esc(CONFIG.undian.hadiah)}</h2>
+    <p style="color:var(--mut);font-size:14px;margin:0 0 16px">Selamat! Anda telah mengumpulkan ${n} stempel booth (syarat minimal: ${target}). Isi kontak di bawah untuk nomor undian resmi Anda.</p>
     <div class="kv" style="margin-top:0;gap:14px"><label class="f">Nama lengkap<input class="txt" id="un" autocomplete="name" value="${esc(store.get("nama", ""))}" required></label>
     <label class="f">Nomor WhatsApp<input class="txt" id="uw" type="tel" inputmode="tel" autocomplete="tel" placeholder="08xxxxxxxxxx" required></label>
     <p id="ue" style="color:var(--err);margin:0;font-size:14px" role="alert" hidden></p>
-    <button class="btn gold" type="submit">Daftar undian</button></div></form></div>`;
+    <div style="display:flex;justify-content:flex-end;margin-top:8px">
+      <button class="btn gold" type="submit">Daftarkan Kupon Undian</button>
+    </div></div></form></div>`;
   $("#un").focus();
 }
 async function submitUndian(ev) {
@@ -3801,6 +3986,10 @@ document.addEventListener("click", async (e) => {
       .querySelectorAll("[data-fr]")
       .forEach((b) => b.setAttribute("aria-checked", b.dataset.fr === S.peran));
     renderDyn(true);
+    return;
+  }
+  if (d.act === "lppmStats") {
+    openLppmStats();
     return;
   }
   if (d.act === "scan") {

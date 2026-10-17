@@ -15,6 +15,7 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 - [x] **Milestone 6: Halaman Umpan Balik (Evaluasi Pameran Ringkas & Tanpa Distraksi)** (Selesai)
 - [x] **Milestone 8: Ergonomi Sentuh Jempol Kanan Mobile (Right-Hand Thumb Ergonomics & Button Accessibility)** (Selesai)
 - [x] **Milestone 9: Penyempurnaan Visual Peta Karya & Otomatis Zoom In Denah** (Selesai)
+- [x] **Milestone 10: Gamifikasi Tantangan Berhadiah (Doorprize Rp 250.000) & Decluttering Beranda** (Selesai)
 - [x] **Milestone 7: QA Polish, Performance, & Accessibility Audit** (Selesai)
 
 ---
@@ -100,6 +101,17 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 ### Milestone 9: Penyempurnaan Visual Peta Karya & Otomatis Zoom In Denah
 - [x] **Centering Sel Peta Karya (Matrix):** Update styling `.cell` pada section "Peta karya" agar nilai angka (`.cell b`) dan teks subtitle (`.cell span`) berada tepat di tengah (*centered vertically and horizontally*).
 - [x] **Otomatis Zoom In Denah dari Referensi:** Pada aksi "Lihat di denah" (`showOnMap(no)`), otomatis set level zoom peta lebih dekat/fokus (`S.map.z = 2.2`) dan gulir presisi ke koordinat booth panel yang dituju.
+
+---
+
+### Milestone 10: Gamifikasi Tantangan Berhadiah (Doorprize Rp 250.000) & Decluttering Beranda
+- [x] **Hero Quest Card Terpadu:** Menyatukan alur kunjungan, undian, dan stempel menjadi satu kartu tantangan interaktif (*"Misi Penjelajah Booth"*) berhadiah **Doorprize Rp 250.000**, lengkap dengan *dynamic progress bar* persentase, live tier status, dan tombol aksi pemindai kamera instan.
+- [x] **Decluttering Beranda & Spacing Lega (`gap: 32px`):** Menghilangkan grafik batang administratif 8 fakultas & komposisi pendanaan dari feed publik beranda; menyediakannya via kartu banner & bottom sheet *"Statistik & Arsip LPPM"* agar beranda bersih dan lega.
+- [x] **Penyelarasan Makro & Mikro Level Gamifikasi:**
+  - *Jelajah:* Setiap kartu karya dilengkapi badge quest dinamis (`✓ Stempel Diraih` vs `🎯 Misi Booth`).
+  - *Detail Booth Sheet:* Dilengkapi tombol interaktif *"🎯 Klaim Stempel"* yang langsung mengaktifkan kamera pemindai QR.
+  - *Sistem Tingkatan & Ambang Batas Kupon:* Target stempel minimal 10 stempel (`CONFIG.undian.target = 10`) untuk membuka formulir kupon undian resmi, serta apresiasi progres hingga 60 booth lengkap.
+- [x] **Ergonomi Aksi Cepat Jempol Kanan:** Quick nav 3 kolom (*Jelajah Booth*, *Buka Denah*, *Rute Saya*) dengan touch target nyaman.
 
 ---
 
