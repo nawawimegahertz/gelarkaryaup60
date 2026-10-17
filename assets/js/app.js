@@ -1250,6 +1250,10 @@ const stan = (d) => "Panel " + panelOf(d);
 const panelArea = (n) =>
   (AREA.find((a) => n >= a[0] && n <= a[1]) || [0, 0, ""])[2];
 const fakOf = (d) => d.fak || "Belum tercantum";
+const shortFak = (f) =>
+  !f || f === "Belum tercantum" || f === "-"
+    ? "UP"
+    : f.replace(/^Fakultas\s+/i, "Fak. ");
 const ink = (hex) => {
   const n = parseInt(hex.slice(1), 16),
     r = n >> 16,
@@ -1451,19 +1455,30 @@ function workCard(d, opt = {}) {
   if (p === "dosen")
     meta = `<div class="meta"><div><span class="k">Skema</span><br>${esc(d.hibah)} · ${esc(d.skema)}</div><div><span class="k">Dana disetujui</span><br><b class="num">${rp(d.dana)}</b></div></div>`;
   else if (p === "mahasiswa")
-    meta = `<div class="meta"><div class="chips">${d.sdg.map(sdgChip).join("")}</div><div class="who">${esc(fakOf(d))}</div></div>`;
+    meta = `<div class="meta"><div class="chips">${d.sdg.map(sdgChip).join("")}</div><div class="who">${esc(shortFak(fakOf(d)))}</div></div>`;
   else if (p === "mitra")
     meta = `<div class="meta">${terapan(d) ? '<div><span class="badge">Orientasi terapan</span></div>' : ""}<div>${esc(d.dampak || "Hibah eksternal: " + d.sumber)}</div></div>`;
   else if (p === "umum")
     meta = `<div class="meta"><div>${esc(d.dampak || "Penelitian dengan pendanaan eksternal (" + d.sumber + ")")}</div></div>`;
   else meta = `<div class="chips">${d.sdg.map(sdgChip).join("")}</div>`;
   return `<article class="work">
-    <div class="top"><span class="pill"><i class="dot"></i>${esc(d.kat)} · ${esc(KLASTER[d.kl])}</span>${S.stamp[panelOf(d)] ? '<span class="pill ok">✓ Dikunjungi</span>' : ""}</div>
-    <button style="all:unset;cursor:pointer;display:block" data-open="${d.no}" aria-label="Buka detail karya ${d.no}"><h3>${esc(d.judul)}</h3></button>
-    <div class="who">${esc(d.ketua)}${p !== "mahasiswa" ? " · " + esc(fakOf(d)) : ""}</div>
+    <div class="top">
+      <span class="pill"><i class="dot"></i>${esc(d.kat)} · ${esc(KLASTER[d.kl])}</span>
+      <span class="pill stan-pill">Panel ${panelOf(d)}</span>
+      ${S.stamp[panelOf(d)] ? '<span class="pill ok">✓ Dikunjungi</span>' : ""}
+    </div>
+    <button style="all:unset;cursor:pointer;display:block;width:100%" data-open="${d.no}" aria-label="Buka detail karya ${d.no}">
+      <h3 class="work-title">${esc(d.judul)}</h3>
+    </button>
+    <div class="who">${esc(d.ketua)}${p !== "mahasiswa" ? " · " + esc(shortFak(fakOf(d))) : ""}</div>
     ${meta}
-    <div class="foot"><button class="maplink" data-map="${d.no}" aria-label="Lihat panel ${panelOf(d)} di denah">Panel <span class="stan">${panelOf(d)}</span> · <u>Lihat di denah</u></button>
-      <span class="row" style="gap:8px">${inRoute ? '<span class="added">Ada di rute</span>' : `<button class="btn sm ghost" data-add="${d.no}">Tambah ke rute</button>`}<button class="btn sm" data-open="${d.no}">Detail</button></span></div>
+    <div class="foot">
+      <button class="maplink" data-map="${d.no}" aria-label="Lihat panel ${panelOf(d)} di denah"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right:3px"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon></svg><u>Lihat di Denah</u></button>
+      <span class="row card-actions" style="gap:8px;margin-left:auto;justify-content:flex-end">
+        ${inRoute ? '<span class="added">✓ Di Rute</span>' : `<button class="btn sm ghost" data-add="${d.no}">+ Rute</button>`}
+        <button class="btn sm" data-open="${d.no}">Detail</button>
+      </span>
+    </div>
   </article>`;
 }
 
@@ -1629,7 +1644,7 @@ function viewJelajah() {
   if (!el.dataset.built) {
     el.dataset.built = 1;
     el.innerHTML = `<div class="tools">
-      <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm9 16l-4-4"/></svg><input id="q" type="search" placeholder="Cari judul, peneliti, atau fakultas" autocomplete="off" aria-label="Cari karya"></label>
+      <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><input id="q" type="search" placeholder="Cari karya, peneliti, atau fakultas..." autocomplete="off" aria-label="Cari karya"></label>
       <div id="stampj"></div>
       <div class="seg" id="segKat" role="group" aria-label="Jenis karya"></div>
       <div class="seg" id="segKl" role="group" aria-label="Bidang"></div>
@@ -1640,8 +1655,8 @@ function viewJelajah() {
           ([n, [l]]) => `<option value="${n}">SDGs ${n} · ${esc(l)}</option>`,
         )
         .join("")}</select>
-      <select id="selFak" aria-label="Filter fakultas"><option value="">Semua fakultas</option>${faks.map((x) => `<option value="${esc(x)}">${esc(x.replace("Fakultas ", ""))}</option>`).join("")}${DATA.some((d) => !d.fak) ? '<option value="-">Belum tercantum</option>' : ""}</select></div>
-    </div><div class="count"><span id="cnt"></span><button class="link" data-act="reset">Atur ulang</button></div><div class="grid" id="list"></div>`;
+      <select id="selFak" aria-label="Filter fakultas"><option value="">Semua fakultas</option>${faks.map((x) => `<option value="${esc(x)}">${esc(shortFak(x))}</option>`).join("")}${DATA.some((d) => !d.fak) ? '<option value="-">Belum tercantum</option>' : ""}</select></div>
+    </div><div class="count"><span id="cnt"></span><button class="link" data-act="reset">Atur Ulang</button></div><div class="grid" id="list"></div>`;
     $("#q").addEventListener("input", (e) => {
       S.f.q = e.target.value;
       renderList();
@@ -1688,7 +1703,17 @@ function renderList() {
   $("#cnt").textContent = list.length + " dari " + DATA.length + " karya";
   $("#list").innerHTML = list.length
     ? list.map((d) => workCard(d)).join("")
-    : `<div class="empty" style="grid-column:1/-1">Tidak ada karya yang cocok. Ubah kata kunci atau atur ulang filter.</div>`;
+    : `<div class="empty-state" style="grid-column:1/-1">
+        <div class="empty-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+        <p class="empty-title">Tidak ada karya yang sesuai</p>
+        <p class="empty-sub">Coba ubah kata kunci atau atur ulang filter pencarian.</p>
+        <button class="btn sm gold" data-act="reset">Atur Ulang Filter</button>
+      </div>`;
 }
 
 /* ---------- SDGs ---------- */
@@ -1699,11 +1724,11 @@ function viewSdgs() {
   );
   const activeEntries = Object.entries(SDGINFO).filter(([n]) => (c[n] || 0) > 0);
   $("#v-sdgs").innerHTML =
-    `<div class="sec" style="margin-top:0"><h2>Keterkaitan dengan SDGs</h2><p class="lead">${activeEntries.length} dari 17 tujuan terhubung dengan 60 karya yang dipamerkan. Ketuk salah satu tujuan untuk melihat daftar booth terkait.</p></div>
+    `<div class="sec" style="margin-top:0"><h2>Keterkaitan SDGs</h2><p class="lead">${activeEntries.length} dari 17 tujuan terhubung dengan 60 karya yang dipamerkan. Ketuk salah satu kartu untuk melihat daftar booth terkait.</p></div>
   <div class="sdgs">${activeEntries
     .map(([n, [l]]) => {
       const v = c[n] || 0;
-      return `<button class="sdgt" data-filter='${JSON.stringify({ sdg: n })}' aria-label="SDGs ${n}: ${esc(l)}, ${v} karya">
+      return `<button class="sdgt" data-open-sdg="${n}" aria-label="SDGs ${n}: ${esc(l)}, ${v} karya">
         <div class="sdgt-head">
           <img src="assets/img/sdgs_logo/sdg-${n}.webp" alt="SDGs ${n}: ${esc(l)}" class="sdgt-icon" width="52" height="52" loading="lazy" />
           <span class="c">${v} karya</span>
@@ -1911,6 +1936,7 @@ function showOnMap(no) {
     route: false,
     sel: no,
     pending: no,
+    z: 2.2, // Otomatis perbesar/zoom in agar lokasi booth langsung fokus dan jelas
   };
   if (S.tab === "denah") viewDenah();
   else go("denah");
@@ -1932,12 +1958,71 @@ function viewRute() {
     .map((n) => DATA.find((d) => d.no === n))
     .filter(Boolean)
     .sort((a, b) => panelOf(a) - panelOf(b));
-  $("#v-rute").innerHTML =
-    `<div class="sec" style="margin-top:0"><h2>Rute Saya</h2><p class="lead">Karya yang Anda simpan, diurutkan menurut nomor panel supaya langkah Anda efisien. Rute tersimpan di perangkat ini.</p></div>` +
-    (items.length
-      ? `<div class="grid">${items.map((d) => `<article class="work"><div class="top"><span class="pill"><i class="dot"></i>${esc(d.kat)} · ${esc(KLASTER[d.kl])}</span></div><button style="all:unset;cursor:pointer;display:block" data-open="${d.no}"><h3>${esc(d.judul)}</h3></button><div class="who">${esc(d.ketua)}</div><div class="foot"><button class="maplink" data-map="${d.no}">Panel <span class="stan">${panelOf(d)}</span> · <u>Lihat di denah</u></button><button class="btn sm ghost" data-del="${d.no}">Hapus</button></div></article>`).join("")}</div>
-  <div class="row" style="margin-top:16px"><button class="btn" data-act="copyRute">Salin daftar rute</button><button class="btn ghost" data-act="routeMap">Lihat rute di denah</button></div>`
-      : `<div class="card empty">Belum ada karya di rute. Buka tab Jelajah, lalu pilih "Tambah ke rute".<br><br><button class="btn" data-go="jelajah">Jelajahi karya</button></div>`);
+
+  if (!items.length) {
+    $("#v-rute").innerHTML = `
+      <div class="sec" style="margin-top:0">
+        <h2>Rute Kunjungan</h2>
+        <p class="lead">Simpan karya yang ingin Anda kunjungi agar alur langkah pameran lebih efisien.</p>
+      </div>
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="6" cy="19" r="3"></circle>
+            <path d="M9 19h8.5a4.5 4.5 0 0 0 0-9H7"></path>
+            <polyline points="10 6 7 9 10 12"></polyline>
+          </svg>
+        </div>
+        <p class="empty-title">Rute Kunjungan Masih Kosong</p>
+        <p class="empty-sub">Pilih "+ Rute" pada kartu karya di menu Jelajah untuk menyusun rencana kunjungan Anda.</p>
+        <button class="btn sm gold" data-go="jelajah">Jelajahi Karya</button>
+      </div>`;
+    return;
+  }
+
+  const estMin = items.length * 4;
+  $("#v-rute").innerHTML = `
+    <div class="sec" style="margin-top:0">
+      <h2>Rute Kunjungan</h2>
+      <p class="lead">${items.length} booth tersimpan · Estimasi ~${estMin} menit. Urutan otomatis disesuaikan denah.</p>
+    </div>
+
+    <div class="row card-actions" style="margin-bottom:14px; gap:8px; justify-content:flex-end;">
+      <button class="btn sm ghost" data-act="copyRute">Salin Rute</button>
+      <button class="btn sm ghost" data-act="clearRute" style="color:var(--err)">Hapus Semua</button>
+      <button class="btn sm gold" data-act="routeMap">Lihat di Denah</button>
+    </div>
+
+    <div class="grid">
+      ${items
+        .map(
+          (d, i) => `
+        <article class="work">
+          <div class="top">
+            <span class="pill stan-pill">Langkah ${i + 1} · Panel ${panelOf(d)}</span>
+            <span class="pill"><i class="dot"></i>${esc(d.kat)} · ${esc(KLASTER[d.kl])}</span>
+            ${S.stamp[panelOf(d)] ? '<span class="pill ok">✓ Dikunjungi</span>' : ""}
+          </div>
+          <button style="all:unset;cursor:pointer;display:block;width:100%" data-open="${d.no}" aria-label="Buka detail karya ${d.no}">
+            <h3 class="work-title">${esc(d.judul)}</h3>
+          </button>
+          <div class="who">${esc(d.ketua)} · <span class="fak-text">${esc(shortFak(fakOf(d)))}</span></div>
+          <div class="foot">
+            <button class="maplink" data-map="${d.no}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right:3px"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon></svg><u>Lihat di Denah</u></button>
+            <span class="row card-actions" style="gap:8px;margin-left:auto;justify-content:flex-end">
+              <button class="btn sm ghost" data-del="${d.no}">Hapus</button>
+              <button class="btn sm" data-open="${d.no}">Detail</button>
+            </span>
+          </div>
+        </article>`,
+        )
+        .join("")}
+    </div>
+
+    <div class="row card-actions" style="margin-top:16px; gap:8px; justify-content:flex-end;">
+      <button class="btn ghost" data-act="copyRute">Salin Rute</button>
+      <button class="btn gold" data-act="routeMap">Tampilkan di Denah</button>
+    </div>`;
 }
 
 /* ---------- Detail ---------- */
@@ -3768,6 +3853,15 @@ document.addEventListener("click", async (e) => {
   if (d.act === "reset") {
     S.f = { q: "", kat: "", kl: "", sdg: "", fak: "" };
     viewJelajah();
+    return;
+  }
+  if (d.act === "clearRute") {
+    if (confirm("Hapus semua karya dari rute kunjungan Anda?")) {
+      S.rute = [];
+      store.set("rute", S.rute);
+      viewRute();
+      toast("Semua karya telah dihapus dari rute");
+    }
     return;
   }
   if (d.act === "demo") {

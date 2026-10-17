@@ -14,6 +14,8 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 - [ ] **Milestone 5: Halaman Rute (Itinerary Kunjungan Berurutan & Aksi)** (Antrean)
 - [ ] **Milestone 6: Halaman Umpan Balik (Evaluasi Pameran Ringkas & Tanpa Distraksi)** (Selesai Sebagian di Sheet)
 - [ ] **Milestone 7: QA Polish, Performance, & Accessibility Audit** (Antrean)
+- [ ] **Milestone 8: Ergonomi Sentuh Jempol Kanan Mobile (Right-Hand Thumb Ergonomics & Button Accessibility)** (Antrean)
+- [ ] **Milestone 9: Penyempurnaan Visual Peta Karya & Otomatis Zoom In Denah** (Antrean)
 
 ---
 
@@ -92,3 +94,16 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 - [ ] Pengujian visual pada resolusi mobile sempit (360px), standar (390px - 412px), dan desktop.
 - [ ] Verifikasi kontras teks WCAG AAA pada mode terang dan mode gelap.
 - [ ] Audit performa: zero layout shift (CLS 0) dan transisi responsif 60fps.
+
+---
+
+### Milestone 8: Ergonomi Sentuh Jempol Kanan Mobile (Right-Hand Thumb Ergonomics & Button Accessibility)
+- [ ] **Prioritas Tombol Aksi Kanan (Right-Hand Dominance):** Tata letak tombol aksi utama, button group, card footer action, dan dialog/sheet CTA berada di sisi **kanan** (`justify-content: flex-end`, right-aligned) pada tampilan mobile agar mudah dijangkau jempol tangan kanan 90% pengguna ponsel.
+- [ ] **Urutan Button Group Alami:** Tombol aksi primer/konfirmasi diletakkan di posisi paling kanan/bawah yang paling dekat dengan jangkauan jempol, tombol sekunder/batal di sebelah kirinya.
+- [ ] **Jangkauan Ergonomis:** Touch target minimum $\ge 44\text{px} - 48\text{px}$ di seluruh tombol aksi agar bebas salah sentuh (*mis-click*).
+
+---
+
+### Milestone 9: Penyempurnaan Visual Peta Karya & Otomatis Zoom In Denah
+- [ ] **Centering Sel Peta Karya (Matrix):** Update styling `.cell` pada section "Peta karya" agar nilai angka (`.cell b`) dan teks subtitle (`.cell span`) berada tepat di tengah (*centered vertically and horizontally*).
+- [ ] **Otomatis Zoom In Denah dari Referensi:** Pada aksi "Lihat di denah" (`showOnMap(no)`), otomatis set level zoom peta lebih dekat/fokus (misal: `S.map.z = 2.2`) dan gulir presisi ke koordinat booth panel yang dituju.
