@@ -1,41 +1,64 @@
-<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Gelar Karya UP60</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <title>Gelar Karya UP60</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    />
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="wrap">
+        <img
+          src="https://lh3.googleusercontent.com/d/1-bUeaGic7PcI6EGz7-OlFdL4M82DOuOQ"
+          alt="Logo Dies Natalis ke-60 Universitas Pancasila"
+          width="132"
+          height="125"
+        />
+        <div>
+          <p class="eyebrow">Gelar Karya Penelitian dan PKM</p>
+          <h1>60 Tahun UP: Berakar Pancasila, Berkarya Untuk Bangsa</h1>
+          <p>
+            Senin, 19 Oktober 2026 · 08.00–16.00 WIB · Aula Masjid At-Taqwa,
+            Universitas Pancasila
+          </p>
+        </div>
+        <div class="stats" id="stats"></div>
+      </div>
+    </header>
 
-<header class="hero">
-  <div class="wrap">
-    <img src="https://lh3.googleusercontent.com/d/1-bUeaGic7PcI6EGz7-OlFdL4M82DOuOQ" alt="Logo Dies Natalis ke-60 Universitas Pancasila" width="132" height="125">
-    <div>
-      <p class="eyebrow">Gelar Karya Penelitian dan PKM</p>
-      <h1>60 Tahun UP: Berakar Pancasila, Berkarya Untuk Bangsa</h1>
-      <p>Senin, 19 Oktober 2026 · 08.00–16.00 WIB · Aula Masjid At-Taqwa, Universitas Pancasila</p>
-    </div>
-    <div class="stats" id="stats"></div>
-  </div>
-</header>
+    <main class="wrap" id="main">
+      <section id="v-beranda" data-view="beranda"></section>
+      <section id="v-jelajah" data-view="jelajah" hidden></section>
+      <section id="v-sdgs" data-view="sdgs" hidden></section>
+      <section id="v-denah" data-view="denah" hidden></section>
+      <section id="v-rute" data-view="rute" hidden></section>
+      <section id="v-umpan" data-view="umpan" hidden></section>
+      <section id="v-hadir" data-view="hadir" hidden></section>
+      <section id="v-qrbooth" data-view="qrbooth" hidden></section>
+      <footer>
+        Data: daftar 60 judul terpilih Gelar Karya 2026. Pemetaan bidang
+        (IPTEKS, Kesehatan, Sosial Humaniora) dan SDGs disusun dari judul karya
+        dan perlu diverifikasi peneliti. Nomor panel pada denah mengikuti nomor
+        urut karya (1 sampai 60) dan dapat disesuaikan panitia.
+      </footer>
+    </main>
 
-<main class="wrap" id="main">
-  <section id="v-beranda" data-view="beranda"></section>
-  <section id="v-jelajah" data-view="jelajah" hidden></section>
-  <section id="v-sdgs" data-view="sdgs" hidden></section>
-  <section id="v-denah" data-view="denah" hidden></section>
-  <section id="v-rute" data-view="rute" hidden></section>
-  <section id="v-umpan" data-view="umpan" hidden></section>
-  <section id="v-hadir" data-view="hadir" hidden></section>
-  <section id="v-qrbooth" data-view="qrbooth" hidden></section>
-  <footer>Data: daftar 60 judul terpilih Gelar Karya 2026. Pemetaan bidang (IPTEKS, Kesehatan, Sosial Humaniora) dan SDGs disusun dari judul karya dan perlu diverifikasi peneliti. Nomor panel pada denah mengikuti nomor urut karya (1 sampai 60) dan dapat disesuaikan panitia.</footer>
-</main>
+    <nav class="tabs" id="tabs" aria-label="Navigasi utama"></nav>
+    <div id="layer"></div>
+    <div id="scanlayer"></div>
 
-<nav class="tabs" id="tabs" aria-label="Navigasi utama"></nav>
-<div id="layer"></div>
-<div id="scanlayer"></div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="assets/js/jsqr.min.js"></script>
-<script src="assets/js/app.js"></script>
-</body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="assets/js/jsqr.min.js"></script>
+    <script src="assets/js/app.js"></script>
+  </body>
 </html>
