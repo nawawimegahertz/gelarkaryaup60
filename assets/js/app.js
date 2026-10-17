@@ -34,7 +34,7 @@ const CONFIG = {
   },
   undian: {
     hadiah: "Rp 250.000", // hadiah undian bagi pengunjung yang memindai booth
-    target: 10, // Target stempel untuk membuka kupon undian resmi (10 dari 60 booth)
+    target: 60, // Syarat 60 booth lengkap konsisten dengan #jelajah
     garam: "up60-gk-2026", // ubah sebelum mencetak QR; kode booth dihitung dari nilai ini
     jeda: 8, // detik minimal antarpindaian, mencegah pindai beruntun tanpa berkunjung
     formAction: "", // opsional: Google Form pendaftaran undian
@@ -1489,30 +1489,26 @@ function workCard(d, opt = {}) {
 /* ---------- Beranda (Decluttered & Gamifikasi Reward) ---------- */
 function questCard() {
   const n = Object.keys(S.stamp).length;
-  const target = (CONFIG.undian && CONFIG.undian.target) || 10;
+  const target = BOOTH_N;
   const pct = Math.min(100, Math.round((n / target) * 100));
   const done = store.get("undian", null);
 
-  let tier = "Level 1: Penjelajah Pemula";
-  let tierDesc = `Kumpulkan minimal ${target} stempel untuk membuka Tiket Undian Resmi!`;
-  let tierBadge = "Pemula";
-  if (n >= BOOTH_N) {
-    tier = "Level 4: Penjelajah Sempurna (Master)";
-    tierDesc = "Luar biasa! Seluruh 60 booth pameran telah Anda jelajahi!";
-    tierBadge = "Master";
-  } else if (n >= 30) {
-    tier = "Level 3: Penjelajah Unggul";
-    tierDesc = "Hebat! Separuh booth telah dikunjungi. Terus jelajahi pameran!";
-    tierBadge = "Unggul";
-  } else if (n >= target) {
-    tier = "Level 2: Tiket Undian Aktif";
+  let tier = "Tantangan Penjelajah Booth";
+  let tierDesc = `Pindai QR di bawah poster setiap booth. Pengunjung yang melengkapi seluruh ${target} booth berhak ikut undian ${esc(CONFIG.undian.hadiah)}.`;
+  let tierBadge = `${n}/${target}`;
+  if (n >= target) {
+    tier = "Seluruh 60 Booth Lengkap!";
     tierDesc = done
       ? `Kupon Anda terdaftar: #${esc(done.kode)}`
-      : `Syarat tercapai! Daftarkan kupon undian ${esc(CONFIG.undian.hadiah)} Anda sekarang!`;
-    tierBadge = "Kupon Aktif";
-  } else {
+      : `Luar biasa! Seluruh ${target} booth telah Anda lengkapi. Daftarkan kupon undian ${esc(CONFIG.undian.hadiah)} Anda sekarang!`;
+    tierBadge = "Lengkap 60/60";
+  } else if (n >= 30) {
+    tier = "Penjelajah Unggul (Separuh Booth)";
     const sisa = target - n;
-    tierDesc = `Tinggal ${sisa} stempel booth lagi untuk membuka Kupon Undian Resmi!`;
+    tierDesc = `Mantap! ${n} booth telah Anda kunjungi. Kunjungi ${sisa} booth lagi untuk memenuhi syarat undian doorprize!`;
+  } else if (n > 0) {
+    const sisa = target - n;
+    tierDesc = `Bagus! ${n} stempel terkumpul. Lanjutkan penjelajahan ${sisa} booth lagi untuk melengkapi 60 booth!`;
   }
 
   return `
@@ -1520,17 +1516,17 @@ function questCard() {
     <div class="quest-top">
       <div class="quest-badge">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-        <span>Misi Berhadiah</span>
+        <span>Misi Undian</span>
       </div>
       <div class="quest-reward">
-        <span>Hadiah Utama</span>
+        <span>Hadiah Undian</span>
         <b class="reward-val">${esc(CONFIG.undian.hadiah)}</b>
       </div>
     </div>
 
     <div class="quest-body">
       <div class="quest-headline-row">
-        <h2 class="quest-title">Misi Penjelajah Booth</h2>
+        <h2 class="quest-title">Undian ${esc(CONFIG.undian.hadiah)}</h2>
         <span class="quest-tier-pill">${esc(tierBadge)}</span>
       </div>
       <div class="quest-tier-name">${esc(tier)}</div>
@@ -1538,7 +1534,7 @@ function questCard() {
 
       <div class="quest-progress-box">
         <div class="quest-prog-meta">
-          <span class="quest-count"><b>${n}</b> / ${target} stempel</span>
+          <span class="quest-count"><b>${n}</b> / ${target} booth dikunjungi</span>
           <span class="quest-pct">${pct}%</span>
         </div>
         <div class="prog quest-prog-bar" role="progressbar" aria-valuemin="0" aria-valuemax="${target}" aria-valuenow="${n}">
@@ -1548,17 +1544,17 @@ function questCard() {
     </div>
 
     <div class="quest-actions">
-      <button class="btn sm ghost" data-go="jelajah">Cari Booth</button>
+      <button class="btn sm ghost" data-go="jelajah">Jelajah Booth</button>
       <button class="btn sm gold" data-act="scan">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="margin-right:4px"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path></svg>
-        Pindai QR Booth
+        Pindai QR
       </button>
       ${
         n >= target && !done
-          ? '<button class="btn sm gold" data-act="undian" style="animation: pulse 2s infinite">Daftar Undian</button>'
+          ? '<button class="btn sm gold animate-pulse" data-act="undian">Daftar Undian</button>'
           : ""
       }
-      ${done ? '<button class="btn sm ghost" data-act="undian">Tiket Saya</button>' : ""}
+      ${done ? '<button class="btn sm ghost" data-act="undian">Kupon Saya</button>' : ""}
     </div>
   </div>`;
 }
@@ -1735,7 +1731,7 @@ function journeyCard() {
     },
     {
       ok: Object.keys(S.stamp).length >= BOOTH_N,
-      t: "Pindai QR Booth",
+      t: "Pindai QR",
       s:
         Object.keys(S.stamp).length +
         " dari " +
@@ -3382,7 +3378,7 @@ function stampCard() {
   return `<div class="card stamp"><div class="row" style="justify-content:space-between;flex-wrap:nowrap;align-items:baseline"><h2 style="font-size:16px">Undian ${esc(CONFIG.undian.hadiah)}</h2><b class="num" style="font-size:24px;color:var(--ok)">${n}/${BOOTH_N}</b></div>
     <p style="margin:4px 0 0;color:var(--mut);font-size:14px">Pindai QR booth untuk kumpulkan stempel. Lengkapi ${BOOTH_N} booth untuk berhak ikut undian doorprize.</p>
     <div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="${BOOTH_N}" aria-valuenow="${n}" aria-label="Booth dikunjungi"><i style="width:${(n / BOOTH_N) * 100}%"></i></div>
-    <div class="row"><button class="btn gold" data-act="scan">Pindai QR Booth</button>${n >= BOOTH_N && !done ? '<button class="btn" data-act="undian">Daftar Undian</button>' : ""}${done ? `<button class="btn ghost" data-act="undian">Bukti Undian</button>` : ""}</div></div>`;
+    <div class="row"><button class="btn gold" data-act="scan">Pindai QR</button>${n >= BOOTH_N && !done ? '<button class="btn" data-act="undian">Daftar Undian</button>' : ""}${done ? `<button class="btn ghost" data-act="undian">Bukti Undian</button>` : ""}</div></div>`;
 }
 /* kamera */
 let scanState = null;
@@ -3392,7 +3388,7 @@ function loadJsQR() {
 function openScan() {
   const n = Object.keys(S.stamp).length;
   $("#scanlayer").innerHTML =
-    `<div class="scan" role="dialog" aria-modal="true" aria-label="Pindai QR booth">
+    `<div class="scan" role="dialog" aria-modal="true" aria-label="Pindai QR">
     <div class="scan-top"><b id="sc-p">Booth ${n} dari ${BOOTH_N}</b><button data-act="scanx" aria-label="Tutup pemindai">×</button></div>
     <div class="scan-view"><video id="sc-v" playsinline muted></video><div class="scan-frame"></div></div>
     <div class="scan-msg" id="sc-m" role="status" aria-live="polite">Memulai kamera. Pilih Izinkan bila diminta.</div>

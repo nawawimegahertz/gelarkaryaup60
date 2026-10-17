@@ -170,26 +170,24 @@
 
       /* ===== 3. GAMIFIED HERO QUEST CARD ===== */
       .quest-card {
-        background: linear-gradient(145deg, #0a1b3a 0%, #102e68 100%);
-        border-radius: var(--card-radius);
+        background: var(--surface, #ffffff);
+        border-radius: var(--card-radius, 16px);
         padding: 20px 18px;
-        color: #ffffff;
-        box-shadow: 0 10px 28px -6px rgba(10, 27, 58, 0.35);
+        color: var(--ink, #0f172a);
+        box-shadow: 0 1px 3px rgba(10, 42, 102, 0.08);
         position: relative;
         overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.12);
+        border: 1px solid var(--line, #e2e8f0);
       }
 
       .quest-card::before {
         content: "";
         position: absolute;
-        top: -40px;
-        right: -40px;
-        width: 140px;
-        height: 140px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(235, 179, 56, 0.25) 0%, transparent 70%);
-        pointer-events: none;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gold, #f5a800);
       }
 
       .quest-top {
@@ -204,9 +202,9 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        background: rgba(235, 179, 56, 0.2);
-        border: 1px solid rgba(235, 179, 56, 0.45);
-        color: #ffd875;
+        background: rgba(245, 168, 0, 0.12);
+        border: 1px solid rgba(245, 168, 0, 0.35);
+        color: #b45309;
         padding: 4px 10px;
         border-radius: 999px;
         font-size: 11px;
@@ -217,35 +215,36 @@
 
       .quest-reward {
         font-size: 12px;
-        color: #e2e8f0;
+        color: var(--mut, #64748b);
         font-weight: 600;
       }
 
       .quest-reward b {
-        color: #ffd875;
-        font-size: 14px;
+        color: #b45309;
+        font-size: 15px;
         font-weight: 800;
       }
 
       .quest-headline {
-        font-size: 17px;
+        font-size: 17.5px;
         line-height: 1.35;
         font-weight: 800;
         margin-bottom: 6px;
+        color: var(--ink, #0f172a);
         letter-spacing: -0.01em;
       }
 
       .quest-desc {
-        font-size: 13px;
-        color: #cbd5e1;
+        font-size: 13.5px;
+        color: var(--mut, #64748b);
         line-height: 1.45;
         margin-bottom: 16px;
       }
 
-      /* Interactive Progress Bar */
+      /* Interactive Progress Bar (Solid Gold, no multi-color gradient) */
       .quest-progress-box {
-        background: rgba(0, 0, 0, 0.25);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: #f8fafc;
+        border: 1px solid var(--line, #e2e8f0);
         border-radius: 12px;
         padding: 12px 14px;
         margin-bottom: 16px;
@@ -256,12 +255,13 @@
         justify-content: space-between;
         font-size: 12.5px;
         font-weight: 700;
+        color: var(--mut, #64748b);
         margin-bottom: 8px;
       }
 
       .quest-progress-track {
         height: 10px;
-        background: rgba(255, 255, 255, 0.15);
+        background: #e2e8f0;
         border-radius: 999px;
         overflow: hidden;
         position: relative;
@@ -269,10 +269,9 @@
 
       .quest-progress-fill {
         height: 100%;
-        width: 35%;
-        background: linear-gradient(90deg, #ebb338, #ffda73);
+        width: 40%;
+        background: var(--gold, #f5a800);
         border-radius: 999px;
-        box-shadow: 0 0 10px rgba(235, 179, 56, 0.7);
         transition: width 0.4s ease;
       }
 
@@ -294,9 +293,9 @@
       }
 
       .btn-quest-secondary {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: #ffffff;
+        background: #ffffff;
+        border: 1.5px solid var(--line, #e2e8f0);
+        color: var(--ink, #0f172a);
         padding: 10px 14px;
         border-radius: 12px;
         font-size: 13px;
@@ -308,10 +307,15 @@
         gap: 6px;
       }
 
+      .btn-quest-secondary:hover,
+      .btn-quest-secondary:active {
+        background: #f1f5f9;
+      }
+
       .btn-quest-primary {
-        background: linear-gradient(135deg, var(--gold), #d99a18);
+        background: var(--gold, #f5a800);
         border: 0;
-        color: #0f172a;
+        color: #10213f;
         padding: 10px 18px;
         border-radius: 12px;
         font-size: 13px;
@@ -321,7 +325,7 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        box-shadow: var(--shadow-gold);
+        box-shadow: 0 4px 12px rgba(245, 168, 0, 0.28);
         transition: transform 0.15s ease;
       }
 
@@ -639,29 +643,29 @@
         <div class="quest-top">
           <span class="quest-badge">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-            Misi Penjelajah Booth
+            Misi Undian Booth
           </span>
-          <span class="quest-reward">Hadiah: <b>Saldo Rp250.000</b></span>
+          <span class="quest-reward">Hadiah: <b>Undian Rp250.000</b></span>
         </div>
 
-        <h2 class="quest-headline">Kumpulkan 10 Stempel, Buka Peluang Doorprize!</h2>
+        <h2 class="quest-headline">Kunjungi 60 Booth, Buka Peluang Undian Rp 250.000!</h2>
         <p class="quest-desc">
-          Kunjungi booth pameran, temukan QR code pada poster penelitian, dan kumpulkan stempel untuk mengaktifkan kupon undian Anda.
+          Pindai QR di bawah poster setiap booth. Pengunjung yang melengkapi seluruh 60 booth berhak mengikuti undian doorprize (konsisten dengan syarat di menu Jelajah).
         </p>
 
         <!-- Progress Box -->
         <div class="quest-progress-box">
           <div class="quest-progress-labels">
             <span>Stempel Terkumpul</span>
-            <span id="stampCountText"><b style="color:#ffd875; font-size:15px;">4</b> / 10 Booth</span>
+            <span id="stampCountText"><b style="color:#b45309; font-size:15px;">24</b> / 60 Booth Dikunjungi</span>
           </div>
           <div class="quest-progress-track">
             <div class="quest-progress-fill" id="stampFill" style="width: 40%;"></div>
           </div>
           <div class="quest-milestones">
-            <span>Mulai</span>
-            <span>Target: 10 Booth (Syarat Undian)</span>
-            <span>Kupon Siap</span>
+            <span>Mulai (0)</span>
+            <span>Separuh (30 Booth)</span>
+            <span>Target Lengkap (60/60)</span>
           </div>
         </div>
 
@@ -799,8 +803,8 @@
 
     <!-- SCRIPT SIMULATOR INTERAKTIF -->
     <script>
-      let currentStamps = 4;
-      const targetStamps = 10;
+      let currentStamps = 24;
+      const targetStamps = 60;
       const btnScan = document.getElementById("btnDemoScan");
       const btnScanAction = document.getElementById("btnScanAction");
       const textCount = document.getElementById("stampCountText");
@@ -811,13 +815,13 @@
           currentStamps++;
           const pct = Math.min(100, Math.round((currentStamps / targetStamps) * 100));
           fillBar.style.width = pct + "%";
-          textCount.innerHTML = `<b style="color:#ffd875; font-size:15px;">${currentStamps}</b> / ${targetStamps} Booth`;
+          textCount.innerHTML = `<b style="color:#b45309; font-size:15px;">${currentStamps}</b> / ${targetStamps} Booth Dikunjungi`;
           
           if (currentStamps === targetStamps) {
-            alert("SELAMAT! Misi Jelajah Selesai!\nAnda telah mengumpulkan 10 stempel booth. Kupon undian Doorprize Rp250.000 kini telah AKTIF!");
+            alert("SELAMAT! Syarat Undian Terpenuhi!\nAnda telah mengunjungi seluruh 60 booth (60/60). Kupon undian Doorprize Rp250.000 kini telah AKTIF!");
           }
         } else {
-          alert("Misi sudah selesai (10/10 stempel lengkap)!");
+          alert("Lengkap! Seluruh 60 booth telah dikunjungi (60/60)!");
         }
       }
 

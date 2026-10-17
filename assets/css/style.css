@@ -3052,7 +3052,7 @@ button,
 .prog i {
   display: block;
   height: 100%;
-  background: var(--ok);
+  background: var(--gold, #f5a800);
   border-radius: 6px;
   transition: width 0.3s;
 }
@@ -3308,14 +3308,14 @@ button,
 }
 
 .quest-card {
-  background: linear-gradient(135deg, #071c46 0%, #0d347f 50%, #1754be 100%);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-lg, 20px);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--line, #e2e8f0);
+  border-radius: var(--radius-lg, 16px);
   padding: var(--space-lg, 20px);
-  box-shadow: 0 10px 28px -4px rgba(10, 42, 102, 0.28);
+  box-shadow: var(--shadow, 0 1px 3px rgba(10, 42, 102, 0.08));
   position: relative;
   overflow: hidden;
-  color: #ffffff;
+  color: var(--ink, #10213f);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
@@ -3326,7 +3326,7 @@ button,
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #f5a800, #ffd36b, #10b981);
+  background: var(--gold, #f5a800);
 }
 
 .quest-top {
@@ -3341,9 +3341,9 @@ button,
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(245, 168, 0, 0.2);
-  border: 1px solid rgba(245, 168, 0, 0.4);
-  color: #ffd36b;
+  background: rgba(245, 168, 0, 0.12);
+  border: 1px solid rgba(245, 168, 0, 0.35);
+  color: #b45309;
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
@@ -3355,14 +3355,14 @@ button,
 .quest-reward {
   text-align: right;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--mut, #52617d);
 }
 
 .quest-reward .reward-val {
   display: block;
   font-size: 16px;
   font-weight: 800;
-  color: #ffd36b;
+  color: #b45309;
   letter-spacing: -0.01em;
 }
 
@@ -3374,18 +3374,19 @@ button,
 }
 
 .quest-title {
-  font-size: 18.5px;
+  font-size: 18px;
   font-weight: 800;
   margin: 0;
-  color: #ffffff;
+  color: var(--ink, #10213f);
   letter-spacing: -0.015em;
 }
 
 .quest-tier-pill {
   font-size: 11px;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.18);
-  color: #ffffff;
+  background: var(--tint, #f1f5f9);
+  color: var(--primary, #1857c4);
+  border: 1px solid var(--line, #e2e8f0);
   padding: 3px 8px;
   border-radius: 6px;
   white-space: nowrap;
@@ -3394,20 +3395,20 @@ button,
 .quest-tier-name {
   font-size: 13.5px;
   font-weight: 700;
-  color: #ffd36b;
+  color: var(--primary, #1857c4);
   margin: 4px 0 2px;
 }
 
 .quest-desc {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.85);
+  font-size: 13.5px;
+  color: var(--mut, #52617d);
   margin: 0 0 14px;
   line-height: 1.45;
 }
 
 .quest-progress-box {
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--tint, #f8fafc);
+  border: 1px solid var(--line, #e2e8f0);
   border-radius: var(--radius-md, 12px);
   padding: 10px 14px;
   margin-bottom: 14px;
@@ -3419,23 +3420,23 @@ button,
   align-items: center;
   font-size: 12.5px;
   margin-bottom: 6px;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--mut, #52617d);
 }
 
 .quest-count b {
   font-size: 15px;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--ink, #10213f);
 }
 
 .quest-pct {
   font-weight: 800;
-  color: #ffd36b;
+  color: #b45309;
 }
 
 .quest-prog-bar {
-  height: 8px;
-  background: rgba(255, 255, 255, 0.2);
+  height: 10px;
+  background: var(--bar-bg, #e2e8f0);
   border-radius: var(--radius-pill, 9999px);
   overflow: hidden;
 }
@@ -3443,7 +3444,7 @@ button,
 .quest-prog-bar > i {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #f5a800, #ffd36b, #10b981);
+  background: var(--gold, #f5a800);
   border-radius: var(--radius-pill, 9999px);
   transition: width 0.4s ease;
 }
@@ -3457,14 +3458,14 @@ button,
 }
 
 .quest-actions .btn.ghost {
-  background: rgba(255, 255, 255, 0.14);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: transparent;
+  color: var(--ink, #10213f);
+  border: 1.5px solid var(--line, #e2e8f0);
 }
 
 .quest-actions .btn.ghost:hover,
 .quest-actions .btn.ghost:active {
-  background: rgba(255, 255, 255, 0.24);
+  background: var(--tint, #f1f5f9);
 }
 
 .quest-badge-tag {

@@ -147,7 +147,15 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 
 ---
 
+### Milestone 15: Penyelarasan Style Kartu Misi, Progress Bar Emas Murni, & Threshold 60/60
+- [x] Sinkronisasi style kartu `.quest-card` ke latar putih (`var(--surface, #ffffff)`), border halus (`#e2e8f0`), tipografi gelap kontras tinggi, identik dengan kartu pada `assets/archives/mockup-gelar-karya-up60.html`.
+- [x] Rombak progres bar dari multi-gradasi menjadi **emas murni solid** (`var(--gold, #f5a800)`), konsisten pada `.prog i`, `.quest-prog-bar > i`, dan `.quest-progress-fill`.
+- [x] Kunci ambang batas (threshold) tantangan secara mutlak di **60/60 booth** (`BOOTH_N = 60`), sinkron dengan kriteria undian di `#jelajah`.
+- [x] Sinkronisasi simulator dan visualisasi di `mockup-beranda-gamifikasi.html` dan `assets/css/style.css`.
+
+---
+
 ### Milestone 7: QA Polish, Performance, & Accessibility Audit
 - [x] Pengujian visual pada resolusi mobile sempit (360px), standar (390px - 412px), dan desktop.
-- [x] Verifikasi kontras teks WCAG AAA pada mode terang dan mode gelap.
+- [x] Verifikasi kontras teks WCAG AAA pada latar putih bersih.
 - [x] Audit performa: zero layout shift (CLS 0) dan transisi responsif 60fps.
