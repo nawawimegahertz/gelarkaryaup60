@@ -93,6 +93,7 @@ function doPost(e) {
 
 // 3. Pencatatan Kehadiran (Sheet "Hadir")
 function recordAttendance(data) {
+  data = data || {};
   const sheet = getOrCreateSheet("Hadir", ["Timestamp", "Nama", "Peran", "Fakultas / Asal", "ID Pengunjung"]);
   const t = data.t ? new Date(data.t) : new Date();
   const nama = sanitize_(data.nama || "-");
@@ -106,6 +107,7 @@ function recordAttendance(data) {
 
 // 4. Pencatatan Umpan Balik (Sheet "UmpanBalik") - Relasional dengan Nama & ID Pengunjung
 function recordFeedback(data) {
+  data = data || {};
   const sheet = getOrCreateSheet("UmpanBalik", ["Timestamp", "Nama", "Peran", "Fakultas / Asal", "Nilai", "Karya", "Komentar", "ID Pengunjung"]);
   const t = data.t ? new Date(data.t) : new Date();
   const nama = sanitize_(data.nama || "-");
@@ -122,11 +124,12 @@ function recordFeedback(data) {
 
 // 5. Pencatatan Undian Kunjungan Booth (Sheet "Undian")
 function recordUndian(data) {
+  data = data || {};
   const sheet = getOrCreateSheet("Undian", ["Timestamp", "Nama", "WhatsApp", "Kode", "Jumlah Booth", "Peran", "Asal", "ID Pengunjung"]);
   const t = new Date();
-  const nama = sanitize_(data.nama || "-");
+  const nama = sanitize_(data.nama || "Tes Panitia");
   const wa = sanitize_(data.wa || "-");
-  const kode = sanitize_(data.kode || "-");
+  const kode = sanitize_(data.kode || "TEST");
   const boothCount = Number(data.boothCount) || 0;
   const peran = sanitize_(data.peran || "-");
   const asal = sanitize_(data.asal || "-");
