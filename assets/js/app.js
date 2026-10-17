@@ -1804,21 +1804,61 @@ function journeyCard() {
 }
 function viewUmpan() {
   const seen = store.get("dilihat", []).length;
-  $("#v-umpan").innerHTML =
-    `<div class="sec" style="margin-top:0">
+  const stampsCount = Object.keys(S.stamp).length;
+  const target = BOOTH_N;
+  const myFb = store.get("myFb", null);
+  const doneUndian = store.get("undian", null);
+
+  $("#v-umpan").innerHTML = `
+    <div class="sec" style="margin-top:0">
       <h2>Selesai Berkunjung</h2>
-      <p class="lead">Langkah terakhir sebelum meninggalkan pameran. Karya yang dibuka dan disimpan tetap tersimpan di perangkat ini.</p>
+      <p class="lead">Rangkuman perjalanan jelajah Anda di Gelar Karya 60 Tahun UP dan evaluasi pameran terpadu.</p>
     </div>
-    <div class="card">
-      <div class="row" style="justify-content:space-between;align-items:baseline">
-        <span><b class="num" style="font-size:28px">${seen}</b> karya dibuka</span>
-        <span><b class="num" style="font-size:28px">${S.rute.length}</b> karya di rute</span>
+
+    <!-- Rekap Aktivitas Pengunjung (Stempel, Rute, Karya Dibuka) -->
+    <div class="card" style="margin-bottom:14px;">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;color:var(--ink)">Aktivitas Kunjungan Anda</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:12px;margin-bottom:12px;">
+        <div style="background:var(--tint);padding:10px 12px;border-radius:10px;">
+          <span style="font-size:11px;color:var(--mut);text-transform:uppercase;font-weight:700;letter-spacing:0.02em;">Stempel Booth</span>
+          <div style="font-size:24px;font-weight:800;color:var(--ink);margin-top:2px;">
+            <b class="num">${stampsCount}</b><span style="font-size:14px;font-weight:500;color:var(--mut);"> / ${target}</span>
+          </div>
+          <small style="font-size:11.5px;color:${stampsCount >= target ? 'var(--ok, #15803d)' : 'var(--primary, #15459e)'};font-weight:700;">
+            ${stampsCount >= target ? (doneUndian ? "🏆 Kupon Terdaftar" : "🏆 Siap Diundi") : `Tinggal ${target - stampsCount} lagi`}
+          </small>
+        </div>
+
+        <div style="background:var(--tint);padding:10px 12px;border-radius:10px;">
+          <span style="font-size:11px;color:var(--mut);text-transform:uppercase;font-weight:700;letter-spacing:0.02em;">Karya Dibuka</span>
+          <div style="font-size:24px;font-weight:800;color:var(--ink);margin-top:2px;">
+            <b class="num">${seen}</b><span style="font-size:14px;font-weight:500;color:var(--mut);"> karya</span>
+          </div>
+          <small style="font-size:11.5px;color:var(--mut);">Eksplorasi panel</small>
+        </div>
+
+        <div style="background:var(--tint);padding:10px 12px;border-radius:10px;">
+          <span style="font-size:11px;color:var(--mut);text-transform:uppercase;font-weight:700;letter-spacing:0.02em;">Rute Pilihan</span>
+          <div style="font-size:24px;font-weight:800;color:var(--ink);margin-top:2px;">
+            <b class="num">${S.rute.length}</b><span style="font-size:14px;font-weight:500;color:var(--mut);"> karya</span>
+          </div>
+          <small style="font-size:11.5px;color:var(--mut);">Disimpan di rute</small>
+        </div>
       </div>
-      <div class="row card-actions" style="margin-top:14px;justify-content:flex-end">
+
+      <div class="row card-actions" style="margin-top:10px;justify-content:flex-end;gap:8px;">
+        <button class="btn ghost sm" data-go="jelajah">Jelajah Booth</button>
         <button class="btn ghost sm" data-go="rute">Lihat Rute Saya</button>
       </div>
     </div>
+
+    ${myFbCard(myFb)}
     ${fbCard()}`;
+
+  // Tarik data evaluasi pameran terkini secara live dari Google Sheets
+  try {
+    Fb.fetchLive();
+  } catch (e) {}
 }
 
 /* ---------- Jelajah ---------- */
@@ -2837,16 +2877,63 @@ async function submitForm(ev) {
 }
 
 /* ---------- Umpan balik ---------- */
+function myFbCard(myFb) {
+  if (!S.fbDone || !myFb) return "";
+  const starsStr = "★".repeat(myFb.nilai || 5) + "☆".repeat(5 - (myFb.nilai || 5));
+  const boothFav = myFb.karya ? DATA.find((x) => x.no === myFb.karya) : null;
+
+  return `
+    <div class="card" style="margin-bottom:14px;border:1.5px solid #bbf7d0;background:#f0fdf4;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <span style="font-size:12px;font-weight:700;color:#15803d;display:inline-flex;align-items:center;gap:4px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          Umpan Balik Anda Telah Tercatat
+        </span>
+        <span style="font-size:11px;color:#166534;background:#dcfce7;padding:2px 8px;border-radius:999px;font-weight:600;">
+          Google Sheets ✓
+        </span>
+      </div>
+      <div style="margin-bottom:6px;">
+        <span style="color:#d97706;font-size:16px;letter-spacing:2px;font-weight:700;">${starsStr}</span>
+        <span style="font-size:13px;font-weight:700;color:#166534;margin-left:6px;">${myFb.nilai}/5 (${NILAI[(myFb.nilai || 5) - 1] || "Sangat baik"})</span>
+      </div>
+      ${boothFav ? `<p style="font-size:12.5px;color:#1f2937;margin:4px 0;"><b>Karya Berkesan:</b> Booth #${boothFav.no} · ${esc(boothFav.judul)}</p>` : ""}
+      ${myFb.komentar ? `<p style="font-size:12.5px;color:#374151;margin:6px 0 4px;font-style:italic;background:#ffffff;padding:8px 10px;border-radius:8px;border:1px solid #dcfce7;">"${esc(myFb.komentar)}"</p>` : ""}
+      <div style="margin-top:10px;display:flex;justify-content:flex-end;">
+        <button class="btn sm ghost" data-act="umpan" style="font-size:12px;padding:6px 12px;">Ubah Penilaian</button>
+      </div>
+    </div>`;
+}
+
 function fbCard() {
   const f = S.fb;
-  return `<div class="sec"><h2>Umpan balik pameran</h2><div class="card">
-    <p style="margin:0 0 12px;color:var(--mut);font-size:14px;line-height:1.5">Penilaian Anda sangat bermanfaat bagi panitia untuk evaluasi penyelenggaraan dan apresiasi karya riset.</p>
-    ${f.n ? `<div class="big" style="margin-bottom:12px"><b class="num" style="font-size:36px">${f.avg.toFixed(1).replace(".", ",")}</b><span>Rata-rata dari ${f.n} responden (skala 5)</span></div>` : ""}
-    <div class="row card-actions" style="justify-content:flex-end; gap:8px;">
-      ${S.fbDone ? '<span class="added" style="margin-right:auto">✓ Umpan balik sudah terkirim</span>' : ""}
-      <button class="btn ${S.fbDone ? "ghost" : "gold"}" data-act="umpan">${S.fbDone ? "Beri Masukan Lagi" : "Beri Umpan Balik"}</button>
-    </div>
-  </div></div>`;
+  return `
+    <div class="sec">
+      <h2>Statistik Umpan Balik Pameran</h2>
+      <div class="card">
+        <p style="margin:0 0 12px;color:var(--mut);font-size:14px;line-height:1.5">
+          Penilaian dari pengunjung digunakan oleh panitia dan LPPM Universitas Pancasila untuk mengevaluasi penyelenggaraan serta mengapresiasi karya riset.
+        </p>
+        ${
+          f.n
+            ? `<div class="big" style="margin-bottom:12px">
+                <b class="num" style="font-size:36px;color:var(--ink);">${f.avg.toFixed(1).replace(".", ",")}</b>
+                <span style="font-size:13px;color:var(--mut);">Rata-rata dari <b>${f.n} responden</b> (skala 5) terdata di Google Spreadsheet</span>
+              </div>`
+            : `<div style="margin-bottom:12px;font-size:13px;color:var(--mut);font-style:italic;">Memuat statistik terbaru dari Google Spreadsheet...</div>`
+        }
+        <div class="row card-actions" style="justify-content:flex-end; gap:8px;">
+          ${
+            S.fbDone
+              ? '<span class="added" style="margin-right:auto;font-size:12.5px;">✓ Anda sudah memberi masukan</span>'
+              : ""
+          }
+          <button class="btn ${S.fbDone ? "ghost" : "gold"}" data-act="umpan">
+            ${S.fbDone ? "Beri Masukan Lagi" : "Beri Umpan Balik"}
+          </button>
+        </div>
+      </div>
+    </div>`;
 }
 const NILAI = ["Kurang", "Cukup", "Baik", "Sangat baik", "Luar biasa"];
 function openFeedback() {
@@ -2961,9 +3048,20 @@ async function submitFeedback(ev) {
     await Fb.submit(row);
     S.fbDone = true;
     store.set("umpan", true);
+    store.set("myFb", row);
+
+    // Perbarui data lokal segera (optimistic UI)
+    let rowsFb = store.get("rowsFb", []);
+    rowsFb.push(row);
+    store.set("rowsFb", rowsFb);
+    if (!S.fb.n) {
+      S.fb = { n: rowsFb.length, avg: row.nilai };
+    }
+
     closeLayer();
     toast("Umpan balik terkirim. Terima kasih.");
-    render(S.tab);
+    if (S.tab === "umpan") viewUmpan();
+    else render(S.tab);
   } catch (e) {
     btn.disabled = false;
     err(
@@ -2974,32 +3072,43 @@ async function submitFeedback(ev) {
   }
 }
 const Fb = {
-  watch() {
-    if (S.att.mode === "gas-api") {
+  fetchLive() {
+    if (CONFIG.gasUrl) {
       fetch(CONFIG.gasUrl + "?action=fbStats")
         .then((r) => r.json())
         .then((res) => {
-          if (res) {
+          if (res && res.n !== undefined) {
             S.fb = res;
-            if (
-              !$("#layer").innerHTML &&
-              (S.tab === "umpan" || S.tab === "beranda")
-            )
-              render(S.tab);
+            renderStats();
+            if (S.tab === "umpan") {
+              const fbSec = document.querySelector("#v-umpan .sec:last-of-type .card");
+              if (fbSec && res.n) {
+                const big = fbSec.querySelector(".big") || document.createElement("div");
+                big.className = "big";
+                big.style.marginBottom = "12px";
+                big.innerHTML = `<b class="num" style="font-size:36px;color:var(--ink);">${res.avg.toFixed(1).replace(".", ",")}</b><span style="font-size:13px;color:var(--mut);">Rata-rata dari <b>${res.n} responden</b> (skala 5) terdata di Google Spreadsheet</span>`;
+                const p = fbSec.querySelector("p");
+                if (p && !fbSec.querySelector(".big")) {
+                  p.after(big);
+                  const loadingMsg = fbSec.querySelector("div[style*='italic']");
+                  if (loadingMsg) loadingMsg.remove();
+                }
+              }
+            }
           }
         })
         .catch(() => {});
-      return;
     }
+  },
+  watch() {
+    this.fetchLive();
+    setInterval(() => this.fetchLive(), 25000); // Polling live sync berkala
     if (S.att.mode === "gas") {
       google.script.run
         .withSuccessHandler((res) => {
           if (res) {
             S.fb = res;
-            if (
-              !$("#layer").innerHTML &&
-              (S.tab === "umpan" || S.tab === "beranda")
-            )
+            if (!$("#layer").innerHTML && (S.tab === "umpan" || S.tab === "beranda"))
               render(S.tab);
           }
         })
@@ -3042,15 +3151,7 @@ const Fb = {
           body: JSON.stringify({ action: "feedback", ...row }),
         });
         setTimeout(() => {
-          fetch(CONFIG.gasUrl + "?action=fbStats")
-            .then((r) => r.json())
-            .then((res) => {
-              if (res) {
-                S.fb = res;
-                renderStats();
-              }
-            })
-            .catch(() => {});
+          this.fetchLive();
         }, 1200);
       } catch (e) {}
       return;
@@ -3059,7 +3160,11 @@ const Fb = {
       return new Promise((resolve, reject) => {
         google.script.run
           .withSuccessHandler((res) => {
-            if (res && res.fb) S.fb = res.fb;
+            if (res && res.fb) {
+              S.fb = res.fb;
+              renderStats();
+              if (S.tab === "umpan") viewUmpan();
+            }
             resolve(res);
           })
           .withFailureHandler((err) => reject(err))

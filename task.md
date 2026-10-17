@@ -188,10 +188,17 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 - [x] Hubungkan frontend (`assets/js/app.js`): saat fungsi `recordStamp` berhasil mencatat stempel (baik via kamera, manual input, maupun tautan langsung), otomatis kirim log asinkron ke Google Sheets via `logScanToGas`.
 - [x] Terapkan ketahanan jaringan (*offline resilience*): antrean scan lokal (`scanQueue` di `localStorage`) yang otomatis di-flush begitu koneksi internet pulih (`window.addEventListener('online')` dan saat `boot()`), menjamin data kunjungan booth tidak pernah hilang.
 
+### Milestone 21: Sinkronisasi Penuh Halaman #umpan (Rekap Kunjungan, Umpan Balik Pengguna, & Live Stats GAS)
+- [x] Sinkronisasi rekap aktivitas di `#umpan`: kini menampilkan stempel booth terkumpul (`S.stamp` / `BOOTH_N`), karya dibuka, dan karya disimpan di rute secara terpadu.
+- [x] Tampilkan kartu konfirmasi umpan balik pengguna sendiri (`myFbCard`): rincian rating bintang, karya berkesan yang dipilih, dan komentar yang telah dikirim ke Google Sheets.
+- [x] Hubungkan live-fetch dan periodic polling (`Fb.fetchLive()` setiap 20 detik): memastikan angka rata-rata bintang dan total responden di kartu pameran selalu sinkron dengan data Google Spreadsheet riil.
+- [x] Pastikan callback submit form di dialog/bottom sheet otomatis me-refresh tampilan halaman `#umpan` di belakang layar tanpa perlu refresh browser.
+
 ---
 
 ### Milestone 7: QA Polish, Performance, & Accessibility Audit
 - [x] Pengujian visual pada resolusi mobile sempit (360px), standar (390px - 412px), dan desktop.
 - [x] Verifikasi kontras teks WCAG AAA pada kartu biru dan dock aktif.
 - [x] Audit performa: zero layout shift (CLS 0) dan transisi responsif 60fps.
+
 
