@@ -16,6 +16,16 @@ function getOrCreateSheet(name, headers) {
   return sheet;
 }
 
+/**
+ * Jalankan fungsi ini SEKALI di editor Google Apps Script (klik dropdown fungsi > setupInitialSheets > Run)
+ * jika ingin ketiga sheet (Hadir, UmpanBalik, Undian) langsung dibuat seketika dengan header lengkap.
+ */
+function setupInitialSheets() {
+  getOrCreateSheet("Hadir", ["Timestamp", "Nama", "Peran", "Fakultas / Asal", "ID Pengunjung"]);
+  getOrCreateSheet("UmpanBalik", ["Timestamp", "Nama", "Peran", "Fakultas / Asal", "Nilai", "Karya", "Komentar", "ID Pengunjung"]);
+  getOrCreateSheet("Undian", ["Timestamp", "Nama", "WhatsApp", "Kode", "Jumlah Booth", "Peran", "Asal", "ID Pengunjung"]);
+}
+
 // Helper: Sanitasi input teks
 function sanitize_(val) {
   if (val === undefined || val === null) return "";

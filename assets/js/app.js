@@ -3007,7 +3007,7 @@ function openUndian() {
     `<div class="scrim"><form class="sheet" id="uf" role="dialog" aria-modal="true" aria-labelledby="ut" novalidate>
     <h2 id="ut">Seluruh ${BOOTH_N} booth lengkap</h2>
     <p style="color:var(--mut);font-size:14.5px;margin:8px 0 14px">Isi data kontak agar panitia dapat menghubungi pemenang undian ${esc(CONFIG.undian.hadiah)}.</p>
-    <div class="kv" style="margin-top:0;gap:14px"><label class="f">Nama lengkap<input class="txt" id="un" autocomplete="name" required></label>
+    <div class="kv" style="margin-top:0;gap:14px"><label class="f">Nama lengkap<input class="txt" id="un" autocomplete="name" value="${esc(store.get("nama", ""))}" required></label>
     <label class="f">Nomor WhatsApp<input class="txt" id="uw" type="tel" inputmode="tel" autocomplete="tel" placeholder="08xxxxxxxxxx" required></label>
     <p id="ue" style="color:var(--err);margin:0;font-size:14px" role="alert" hidden></p>
     <button class="btn gold" type="submit">Daftar undian</button></div></form></div>`;
