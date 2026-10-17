@@ -1615,10 +1615,20 @@ function journeyCard() {
 function viewUmpan() {
   const seen = store.get("dilihat", []).length;
   $("#v-umpan").innerHTML =
-    `<div class="sec" style="margin-top:0"><h2>Selesai berkunjung</h2><p class="lead">Langkah terakhir sebelum meninggalkan pameran. Karya yang Anda buka dan simpan tetap dapat diakses di perangkat ini.</p></div>
-  <div class="card"><div class="row" style="justify-content:space-between"><span><b class="num" style="font-size:28px">${seen}</b> karya dibuka</span><span><b class="num" style="font-size:28px">${S.rute.length}</b> karya di rute</span></div>
-  <div class="row" style="margin-top:12px"><button class="btn ghost sm" data-go="rute">Lihat rute</button></div></div>
-  ${fbCard()}`;
+    `<div class="sec" style="margin-top:0">
+      <h2>Selesai Berkunjung</h2>
+      <p class="lead">Langkah terakhir sebelum meninggalkan pameran. Karya yang dibuka dan disimpan tetap tersimpan di perangkat ini.</p>
+    </div>
+    <div class="card">
+      <div class="row" style="justify-content:space-between;align-items:baseline">
+        <span><b class="num" style="font-size:28px">${seen}</b> karya dibuka</span>
+        <span><b class="num" style="font-size:28px">${S.rute.length}</b> karya di rute</span>
+      </div>
+      <div class="row card-actions" style="margin-top:14px;justify-content:flex-end">
+        <button class="btn ghost sm" data-go="rute">Lihat Rute Saya</button>
+      </div>
+    </div>
+    ${fbCard()}`;
 }
 
 /* ---------- Jelajah ---------- */
@@ -1748,15 +1758,15 @@ function viewDenah() {
     m = S.map;
   if (!el.dataset.built) {
     el.dataset.built = 1;
-    el.innerHTML = `<div class="sec" style="margin-top:0"><h2>Denah pameran</h2><p class="lead">Ketuk nomor panel untuk melihat karyanya. Warna menunjukkan bidang; garis serong menandai PKM. Di ponsel, cubit untuk memperbesar.</p></div>
+    el.innerHTML = `<div class="sec" style="margin-top:0"><h2>Denah Pameran</h2><p class="lead">Sentuh nomor panel untuk melihat detail karya. Warna menunjukkan bidang. Geser dan cubit peta untuk eksplorasi.</p></div>
     <div class="tools">
-      <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zm9 16l-4-4"/></svg><input id="mq" type="search" inputmode="search" placeholder="Cari nomor panel, judul, atau peneliti" autocomplete="off" aria-label="Cari panel"></label>
+      <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg><input id="mq" type="search" inputmode="search" placeholder="Cari nomor panel, judul, atau peneliti..." autocomplete="off" aria-label="Cari panel"></label>
       <div class="chiprow"><div class="seg" id="mseg" role="group" aria-label="Jenis karya"></div>
       <div class="leg" id="mleg"></div></div>
-      <div class="row mrow" style="justify-content:space-between;flex-wrap:nowrap"><span id="mcnt" style="font-size:14px;color:var(--mut)"></span><span class="zoom">Perbesar <button data-mz="-" aria-label="Perkecil">−</button><button data-mz="+" aria-label="Perbesar">+</button></span></div>
+      <div class="row mrow" style="justify-content:space-between;flex-wrap:nowrap;align-items:center"><span id="mcnt" style="font-size:13.5px;color:var(--mut);font-weight:600"></span><span class="zoom">Zoom <button data-mz="-" aria-label="Perkecil">−</button><button data-mz="+" aria-label="Perbesar">+</button></span></div>
     </div>
     <div class="mapwrap" id="mapwrap" style="margin-top:10px"><svg id="mapsvg" viewBox="0 0 757 1600" role="group" aria-label="Denah pameran dengan 60 panel poster A0"><defs><pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="#fff" stroke-width="2.4" stroke-opacity=".8"/></pattern></defs><image href="${DENAH_SRC}" x="0" y="0" width="757" height="1600"/><g id="ov"></g></svg></div>
-    <p class="maphint" style="color:var(--mut);font-size:13px;margin:10px 0 0">Geser peta untuk menjelajah. Pintu masuk di kanan atas, pintu keluar di kanan bawah.</p>`;
+    <p class="maphint" style="color:var(--mut);font-size:13px;margin:10px 0 0">Pintu masuk di kanan atas, pintu keluar di kanan bawah. Geser peta untuk menelusuri booth.</p>`;
     pinchInit($("#mapwrap"));
     $("#mq").addEventListener("input", (e) => {
       S.map.q = e.target.value;
@@ -2649,10 +2659,13 @@ async function submitForm(ev) {
 /* ---------- Umpan balik ---------- */
 function fbCard() {
   const f = S.fb;
-  return `<div class="sec"><h2>Umpan balik pameran</h2><div class="card">
-    <p style="margin:0 0 12px;color:var(--mut);font-size:14.5px">Masukan singkat Anda dipakai panitia untuk menilai penyelenggaraan pameran dan apresiasi karya.</p>
-    ${f.n ? `<div class="big" style="margin-bottom:12px"><b class="num" style="font-size:40px">${f.avg.toFixed(1).replace(".", ",")}</b><span>rata-rata dari ${f.n} penilaian (skala 5)</span></div>` : ""}
-    <div class="row">${S.fbDone ? '<span class="added">Umpan balik Anda sudah terkirim</span>' : ""}<button class="btn ${S.fbDone ? "ghost" : "gold"}" data-act="umpan">${S.fbDone ? "Kirim lagi" : "Beri umpan balik"}</button></div>
+  return `<div class="sec"><h2>Evaluasi & Masukan</h2><div class="card">
+    <p style="margin:0 0 12px;color:var(--mut);font-size:14px;line-height:1.5">Penilaian Anda sangat bermanfaat bagi panitia untuk evaluasi penyelenggaraan dan apresiasi karya riset.</p>
+    ${f.n ? `<div class="big" style="margin-bottom:12px"><b class="num" style="font-size:36px">${f.avg.toFixed(1).replace(".", ",")}</b><span>Rata-rata dari ${f.n} responden (skala 5)</span></div>` : ""}
+    <div class="row card-actions" style="justify-content:flex-end; gap:8px;">
+      ${S.fbDone ? '<span class="added" style="margin-right:auto">✓ Umpan balik sudah terkirim</span>' : ""}
+      <button class="btn ${S.fbDone ? "ghost" : "gold"}" data-act="umpan">${S.fbDone ? "Beri Masukan Lagi" : "Beri Umpan Balik"}</button>
+    </div>
   </div></div>`;
 }
 const NILAI = ["Kurang", "Cukup", "Baik", "Sangat baik", "Luar biasa"];

@@ -8,14 +8,14 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 
 - [x] **Milestone 0: Fondasi Design System, Dialog/Sheet Putih & Presisi Tombol Tutup ("X")** (Selesai)
 - [x] **Milestone 1: Halaman Beranda (Home, Stats, & Gateway Presensi)** (Selesai)
-- [ ] **Milestone 2: Halaman Jelajah (Katalog, Pencarian Karya, & Card Hierarchy)** (Berikutnya)
-- [ ] **Milestone 3: Halaman SDGs (Pusat Keterkaitan SDGs & Active Filtering)** (Dalam Pengerjaan)
-- [ ] **Milestone 4: Halaman Denah (Interactive Map, Floorplan & Card Drawer)** (Antrean)
-- [ ] **Milestone 5: Halaman Rute (Itinerary Kunjungan Berurutan & Aksi)** (Antrean)
-- [ ] **Milestone 6: Halaman Umpan Balik (Evaluasi Pameran Ringkas & Tanpa Distraksi)** (Selesai Sebagian di Sheet)
-- [ ] **Milestone 7: QA Polish, Performance, & Accessibility Audit** (Antrean)
-- [ ] **Milestone 8: Ergonomi Sentuh Jempol Kanan Mobile (Right-Hand Thumb Ergonomics & Button Accessibility)** (Antrean)
-- [ ] **Milestone 9: Penyempurnaan Visual Peta Karya & Otomatis Zoom In Denah** (Antrean)
+- [x] **Milestone 2: Halaman Jelajah (Katalog, Pencarian Karya, & Card Hierarchy)** (Selesai)
+- [x] **Milestone 3: Halaman SDGs (Pusat Keterkaitan SDGs & Active Filtering)** (Selesai)
+- [x] **Milestone 4: Halaman Denah (Interactive Map, Floorplan & Card Drawer)** (Selesai)
+- [x] **Milestone 5: Halaman Rute (Itinerary Kunjungan Berurutan & Aksi)** (Selesai)
+- [x] **Milestone 6: Halaman Umpan Balik (Evaluasi Pameran Ringkas & Tanpa Distraksi)** (Selesai)
+- [x] **Milestone 8: Ergonomi Sentuh Jempol Kanan Mobile (Right-Hand Thumb Ergonomics & Button Accessibility)** (Selesai)
+- [x] **Milestone 9: Penyempurnaan Visual Peta Karya & Otomatis Zoom In Denah** (Selesai)
+- [ ] **Milestone 7: QA Polish, Performance, & Accessibility Audit** (Tahap Akhir)
 
 ---
 
@@ -43,40 +43,40 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 ---
 
 ### Milestone 2: Halaman Jelajah (Katalog, Pencarian Karya, & Card Hierarchy)
-- [ ] **Hierarki Tipografi:** 3 level kontras kartu: Tag Kategori/Booth -> Judul Riset (15.5px bold balance) -> Nama Peneliti & Singkatan Fakultas.
-- [ ] **Pemeringkasan Teks:** Singkat format fakultas (misal: *"Fak. Farmasi"*), hilangkan label teks ganda yang repetitif.
-- [ ] Input pencarian teks 16px (anti auto-zoom iOS Safari), placeholder ringkas.
-- [ ] Track segmented filters (`#segKat`, `#segKl`) dengan pill putih independen, elevasi lembut, dan swipe snap.
-- [ ] Refactoring kartu karya (`.work`): Aturan Emas radius (outer 16px, padding 14px, inner badge 8px).
-- [ ] Empty state ringkas dengan tombol reset pencarian instan.
+- [x] **Hierarki Tipografi:** 3 level kontras kartu: Tag Kategori & Booth -> Judul Riset (15.5px bold balance) -> Nama Peneliti & Singkatan Fakultas (`shortFak`).
+- [x] **Pemeringkasan Teks:** Format fakultas diringkas (*"Fak. Farmasi"*, *"Fak. Teknik"*, dll.), hilangkan label repetitif.
+- [x] Input pencarian teks 16px (anti auto-zoom iOS Safari), placeholder ringkas.
+- [x] Track segmented filters (`#segKat`, `#segKl`) dengan pill putih independen, elevasi lembut, dan swipe snap.
+- [x] Refactoring kartu karya (`.work`): Aturan Emas radius (outer 16px, padding 14px, inner badge 9px/8px).
+- [x] Empty state ringkas dengan tombol reset pencarian instan.
 
 ---
 
 ### Milestone 3: Halaman SDGs (Pusat Keterkaitan SDGs & Active Filtering)
 - [x] **Filter Hanya SDGs Aktif:** Hanya tampilkan poin SDGs yang memiliki minimal 1 karya terhubung; sembunyikan kartu "0 karya".
 - [x] **Radius Logo SDGs Presisi:** Gunakan radius 6px pada `.sdgt-icon` agar logo resmi PBB tidak terpotong.
-- [ ] **Hierarki Tipografi:** Nomor SDGs menonjol, nama tujuan resmi dalam Proper Case, badge counter jumlah karya.
-- [ ] **Pemeringkasan Teks:** Hapus penjelasan umum PBB yang panjang; fokus pada relevansi karya riset UP 60.
-- [ ] Bottom sheet interaktif daftar booth terkait saat kartu SDG diklik.
+- [x] **Hierarki Tipografi:** Nomor SDGs menonjol, nama tujuan resmi dalam Proper Case, badge counter jumlah karya.
+- [x] **Pemeringkasan Teks:** Hapus penjelasan umum PBB yang panjang; fokus pada relevansi karya riset UP 60.
+- [x] **Bottom Sheet Interaktif:** Mengetuk kartu SDG langsung membuka bottom sheet interaktif daftar booth terkait lengkap dengan aksi rute dan denah.
 
 ---
 
 ### Milestone 4: Halaman Denah (Interactive Map, Floorplan & Card Drawer)
-- [ ] **Hierarki Tipografi:** Nomor panel booth besar dan kontras tinggi; pill legenda bidang terbaca jelas.
-- [ ] **Pemeringkasan Teks:** Instruksi gestur navigasi disederhanakan menjadi satu baris instruksi ringkas.
-- [ ] Toolbar pencarian nomor panel booth dengan tombol fokus langsung ke pin booth.
-- [ ] Kontrol zoom floating (`+` dan `−`) yang ergonomis untuk jempol.
-- [ ] Baris legenda warna bidang (IPTEKS, Kesehatan, Soshum) dalam format pill horizontal scroll.
-- [ ] Preview drawer kartu booth saat panel di peta disentuh.
+- [x] **Hierarki Tipografi:** Nomor panel booth besar dan kontras tinggi; pill legenda bidang terbaca jelas.
+- [x] **Pemeringkasan Teks:** Instruksi gestur navigasi disederhanakan menjadi satu baris instruksi ringkas.
+- [x] Toolbar pencarian nomor panel booth dengan tombol fokus langsung ke pin booth.
+- [x] Kontrol zoom floating (`+` dan `−`) yang ergonomis untuk jempol.
+- [x] Baris legenda warna bidang (IPTEKS, Kesehatan, Soshum) dalam format pill horizontal scroll.
+- [x] Drawer detail booth interaktif saat panel di peta disentuh.
 
 ---
 
 ### Milestone 5: Halaman Rute (Itinerary Kunjungan Berurutan & Aksi)
-- [ ] **Hierarki Tipografi:** Nomor langkah kunjungan besar (Langkah 1, 2, 3...) sebagai penuntun visual utama.
-- [ ] **Pemeringkasan Teks:** Header ringkas: *"X booth dipilih · Estimasi ~Y menit"* tanpa narasi pengantar panjang.
-- [ ] Tombol aksi cepat: *"Tampilkan Rute di Denah"* dan *"Hapus Semua"*.
-- [ ] Kartu langkah terurut dengan nomor booth, judul riset, dan lokasi zona denah.
-- [ ] Empty state informatif dan bersahabat jika rute belum diisi.
+- [x] **Hierarki Tipografi:** Nomor langkah kunjungan jelas (Langkah 1, 2, 3...) sebagai penuntun visual utama.
+- [x] **Pemeringkasan Teks:** Header ringkas: *"${items.length} booth tersimpan · Estimasi ~${estMin} menit"*.
+- [x] Tombol aksi cepat: *"Tampilkan di Denah"*, *"Salin Rute"*, dan *"Hapus Semua"*.
+- [x] Kartu langkah terurut dengan nomor booth, judul riset, dan lokasi zona denah.
+- [x] Empty state informatif dan bersahabat jika rute belum diisi.
 
 ---
 
@@ -84,9 +84,22 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 - [x] Terapkan reusable detail-sheet putih bersih pada form feedback modal.
 - [x] Set default rating bintang 5 ("Luar biasa").
 - [x] Sembunyikan field "Nama Anda" dan "Anda hadir sebagai" dari form visual (disimpan otomatis di background).
-- [ ] **Hierarki Tipografi:** Label form Proper Case tanpa huruf kapital berteriak.
-- [ ] **Pemeringkasan Teks:** Formulir 1-langkah efisien dengan dropdown booth favorit dan textarea catatan yang lega.
-- [ ] Tata ulang kartu evaluasi di section halaman (`#v-umpan`) agar serasi dengan desain kartu berjenjang.
+- [x] **Hierarki Tipografi:** Label form Proper Case tanpa huruf kapital berteriak.
+- [x] **Pemeringkasan Teks:** Formulir 1-langkah efisien dengan dropdown booth favorit dan textarea catatan yang lega.
+- [x] Tata ulang kartu evaluasi di section halaman (`#v-umpan`) agar serasi dengan desain kartu berjenjang.
+
+---
+
+### Milestone 8: Ergonomi Sentuh Jempol Kanan Mobile (Right-Hand Thumb Ergonomics & Button Accessibility)
+- [x] **Prioritas Tombol Aksi Kanan (Right-Hand Dominance):** Tata letak tombol aksi utama, button group, card footer action (`.work .foot .row`, `.card-actions`, `.sheet-footer-bar`), dan dialog/sheet CTA berada di sisi **kanan** (`justify-content: flex-end`, right-aligned) pada tampilan mobile agar mudah dijangkau jempol tangan kanan 90% pengguna ponsel.
+- [x] **Urutan Button Group Alami:** Tombol aksi primer/konfirmasi diletakkan di posisi paling kanan/bawah yang paling dekat dengan jangkauan jempol, tombol sekunder/batal di sebelah kirinya.
+- [x] **Jangkauan Ergonomis:** Touch target minimum $\ge 44\text{px} - 48\text{px}$ di seluruh tombol aksi agar bebas salah sentuh (*mis-click*).
+
+---
+
+### Milestone 9: Penyempurnaan Visual Peta Karya & Otomatis Zoom In Denah
+- [x] **Centering Sel Peta Karya (Matrix):** Update styling `.cell` pada section "Peta karya" agar nilai angka (`.cell b`) dan teks subtitle (`.cell span`) berada tepat di tengah (*centered vertically and horizontally*).
+- [x] **Otomatis Zoom In Denah dari Referensi:** Pada aksi "Lihat di denah" (`showOnMap(no)`), otomatis set level zoom peta lebih dekat/fokus (`S.map.z = 2.2`) dan gulir presisi ke koordinat booth panel yang dituju.
 
 ---
 
@@ -94,16 +107,3 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 - [ ] Pengujian visual pada resolusi mobile sempit (360px), standar (390px - 412px), dan desktop.
 - [ ] Verifikasi kontras teks WCAG AAA pada mode terang dan mode gelap.
 - [ ] Audit performa: zero layout shift (CLS 0) dan transisi responsif 60fps.
-
----
-
-### Milestone 8: Ergonomi Sentuh Jempol Kanan Mobile (Right-Hand Thumb Ergonomics & Button Accessibility)
-- [ ] **Prioritas Tombol Aksi Kanan (Right-Hand Dominance):** Tata letak tombol aksi utama, button group, card footer action, dan dialog/sheet CTA berada di sisi **kanan** (`justify-content: flex-end`, right-aligned) pada tampilan mobile agar mudah dijangkau jempol tangan kanan 90% pengguna ponsel.
-- [ ] **Urutan Button Group Alami:** Tombol aksi primer/konfirmasi diletakkan di posisi paling kanan/bawah yang paling dekat dengan jangkauan jempol, tombol sekunder/batal di sebelah kirinya.
-- [ ] **Jangkauan Ergonomis:** Touch target minimum $\ge 44\text{px} - 48\text{px}$ di seluruh tombol aksi agar bebas salah sentuh (*mis-click*).
-
----
-
-### Milestone 9: Penyempurnaan Visual Peta Karya & Otomatis Zoom In Denah
-- [ ] **Centering Sel Peta Karya (Matrix):** Update styling `.cell` pada section "Peta karya" agar nilai angka (`.cell b`) dan teks subtitle (`.cell span`) berada tepat di tengah (*centered vertically and horizontally*).
-- [ ] **Otomatis Zoom In Denah dari Referensi:** Pada aksi "Lihat di denah" (`showOnMap(no)`), otomatis set level zoom peta lebih dekat/fokus (misal: `S.map.z = 2.2`) dan gulir presisi ke koordinat booth panel yang dituju.
