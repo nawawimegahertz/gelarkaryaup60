@@ -182,6 +182,12 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 - [x] Berikan padding nyaman (`10px 14px`) dan `line-height: 1.5` pada `textarea.txt` dan `input.txt` di bottom sheet (Presensi, Feedback, Undian, PIN, Pencarian) agar teks placeholder bernapas lega dan tidak mepet tepi atas-kiri.
 - [x] Pastikan hierarki visual jelas: Label (tegas & jelas) > Nilai Input (kontras tinggi saat diketik) > Placeholder (redup & sebagai penunjuk).
 
+### Milestone 20: Rekap dan Logging Scan QR Booth ke Google Sheets (ScanBooth Sheet)
+- [x] Tambahkan sheet baru `ScanBooth` dengan struktur header: `["Timestamp", "ID Pengunjung", "Nama", "Peran", "Fakultas / Asal", "No Booth", "Judul Karya", "Fakultas Booth", "Total Stempel", "Metode"]`.
+- [x] Perbarui backend Google Apps Script (`Kode.gs`) dengan fungsi `recordScan(data)`, `getScanStats()`, dan tambahkan handler `action === "scan"` pada `doPost` serta `action === "scanStats"` pada `doGet`.
+- [x] Hubungkan frontend (`assets/js/app.js`): saat fungsi `recordStamp` berhasil mencatat stempel (baik via kamera, manual input, maupun tautan langsung), otomatis kirim log asinkron ke Google Sheets via `logScanToGas`.
+- [x] Terapkan ketahanan jaringan (*offline resilience*): antrean scan lokal (`scanQueue` di `localStorage`) yang otomatis di-flush begitu koneksi internet pulih (`window.addEventListener('online')` dan saat `boot()`), menjamin data kunjungan booth tidak pernah hilang.
+
 ---
 
 ### Milestone 7: QA Polish, Performance, & Accessibility Audit

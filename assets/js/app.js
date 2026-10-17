@@ -3348,7 +3348,7 @@ function parseCode(raw) {
   const p = +m[1];
   return p >= 1 && p <= BOOTH_N && boothCode(p) === m[0] ? p : null;
 }
-function recordStamp(raw) {
+function recordStamp(raw, metode = "kamera") {
   const p = parseCode(raw);
   if (!p)
     return {
@@ -3382,6 +3382,16 @@ function recordStamp(raw) {
   if ($("#stampj")) $("#stampj").innerHTML = questCard({ inJelajah: true });
   const n = Object.keys(S.stamp).length;
   const target = BOOTH_N;
+
+  // Logging ke Google Sheets (Sheet "ScanBooth") secara aman & asinkron
+  logScanToGas({
+    boothNo: p,
+    boothJudul: d ? d.judul : "-",
+    boothFak: d ? d.fak : "-",
+    totalStempel: n,
+    metode: metode,
+  });
+
   return {
     ok: true,
     p,
@@ -3398,13 +3408,73 @@ function recordStamp(raw) {
         : " (Tinggal " + (target - n) + " booth lagi ke undian)"),
   };
 }
+
+async function logScanToGas(info) {
+  const payload = {
+    action: "scan",
+    uid: Undi.id(),
+    nama: store.get("nama", "-"),
+    peran: S.peran || store.get("peran", "umum"),
+    asal: store.get("asal", store.get("fakultas", "-")),
+    t: new Date().toISOString(),
+    ...info,
+  };
+
+  // Simpan ke antrean lokal (offline-first resilience)
+  try {
+    let queue = store.get("scanQueue", []);
+    queue.push(payload);
+    store.set("scanQueue", queue);
+  } catch (e) {}
+
+  flushScanQueue();
+}
+
+async function flushScanQueue() {
+  if (!CONFIG.gasUrl && S.att.mode !== "gas") return;
+  let queue = store.get("scanQueue", []);
+  if (!queue || !queue.length) return;
+
+  const item = queue[0];
+  try {
+    if (S.att.mode === "gas" && window.google && google.script && google.script.run) {
+      google.script.run
+        .withSuccessHandler(() => {
+          let q = store.get("scanQueue", []);
+          q.shift();
+          store.set("scanQueue", q);
+          if (q.length) setTimeout(flushScanQueue, 350);
+        })
+        .withFailureHandler(() => {})
+        .recordScan(item);
+      return;
+    }
+
+    // Mode gas-api (fetch no-cors ke Web App Apps Script)
+    await fetch(CONFIG.gasUrl, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify(item),
+    });
+
+    let q = store.get("scanQueue", []);
+    q.shift();
+    store.set("scanQueue", q);
+    if (q.length) setTimeout(flushScanQueue, 350);
+  } catch (e) {
+    // Offline / jaringan terputus sementara: biarkan tetap di antrean
+  }
+}
+
+window.addEventListener("online", flushScanQueue);
+
 function renderMapSafe() {
   try {
     if ($("#ov")) renderMap();
   } catch (e) {}
 }
 function handleDeepCode(raw, fromStart) {
-  const r = recordStamp(decodeURIComponent(raw));
+  const r = recordStamp(decodeURIComponent(raw), "tautan");
   history.replaceState(null, "", "#jelajah");
   if (!fromStart) show("jelajah");
   setTimeout(() => {
@@ -3510,7 +3580,7 @@ async function scanStart() {
     if (raw && !(raw === st.lastRaw && Date.now() - st.lastAt < 3000)) {
       st.lastRaw = raw;
       st.lastAt = Date.now();
-      scanResult(recordStamp(raw));
+      scanResult(recordStamp(raw, "kamera"));
       setTimeout(tick, 1400);
       return;
     }
@@ -3536,7 +3606,7 @@ function scanResult(r) {
 function scanManual() {
   const i = $("#sc-i");
   if (!i || !i.value.trim()) return;
-  scanResult(recordStamp(i.value));
+  scanResult(recordStamp(i.value, "manual"));
   i.value = "";
 }
 function closeScan() {
@@ -4144,6 +4214,9 @@ function boot() {
           } catch (e) {}
           try {
             Undi.init();
+          } catch (e) {}
+          try {
+            flushScanQueue();
           } catch (e) {}
         })
         .catch((err) => console.warn("Att.init:", err));

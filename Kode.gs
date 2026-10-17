@@ -18,12 +18,13 @@ function getOrCreateSheet(name, headers) {
 
 /**
  * Jalankan fungsi ini SEKALI di editor Google Apps Script (klik dropdown fungsi > setupInitialSheets > Run)
- * jika ingin ketiga sheet (Hadir, UmpanBalik, Undian) langsung dibuat seketika dengan header lengkap.
+ * jika ingin seluruh sheet (Hadir, UmpanBalik, Undian, ScanBooth) langsung dibuat seketika dengan header lengkap.
  */
 function setupInitialSheets() {
   getOrCreateSheet("Hadir", ["Timestamp", "Nama", "Peran", "Fakultas / Asal", "ID Pengunjung"]);
   getOrCreateSheet("UmpanBalik", ["Timestamp", "Nama", "Peran", "Fakultas / Asal", "Nilai", "Karya", "Komentar", "ID Pengunjung"]);
   getOrCreateSheet("Undian", ["Timestamp", "Nama", "WhatsApp", "Kode", "Jumlah Booth", "Peran", "Asal", "ID Pengunjung"]);
+  getOrCreateSheet("ScanBooth", ["Timestamp", "ID Pengunjung", "Nama", "Peran", "Fakultas / Asal", "No Booth", "Judul Karya", "Fakultas Booth", "Total Stempel", "Metode"]);
 }
 
 // Helper: Sanitasi input teks
@@ -35,7 +36,7 @@ function sanitize_(val) {
     .slice(0, 500);
 }
 
-// 1. Melayani Request GET (API Stats, Feedback Stats, Undian, atau Tampilan Web)
+// 1. Melayani Request GET (API Stats, Feedback Stats, Undian, Scan Stats, atau Tampilan Web)
 function doGet(e) {
   if (e && e.parameter) {
     const action = e.parameter.action;
@@ -49,6 +50,10 @@ function doGet(e) {
     }
     if (action === "draw") {
       return ContentService.createTextOutput(JSON.stringify(drawLotteryWinner()))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    if (action === "scanStats") {
+      return ContentService.createTextOutput(JSON.stringify(getScanStats()))
         .setMimeType(ContentService.MimeType.JSON);
     }
   }
@@ -79,6 +84,8 @@ function doPost(e) {
       result = recordUndian(data);
     } else if (action === "feedback") {
       result = recordFeedback(data);
+    } else if (action === "scan") {
+      result = recordScan(data);
     } else {
       result = { status: "unknown_action" };
     }
@@ -139,7 +146,37 @@ function recordUndian(data) {
   return { status: "success" };
 }
 
-// 6. Hitung Statistik Pengunjung Live
+// 6. Pencatatan Scan QR Booth (Sheet "ScanBooth") - Relasional & Realtime
+function recordScan(data) {
+  data = data || {};
+  const sheet = getOrCreateSheet("ScanBooth", [
+    "Timestamp",
+    "ID Pengunjung",
+    "Nama",
+    "Peran",
+    "Fakultas / Asal",
+    "No Booth",
+    "Judul Karya",
+    "Fakultas Booth",
+    "Total Stempel",
+    "Metode"
+  ]);
+  const t = data.t ? new Date(data.t) : new Date();
+  const uid = sanitize_(data.uid || "-");
+  const nama = sanitize_(data.nama || "-");
+  const peran = sanitize_(data.peran || "umum");
+  const asal = sanitize_(data.asal || "-");
+  const boothNo = data.boothNo !== undefined ? Number(data.boothNo) || sanitize_(data.boothNo) : "-";
+  const boothJudul = sanitize_(data.boothJudul || "-");
+  const boothFak = sanitize_(data.boothFak || "-");
+  const totalStempel = Number(data.totalStempel) || 0;
+  const metode = sanitize_(data.metode || "kamera");
+
+  sheet.appendRow([t, uid, nama, peran, asal, boothNo, boothJudul, boothFak, totalStempel, metode]);
+  return { status: "success", count: totalStempel };
+}
+
+// 7. Hitung Statistik Pengunjung Live
 function getLiveStats() {
   const sheet = getOrCreateSheet("Hadir", ["Timestamp", "Nama", "Peran", "Fakultas / Asal", "ID Pengunjung"]);
   const values = sheet.getDataRange().getValues();
@@ -166,7 +203,7 @@ function getLiveStats() {
   };
 }
 
-// 7. Rata-rata Bintang Umpan Balik
+// 8. Rata-rata Bintang Umpan Balik
 function getFeedbackStats() {
   const sheet = getOrCreateSheet("UmpanBalik", ["Timestamp", "Nama", "Peran", "Fakultas / Asal", "Nilai", "Karya", "Komentar", "ID Pengunjung"]);
   const values = sheet.getDataRange().getValues();
@@ -186,7 +223,28 @@ function getFeedbackStats() {
   return { n: ratings.length, avg: avg };
 }
 
-// 8. Pengundian Doorprize Acak Langsung dari Sheet Undian
+// 9. Rekap Statistik Scan QR Booth
+function getScanStats() {
+  const sheet = getOrCreateSheet("ScanBooth", [
+    "Timestamp", "ID Pengunjung", "Nama", "Peran", "Fakultas / Asal", "No Booth", "Judul Karya", "Fakultas Booth", "Total Stempel", "Metode"
+  ]);
+  const values = sheet.getDataRange().getValues();
+  if (values.length <= 1) return { total: 0, booths: {} };
+
+  const booths = {};
+  for (let i = 1; i < values.length; i++) {
+    const bNo = values[i][5];
+    if (bNo) {
+      booths[bNo] = (booths[bNo] || 0) + 1;
+    }
+  }
+  return {
+    total: values.length - 1,
+    booths: booths
+  };
+}
+
+// 10. Pengundian Doorprize Acak Langsung dari Sheet Undian
 function drawLotteryWinner() {
   const sheet = getOrCreateSheet("Undian", ["Timestamp", "Nama", "WhatsApp", "Kode", "Jumlah Booth", "Peran", "Asal", "ID Pengunjung"]);
   const values = sheet.getDataRange().getValues();
