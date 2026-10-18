@@ -205,6 +205,11 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 - [x] Sertakan instruksi pameran di footer cetak untuk memandu pengunjung memindai via kamera atau web app.
 - [x] Berikan opsi fleksibel bagi panitia: Tombol *"🖨️ Cetak (1 QR per Lembar A4)"* dan opsi alternatif *"📑 Format Lembar Stiker (6 per A4)"*.
 
+### Milestone 24: Header Minimalis Terpadu di Beranda (Fokus Visual Card Misi Undian)
+- [x] Seragamkan tampilan `<header class="hero">` di Beranda agar identik dengan tab lainnya (`padding-block: 12px 14px`, logo 52px, judul 16px).
+- [x] Sembunyikan blok `.stats` dan tanggal berukuran besar dari header agar Beranda tampil jauh lebih minimalis dan bersih.
+- [x] Menjadikan **Card MISI UNDIAN ("Misi Penjelajah Booth")** langsung tampil menonjol sebagai hero visual pertama saat pengguna membuka Beranda.
+
 ---
 
 ### Milestone 7: QA Polish, Performance, & Accessibility Audit

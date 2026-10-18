@@ -2593,30 +2593,34 @@ label.f {
   overflow-x: hidden;
 }
 
-html:not([data-tab="beranda"]) .hero {
-  padding-block: 12px 14px;
+/* Header minimalis terpadu untuk semua halaman (termasuk Beranda) */
+.hero {
+  padding-block: 12px 14px !important;
 }
 
-html:not([data-tab="beranda"]) .hero .stats,
-html:not([data-tab="beranda"]) .hero p:not(.eyebrow) {
-  display: none;
+.hero .stats,
+.hero p:not(.eyebrow),
+.hero .hero-date {
+  display: none !important;
 }
 
-html:not([data-tab="beranda"]) .hero img {
-  width: 52px;
+.hero img {
+  width: 52px !important;
+  height: auto;
 }
 
-html:not([data-tab="beranda"]) .hero h1 {
-  font-size: 16px;
+.hero h1 {
+  font-size: 16px !important;
+  line-height: 1.25 !important;
 }
 
-html:not([data-tab="beranda"]) .hero .eyebrow {
-  margin-bottom: 2px;
-  font-size: 11px;
+.hero .eyebrow {
+  margin-bottom: 2px !important;
+  font-size: 11px !important;
 }
 
-html:not([data-tab="beranda"]) .hero .wrap {
-  gap: 12px;
+.hero .wrap {
+  gap: 12px !important;
 }
 
 button.stat {
