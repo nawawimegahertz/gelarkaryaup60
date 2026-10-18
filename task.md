@@ -212,7 +212,13 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 
 ### Milestone 25: Penyesuaian Doorprize Rp 150.000 (3 Pemenang)
 - [x] Sesuaikan nominal doorprize dari Rp 250.000 menjadi **Rp 150.000** dengan kuota tetap **3 penerima/pemenang** di seluruh sistem (`CONFIG.undian`, `questCard()`, dialog pengundian, cetak QR, dan mockup).
-- [x] Tambahkan keterangan jelas *"3 Pemenang"* pada quest card dan badge hadiah agar ekspektasi pengunjung transparan dan memotivasi partisipasi.
+- [x] Bersihkan label repetitif `(3 Pemenang)` dari judul kartu, badge, dan alert agar tampilan UI tetap minimalis dan ringkas.
+
+### Milestone 26: Fitur Booth Terfavorit (Micro-Rating Thumbs Up/Down & Logging ke Google Sheets)
+- [x] **Micro-Rating Modal:** Tampilkan bottom sheet otomatis pasca-scan sukses untuk 1-tap rating thumbs up 👍 / down 👎 (lengkap dengan opsi *"Lewati"*).
+- [x] **Rating Interaktif di Seluruh Kartu:** Tambahkan tombol mini 👍/👎 interaktif pada seluruh komponen `workCard` di Beranda, Jelajah, Rute, SDGs, serta di dalam Detail Sheet.
+- [x] **Seksi "🏆 3 Booth Paling Favorit":** Tampilkan kurasi 3 booth dengan likes tertinggi di Beranda serta opsi filter/sort *"⭐ Terfavorit"* di halaman Jelajah.
+- [x] **Logging ke Google Sheets:** Buat handler `action === "rating"` di backend `Kode.gs` dan antrean offline-resilient `logRatingToGas` yang otomatis mencatat suara ke Sheet *"RatingBooth"*.
 
 ---
 

@@ -25,6 +25,7 @@ function setupInitialSheets() {
   getOrCreateSheet("UmpanBalik", ["Timestamp", "Nama", "Peran", "Fakultas / Asal", "Nilai", "Karya", "Komentar", "ID Pengunjung"]);
   getOrCreateSheet("Undian", ["Timestamp", "Nama", "WhatsApp", "Kode", "Jumlah Booth", "Peran", "Asal", "ID Pengunjung"]);
   getOrCreateSheet("ScanBooth", ["Timestamp", "ID Pengunjung", "Nama", "Peran", "Fakultas / Asal", "No Booth", "Judul Karya", "Fakultas Booth", "Total Stempel", "Metode"]);
+  getOrCreateSheet("RatingBooth", ["Timestamp", "ID Pengunjung", "Nama", "Peran", "Fakultas / Asal", "No Booth", "Judul Karya", "Rating", "Total Up", "Total Down"]);
 }
 
 // Helper: Sanitasi input teks
@@ -54,6 +55,10 @@ function doGet(e) {
     }
     if (action === "scanStats") {
       return ContentService.createTextOutput(JSON.stringify(getScanStats()))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    if (action === "ratingStats") {
+      return ContentService.createTextOutput(JSON.stringify(getRatingStats()))
         .setMimeType(ContentService.MimeType.JSON);
     }
   }
@@ -86,6 +91,8 @@ function doPost(e) {
       result = recordFeedback(data);
     } else if (action === "scan") {
       result = recordScan(data);
+    } else if (action === "rating") {
+      result = recordRating(data);
     } else {
       result = { status: "unknown_action" };
     }
@@ -174,6 +181,65 @@ function recordScan(data) {
 
   sheet.appendRow([t, uid, nama, peran, asal, boothNo, boothJudul, boothFak, totalStempel, metode]);
   return { status: "success", count: totalStempel };
+}
+
+// 7. Pencatatan Rating Thumbs Up / Down Booth (Sheet "RatingBooth")
+function recordRating(data) {
+  data = data || {};
+  const sheet = getOrCreateSheet("RatingBooth", [
+    "Timestamp",
+    "ID Pengunjung",
+    "Nama",
+    "Peran",
+    "Fakultas / Asal",
+    "No Booth",
+    "Judul Karya",
+    "Rating",
+    "Total Up",
+    "Total Down"
+  ]);
+  const t = data.t ? new Date(data.t) : new Date();
+  const uid = sanitize_(data.uid || "-");
+  const nama = sanitize_(data.nama || "-");
+  const peran = sanitize_(data.peran || "umum");
+  const asal = sanitize_(data.asal || "-");
+  const boothNo = data.boothNo !== undefined ? Number(data.boothNo) || sanitize_(data.boothNo) : "-";
+  const boothJudul = sanitize_(data.boothJudul || "-");
+  const rating = sanitize_(data.vote || data.rating || "UP").toUpperCase();
+  const totalUp = Number(data.totalUp) || 0;
+  const totalDown = Number(data.totalDown) || 0;
+
+  sheet.appendRow([t, uid, nama, peran, asal, boothNo, boothJudul, rating, totalUp, totalDown]);
+  return { status: "success", boothNo: boothNo, rating: rating };
+}
+
+// Rekapitulasi Statistik Rating per Booth
+function getRatingStats() {
+  const sheet = getOrCreateSheet("RatingBooth", [
+    "Timestamp",
+    "ID Pengunjung",
+    "Nama",
+    "Peran",
+    "Fakultas / Asal",
+    "No Booth",
+    "Judul Karya",
+    "Rating",
+    "Total Up",
+    "Total Down"
+  ]);
+  const values = sheet.getDataRange().getValues();
+  const booths = {};
+
+  for (let i = 1; i < values.length; i++) {
+    const row = values[i];
+    const b = Number(row[5]) || row[5];
+    const r = String(row[7] || "").toUpperCase();
+    if (!booths[b]) booths[b] = { up: 0, down: 0 };
+    if (r === "UP") booths[b].up++;
+    else if (r === "DOWN") booths[b].down++;
+  }
+
+  return { totalRatings: values.length - 1, booths: booths };
 }
 
 // 7. Hitung Statistik Pengunjung Live

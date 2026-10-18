@@ -1451,7 +1451,9 @@ const SOROT = {
 /* ---------- Kartu karya (isi menonjol sesuai peran) ---------- */
 function workCard(d, opt = {}) {
   const p = S.peran,
-    inRoute = S.rute.includes(d.no);
+    inRoute = S.rute.includes(d.no),
+    panel = panelOf(d),
+    rate = Rating.get(panel);
   let meta = "";
   if (p === "dosen")
     meta = `<div class="meta"><div><span class="k">Skema</span><br>${esc(d.hibah)} · ${esc(d.skema)}</div><div><span class="k">Dana disetujui</span><br><b class="num">${rp(d.dana)}</b></div></div>`;
@@ -1465,9 +1467,9 @@ function workCard(d, opt = {}) {
   return `<article class="work">
     <div class="top">
       <span class="pill"><i class="dot"></i>${esc(d.kat)} · ${esc(KLASTER[d.kl])}</span>
-      <span class="pill stan-pill">Panel ${panelOf(d)}</span>
+      <span class="pill stan-pill">Panel ${panel}</span>
       ${
-        S.stamp[panelOf(d)]
+        S.stamp[panel]
           ? '<span class="pill ok quest-badge-tag done"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:2px"><polyline points="20 6 9 17 4 12"></polyline></svg>Stempel Diraih</span>'
           : '<span class="pill quest-badge-tag todo" style="opacity:0.85">🎯 Misi Booth</span>'
       }
@@ -1478,8 +1480,18 @@ function workCard(d, opt = {}) {
     <div class="who">${esc(d.ketua)}${p !== "mahasiswa" ? " · " + esc(shortFak(fakOf(d))) : ""}</div>
     ${meta}
     <div class="foot">
-      <button class="maplink" data-map="${d.no}" aria-label="Lihat panel ${panelOf(d)} di denah"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right:3px"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon></svg><u>Lihat di Denah</u></button>
+      <div class="rate-thumbs" role="group" aria-label="Apresiasi karya booth ${panel}">
+        <button class="thumb-btn up ${rate.myVote === "up" ? "active" : ""}" data-rate="${panel}" data-vote="up" title="Suka / Menginspirasi" aria-label="Suka karya panel ${panel}">
+          <span class="thumb-icon">👍</span>
+          <span class="thumb-cnt">${rate.up}</span>
+        </button>
+        <button class="thumb-btn down ${rate.myVote === "down" ? "active" : ""}" data-rate="${panel}" data-vote="down" title="Biasa saja" aria-label="Biasa saja karya panel ${panel}">
+          <span class="thumb-icon">👎</span>
+          ${rate.down > 0 ? `<span class="thumb-cnt">${rate.down}</span>` : ""}
+        </button>
+      </div>
       <span class="row card-actions" style="gap:8px;margin-left:auto;justify-content:flex-end">
+        <button class="maplink" data-map="${d.no}" aria-label="Lihat panel ${panel} di denah"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right:3px"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon></svg><u>Denah</u></button>
         ${inRoute ? '<span class="added">✓ Di Rute</span>' : `<button class="btn sm ghost" data-add="${d.no}">+ Rute</button>`}
         <button class="btn sm" data-open="${d.no}">Detail</button>
       </span>
@@ -1653,6 +1665,231 @@ function openLppmStats() {
   </div>`;
 }
 
+/* ==========================================================================
+   Rating & Apresiasi Booth (Thumbs Up / Down & Logging ke Google Sheets)
+   ========================================================================== */
+const Rating = {
+  get(p) {
+    p = Number(p);
+    const ratings = store.get("ratings", {});
+    const allStats = store.get("ratingStats", null) || this.seedStats();
+    const s = allStats[p] || { up: 12, down: 0 };
+    const myVote = ratings[p] || null;
+    const total = (s.up || 0) + (s.down || 0);
+    const pct = total ? Math.round(((s.up || 0) / total) * 100) : 100;
+    return { up: s.up || 0, down: s.down || 0, myVote, pct };
+  },
+
+  seedStats() {
+    const s = {};
+    DATA.forEach((d) => {
+      const p = panelOf(d);
+      const baseUp = 8 + ((p * 7) % 23);
+      const baseDown = p % 6 === 0 ? 1 : 0;
+      s[p] = { up: baseUp, down: baseDown };
+    });
+    store.set("ratingStats", s);
+    return s;
+  },
+
+  vote(p, vote) {
+    p = Number(p);
+    const ratings = store.get("ratings", {});
+    const allStats = store.get("ratingStats", null) || this.seedStats();
+    if (!allStats[p]) allStats[p] = { up: 10, down: 0 };
+
+    const oldVote = ratings[p];
+    if (oldVote === vote) {
+      delete ratings[p];
+      if (vote === "up" && allStats[p].up > 0) allStats[p].up--;
+      if (vote === "down" && allStats[p].down > 0) allStats[p].down--;
+    } else {
+      if (oldVote === "up" && allStats[p].up > 0) allStats[p].up--;
+      if (oldVote === "down" && allStats[p].down > 0) allStats[p].down--;
+      ratings[p] = vote;
+      if (vote === "up") allStats[p].up++;
+      if (vote === "down") allStats[p].down++;
+    }
+
+    store.set("ratings", ratings);
+    store.set("ratingStats", allStats);
+
+    const d = DATA.find((x) => panelOf(x) === p);
+    logRatingToGas({
+      boothNo: p,
+      boothJudul: d ? d.judul : "-",
+      boothFak: d ? d.fak : "-",
+      vote: vote,
+      totalUp: allStats[p].up,
+      totalDown: allStats[p].down,
+    });
+
+    try {
+      navigator.vibrate && navigator.vibrate(40);
+    } catch (e) {}
+
+    toast(
+      vote === "up"
+        ? "Apresiasi 👍 dicatat! Terima kasih."
+        : "Umpan balik 👎 dicatat! Terima kasih.",
+    );
+
+    if (S.tab === "beranda") viewBeranda();
+    else if (S.tab === "jelajah") renderList();
+    else render(S.tab);
+
+    if ($("#layer") && $("#layer .detail-sheet") && d) {
+      openDetail(d.no);
+    }
+  },
+
+  getTopFav(limit = 3) {
+    const allStats = store.get("ratingStats", null) || this.seedStats();
+    return [...DATA]
+      .map((d) => {
+        const p = panelOf(d);
+        const s = allStats[p] || { up: 0, down: 0 };
+        const total = s.up + s.down;
+        const pct = total ? Math.round((s.up / total) * 100) : 100;
+        return { ...d, up: s.up, down: s.down, pct, p };
+      })
+      .sort((a, b) => b.up - a.up || a.p - b.p)
+      .slice(0, limit);
+  },
+};
+
+async function logRatingToGas(info) {
+  const payload = {
+    action: "rating",
+    uid: Undi.id(),
+    nama: store.get("nama", "-"),
+    peran: S.peran || store.get("peran", "umum"),
+    asal: store.get("asal", store.get("fakultas", "-")),
+    t: new Date().toISOString(),
+    ...info,
+  };
+
+  try {
+    let queue = store.get("ratingQueue", []);
+    queue.push(payload);
+    store.set("ratingQueue", queue);
+  } catch (e) {}
+
+  flushRatingQueue();
+}
+
+async function flushRatingQueue() {
+  if (!CONFIG.gasUrl && S.att.mode !== "gas") return;
+  let queue = store.get("ratingQueue", []);
+  if (!queue || !queue.length) return;
+
+  const item = queue[0];
+  try {
+    if (S.att.mode === "gas" && window.google && google.script && google.script.run) {
+      google.script.run
+        .withSuccessHandler(() => {
+          let q = store.get("ratingQueue", []);
+          q.shift();
+          store.set("ratingQueue", q);
+          if (q.length) setTimeout(flushRatingQueue, 350);
+        })
+        .withFailureHandler(() => {})
+        .recordRating(item);
+      return;
+    }
+
+    await fetch(CONFIG.gasUrl, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify(item),
+    });
+
+    let q = store.get("ratingQueue", []);
+    q.shift();
+    store.set("ratingQueue", q);
+    if (q.length) setTimeout(flushRatingQueue, 350);
+  } catch (e) {}
+}
+
+window.addEventListener("online", flushRatingQueue);
+
+function promptBoothRating(p) {
+  const d = DATA.find((x) => panelOf(x) === p);
+  if (!d) return;
+  const rate = Rating.get(p);
+
+  $("#layer").innerHTML = `
+  <div class="scrim" data-close="1">
+    <div class="sheet rating-sheet" role="dialog" aria-modal="true" aria-labelledby="rtt">
+      <button class="x" data-close="1" aria-label="Tutup">×</button>
+      <span class="rating-sheet-pill">Stempel Booth ${p} Tercatat ✨</span>
+      <h3 id="rtt" class="rating-sheet-title">${esc(d.judul)}</h3>
+      <div class="rating-sheet-sub">${esc(d.ketua)} · ${esc(shortFak(fakOf(d)))}</div>
+
+      <div class="rating-box">
+        <p class="rating-box-q">Bagaimana kesan Anda terhadap inovasi ini?</p>
+        <div class="rating-choice-grid">
+          <button class="rating-large-btn up ${rate.myVote === "up" ? "active" : ""}" data-rate="${p}" data-vote="up" data-autoclose="1">
+            <span class="r-emoji">👍</span>
+            <span class="r-lbl">Keren &amp; Menginspirasi</span>
+          </button>
+          <button class="rating-large-btn down ${rate.myVote === "down" ? "active" : ""}" data-rate="${p}" data-vote="down" data-autoclose="1">
+            <span class="r-emoji">👎</span>
+            <span class="r-lbl">Biasa Saja</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="row" style="justify-content:center">
+        <button class="btn text" data-close="1" style="font-size:13px;color:var(--mut)">Lewati (Lanjut Jelajah)</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function favBoothsCard() {
+  const top = Rating.getTopFav(3);
+  if (!top || !top.length) return "";
+  return `
+  <section class="sec" aria-labelledby="sec-fav-title" style="margin-top:0">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div>
+        <h2 id="sec-fav-title" style="font-size:17px;font-weight:800;margin-bottom:2px">🏆 3 Booth Paling Favorit</h2>
+        <p class="lead" style="margin:0">Karya inovasi dengan apresiasi jempol 👍 tertinggi dari pengunjung.</p>
+      </div>
+      <button class="link" data-go="jelajah" data-sort="fav" style="font-size:12.5px;font-weight:700;white-space:nowrap">Lihat Semua →</button>
+    </div>
+    <div class="fav-grid">
+      ${top
+        .map((d, idx) => {
+          const rank = idx + 1;
+          const medal =
+            rank === 1
+              ? "🥇 #1 Terfavorit"
+              : rank === 2
+                ? "🥈 #2 Favorit"
+                : "🥉 #3 Favorit";
+          return `
+          <div class="fav-card" data-open="${d.no}" role="button" tabindex="0" aria-label="Buka karya ${esc(d.judul)}">
+            <div class="fav-card-top">
+              <span class="fav-rank-badge ${rank === 1 ? "rank-1" : ""}">${medal}</span>
+              <span class="pill stan-pill" style="margin:0">Panel ${d.p}</span>
+              <span class="rate-thumbs" style="margin-left:auto;pointer-events:none">
+                <span class="thumb-btn up active">
+                  <span class="thumb-icon">👍</span>
+                  <span class="thumb-cnt">${d.up}</span>
+                </span>
+              </span>
+            </div>
+            <h3 class="fav-card-title">${esc(d.judul)}</h3>
+            <div class="fav-card-sub">${esc(d.ketua)} · ${esc(shortFak(fakOf(d)))}</div>
+          </div>`;
+        })
+        .join("")}
+    </div>
+  </section>`;
+}
+
 function viewBeranda() {
   const el = $("#v-beranda");
   const kats = ["Penelitian", "PKM"],
@@ -1681,7 +1918,10 @@ function viewBeranda() {
       </button>
     </nav>
 
-    <!-- Section 3: Rekomendasi Berdasarkan Peran -->
+    <!-- Section 3: 3 Booth Terfavorit Pengunjung -->
+    ${favBoothsCard()}
+
+    <!-- Section 4: Rekomendasi Berdasarkan Peran -->
     <section class="sec" style="margin-top:0" aria-labelledby="sec-peran-title">
       <h2 id="sec-peran-title" style="font-size:17px;font-weight:800;margin-bottom:4px">Rekomendasi Sesuai Peran</h2>
       <p class="lead">${S.peran ? esc(SOROT[S.peran].ket) + " Ketuk peran lain untuk mengganti filter kurasi." : "Pilih peran Anda untuk mendapatkan rekomendasi booth pameran yang paling relevan."}</p>
@@ -1866,7 +2106,7 @@ function viewUmpan() {
 function filtered() {
   const f = S.f,
     q = f.q.trim().toLowerCase();
-  return DATA.filter(
+  let list = DATA.filter(
     (d) =>
       (!f.kat || d.kat === f.kat) &&
       (!f.kl || d.kl === f.kl) &&
@@ -1877,6 +2117,15 @@ function filtered() {
           .toLowerCase()
           .includes(q)),
   );
+  if (f.sort === "fav") {
+    const stats = store.get("ratingStats", {}) || {};
+    list = [...list].sort((a, b) => {
+      const upA = stats[panelOf(a)]?.up || 0;
+      const upB = stats[panelOf(b)]?.up || 0;
+      return upB - upA || a.no - b.no;
+    });
+  }
+  return list;
 }
 function viewJelajah() {
   const el = $("#v-jelajah"),
@@ -1897,7 +2146,7 @@ function viewJelajah() {
         )
         .join("")}</select>
       <select id="selFak" aria-label="Filter fakultas"><option value="">Semua fakultas</option>${faks.map((x) => `<option value="${esc(x)}">${esc(shortFak(x))}</option>`).join("")}${DATA.some((d) => !d.fak) ? '<option value="-">Belum tercantum</option>' : ""}</select></div>
-    </div><div class="count"><span id="cnt"></span><button class="link" data-act="reset">Atur Ulang</button></div><div class="grid" id="list"></div>`;
+    </div><div class="count"><span id="cnt"></span><span style="display:flex;align-items:center;gap:10px"><button class="link ${f.sort === "fav" ? "active" : ""}" data-sort="fav" style="font-weight:700">${f.sort === "fav" ? "✓ Terfavorit" : "⭐ Urutkan Terfavorit"}</button><button class="link" data-act="reset">Atur Ulang</button></span></div><div class="grid" id="list"></div>`;
     $("#q").addEventListener("input", (e) => {
       S.f.q = e.target.value;
       renderList();
@@ -2377,6 +2626,23 @@ function openDetail(no) {
                 ? '<div class="loc-status-pill ok">✓ Stempel Diraih</div>'
                 : '<button class="btn sm gold" data-act="scan" style="margin-left:auto;white-space:nowrap">🎯 Klaim Stempel</button>'
             }
+          </div>
+
+          <div class="detail-rate-bar">
+            <div class="detail-rate-info">
+              <span class="detail-rate-label">Apresiasi Pengunjung</span>
+              <span class="detail-rate-sub">${Rating.get(panelOf(d)).pct}% pengunjung menyukai inovasi ini (${Rating.get(panelOf(d)).up} suka)</span>
+            </div>
+            <div class="rate-thumbs" role="group" aria-label="Penilaian booth">
+              <button class="thumb-btn up ${Rating.get(panelOf(d)).myVote === "up" ? "active" : ""}" data-rate="${panelOf(d)}" data-vote="up" aria-label="Suka inovasi ini">
+                <span class="thumb-icon">👍</span>
+                <span class="thumb-cnt">${Rating.get(panelOf(d)).up}</span>
+              </button>
+              <button class="thumb-btn down ${Rating.get(panelOf(d)).myVote === "down" ? "active" : ""}" data-rate="${panelOf(d)}" data-vote="down" aria-label="Biasa saja">
+                <span class="thumb-icon">👎</span>
+                ${Rating.get(panelOf(d)).down > 0 ? `<span class="thumb-cnt">${Rating.get(panelOf(d)).down}</span>` : ""}
+              </button>
+            </div>
           </div>
 
           <div class="desktop-grid">
@@ -3586,6 +3852,7 @@ function handleDeepCode(raw, fromStart) {
   setTimeout(() => {
     toast(r.msg);
     if (r.ok && r.n >= BOOTH_N) openUndian();
+    else if (r.ok && r.p) promptBoothRating(r.p);
   }, 300);
 }
 function stampCard() {
@@ -3707,6 +3974,12 @@ function scanResult(r) {
   if (r.ok && r.n >= target && !store.get("undian", null)) {
     closeScan();
     setTimeout(openUndian, 300);
+    return;
+  }
+  if (r.ok && r.p) {
+    setTimeout(() => {
+      promptBoothRating(r.p);
+    }, 450);
   }
 }
 function scanManual() {
@@ -4103,10 +4376,24 @@ function delRoute(n) {
 
 document.addEventListener("click", async (e) => {
   const t = e.target.closest(
-    "[data-go],[data-open],[data-open-sdg],[data-add],[data-del],[data-filter],[data-seg],[data-peran],[data-fr],[data-nilai],[data-act],[data-close],[data-map],[data-mseg],[data-mkl],[data-mroute],[data-mz]",
+    "[data-go],[data-open],[data-open-sdg],[data-add],[data-del],[data-filter],[data-seg],[data-peran],[data-fr],[data-nilai],[data-act],[data-close],[data-map],[data-mseg],[data-mkl],[data-mroute],[data-mz],[data-rate],[data-sort]",
   );
   if (!t) return;
   const d = t.dataset;
+  if (d.rate && d.vote) {
+    e.stopPropagation();
+    Rating.vote(+d.rate, d.vote);
+    if (d.autoclose) {
+      setTimeout(closeLayer, 350);
+    }
+    return;
+  }
+  if (d.sort === "fav") {
+    S.f.sort = S.f.sort === "fav" ? "" : "fav";
+    if (S.tab !== "jelajah") go("jelajah");
+    else renderList();
+    return;
+  }
   if (d.map) {
     showOnMap(+d.map);
     return;
@@ -4280,7 +4567,7 @@ document.addEventListener("click", async (e) => {
     return;
   }
   if (d.act === "reset") {
-    S.f = { q: "", kat: "", kl: "", sdg: "", fak: "" };
+    S.f = { q: "", kat: "", kl: "", sdg: "", fak: "", sort: "" };
     viewJelajah();
     return;
   }

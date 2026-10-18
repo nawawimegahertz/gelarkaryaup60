@@ -3899,5 +3899,276 @@ button,
   line-height: 1.45;
 }
 
+/* ==========================================================================
+   Fitur Booth Terfavorit & Micro-Rating Thumbs Up / Down
+   ========================================================================== */
+
+/* 1. Tombol Mini Thumbs di Kartu Karya (workCard) */
+.rate-thumbs {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--tint);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 2px 4px;
+}
+
+.thumb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: transparent;
+  border: none;
+  padding: 4px 7px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--mut);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1;
+}
+
+.thumb-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--ink);
+}
+
+.thumb-btn.up.active {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.thumb-btn.down.active {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.thumb-btn .thumb-icon {
+  font-size: 12px;
+  display: inline-block;
+  line-height: 1;
+}
+
+.thumb-btn .thumb-cnt {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+
+/* 2. Micro-Rating Sheet (Muncul Setelah Berhasil Scan) */
+.rating-sheet {
+  max-width: 440px;
+  text-align: center;
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: #ffffff !important;
+}
+
+.rating-sheet-pill {
+  display: inline-block;
+  background: var(--tint);
+  color: var(--primary);
+  border: 1px solid rgba(24, 87, 196, 0.15);
+  font-weight: 800;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 6px;
+}
+
+.rating-sheet-title {
+  font-size: 15.5px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: var(--ink);
+  margin: 0 0 4px;
+  text-wrap: balance;
+}
+
+.rating-sheet-sub {
+  font-size: 12px;
+  color: var(--mut);
+  margin-bottom: 14px;
+}
+
+.rating-box {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: var(--radius-md);
+  padding: 16px 14px;
+  margin-bottom: 14px;
+}
+
+.rating-box-q {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 12px;
+}
+
+.rating-choice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.rating-large-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 10px;
+  border-radius: var(--radius-md);
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  min-height: 80px;
+  gap: 6px;
+}
+
+.rating-large-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.rating-large-btn.up {
+  border-color: #a7f3d0;
+  background: #f0fdf4;
+}
+
+.rating-large-btn.up:hover,
+.rating-large-btn.up.active {
+  background: #dcfce7;
+  border-color: #34d399;
+}
+
+.rating-large-btn.down {
+  border-color: #fed7aa;
+  background: #fff7ed;
+}
+
+.rating-large-btn.down:hover,
+.rating-large-btn.down.active {
+  background: #ffedd5;
+  border-color: #fb923c;
+}
+
+.rating-large-btn .r-emoji {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.rating-large-btn .r-lbl {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1.25;
+}
+
+/* 3. Seksi Booth Terfavorit di Beranda */
+.fav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.fav-card {
+  position: relative;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: var(--shadow);
+  transition: all 0.18s ease;
+  cursor: pointer;
+}
+
+.fav-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.fav-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.fav-rank-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+}
+
+.fav-rank-badge.rank-1 {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde047 100%);
+  color: #854d0e;
+  border-color: #facc15;
+}
+
+.fav-card-title {
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: var(--ink);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.fav-card-sub {
+  font-size: 11.5px;
+  color: var(--mut);
+  margin-top: auto;
+}
+
+/* 4. Rating Bar di Detail Sheet */
+.detail-rate-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  margin: 12px 0;
+}
+
+.detail-rate-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-rate-label {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.detail-rate-sub {
+  font-size: 11px;
+  color: var(--mut);
+}
+
 
 
