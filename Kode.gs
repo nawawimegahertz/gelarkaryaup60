@@ -183,37 +183,82 @@ function recordScan(data) {
   return { status: "success", count: totalStempel };
 }
 
-// 7. Pencatatan Rating Thumbs Up / Down Booth (Sheet "RatingBooth")
+// 7. Pencatatan Rating Thumbs Up / Down Booth (Sheet "RatingBooth") - Idempotent In-Place Upsert
 function recordRating(data) {
   data = data || {};
-  const sheet = getOrCreateSheet("RatingBooth", [
-    "Timestamp",
-    "ID Pengunjung",
-    "Nama",
-    "Peran",
-    "Fakultas / Asal",
-    "No Booth",
-    "Judul Karya",
-    "Rating",
-    "Total Up",
-    "Total Down"
-  ]);
-  const t = data.t ? new Date(data.t) : new Date();
-  const uid = sanitize_(data.uid || "-");
-  const nama = sanitize_(data.nama || "-");
-  const peran = sanitize_(data.peran || "umum");
-  const asal = sanitize_(data.asal || "-");
-  const boothNo = data.boothNo !== undefined ? Number(data.boothNo) || sanitize_(data.boothNo) : "-";
-  const boothJudul = sanitize_(data.boothJudul || "-");
-  const rating = sanitize_(data.vote || data.rating || "UP").toUpperCase();
-  const totalUp = Number(data.totalUp) || 0;
-  const totalDown = Number(data.totalDown) || 0;
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) {
+    return { status: "busy", message: "Server sedang sibuk memproses antrean" };
+  }
 
-  sheet.appendRow([t, uid, nama, peran, asal, boothNo, boothJudul, rating, totalUp, totalDown]);
-  return { status: "success", boothNo: boothNo, rating: rating };
+  try {
+    const sheet = getOrCreateSheet("RatingBooth", [
+      "Timestamp",
+      "ID Pengunjung",
+      "Nama",
+      "Peran",
+      "Fakultas / Asal",
+      "No Booth",
+      "Judul Karya",
+      "Rating",
+      "Total Up",
+      "Total Down"
+    ]);
+
+    const t = data.t ? new Date(data.t) : new Date();
+    const uid = sanitize_(data.uid || "-");
+    const nama = sanitize_(data.nama || "-");
+    const peran = sanitize_(data.peran || "umum");
+    const asal = sanitize_(data.asal || "-");
+    const boothNo = data.boothNo !== undefined ? Number(data.boothNo) || sanitize_(data.boothNo) : "-";
+    const boothJudul = sanitize_(data.boothJudul || "-");
+    const state = sanitize_(data.state || data.vote || data.rating || "NONE").toUpperCase();
+    const totalUp = Number(data.totalUp) || 0;
+    const totalDown = Number(data.totalDown) || 0;
+
+    const values = sheet.getDataRange().getValues();
+    const headers = values[0] || [];
+    const colUid = headers.indexOf("ID Pengunjung") !== -1 ? headers.indexOf("ID Pengunjung") : 1;
+    const colBooth = headers.indexOf("No Booth") !== -1 ? headers.indexOf("No Booth") : 5;
+    const colRating = headers.indexOf("Rating") !== -1 ? headers.indexOf("Rating") : 7;
+    const colTime = headers.indexOf("Timestamp") !== -1 ? headers.indexOf("Timestamp") : 0;
+    const colUp = headers.indexOf("Total Up") !== -1 ? headers.indexOf("Total Up") : 8;
+    const colDown = headers.indexOf("Total Down") !== -1 ? headers.indexOf("Total Down") : 9;
+
+    let rowIndex = -1;
+    if (uid && uid !== "-" && boothNo && boothNo !== "-") {
+      for (let i = 1; i < values.length; i++) {
+        if (String(values[i][colUid]).trim() === uid && String(values[i][colBooth]) === String(boothNo)) {
+          rowIndex = i + 1; // 1-indexed baris sheet
+          break;
+        }
+      }
+    }
+
+    if (state === "NONE") {
+      // Hapus data rating jika pengunjung membatalkan pilihannya
+      if (rowIndex > 0) {
+        sheet.deleteRow(rowIndex);
+      }
+      return { status: "success", action: "deleted", boothNo: boothNo };
+    } else if (rowIndex > 0) {
+      // Perbarui in-place di baris yang sama (hindari baris ganda)
+      sheet.getRange(rowIndex, colTime + 1).setValue(t);
+      sheet.getRange(rowIndex, colRating + 1).setValue(state);
+      if (colUp !== -1) sheet.getRange(rowIndex, colUp + 1).setValue(totalUp);
+      if (colDown !== -1) sheet.getRange(rowIndex, colDown + 1).setValue(totalDown);
+      return { status: "success", action: "updated", boothNo: boothNo, rating: state };
+    } else {
+      // Tambahkan baris baru untuk penilaian pertama kali
+      sheet.appendRow([t, uid, nama, peran, asal, boothNo, boothJudul, state, totalUp, totalDown]);
+      return { status: "success", action: "created", boothNo: boothNo, rating: state };
+    }
+  } finally {
+    lock.releaseLock();
+  }
 }
 
-// Rekapitulasi Statistik Rating per Booth (Anti Duplikasi per Pengunjung)
+// Rekapitulasi Statistik Rating per Booth (Idempotent Anti Duplikasi)
 function getRatingStats() {
   const sheet = getOrCreateSheet("RatingBooth", [
     "Timestamp",
@@ -228,28 +273,34 @@ function getRatingStats() {
     "Total Down"
   ]);
   const values = sheet.getDataRange().getValues();
-  const latestVote = {}; // `${uid}_${booth}` -> vote
+  if (values.length <= 1) return { totalRatings: 0, booths: {} };
 
-  for (let i = 1; i < values.length; i++) {
-    const row = values[i];
-    const uid = String(row[1] || "").trim();
-    const b = Number(row[5]) || row[5];
-    const r = String(row[7] || "").toUpperCase();
-    if (!b) continue;
-    const key = (uid || ("row_" + i)) + "_" + b;
-    latestVote[key] = { booth: b, vote: r };
-  }
+  const headers = values[0] || [];
+  const colUid = headers.indexOf("ID Pengunjung") !== -1 ? headers.indexOf("ID Pengunjung") : 1;
+  const colBooth = headers.indexOf("No Booth") !== -1 ? headers.indexOf("No Booth") : 5;
+  const colRating = headers.indexOf("Rating") !== -1 ? headers.indexOf("Rating") : 7;
 
   const booths = {};
   let totalUpCount = 0;
-  for (const k in latestVote) {
-    const item = latestVote[k];
-    const b = item.booth;
+  const visited = {};
+
+  // Iterasi dari baris terbaru ke terlama untuk akurasi tertinggi
+  for (let i = values.length - 1; i >= 1; i--) {
+    const row = values[i];
+    const uid = String(row[colUid] || "").trim();
+    const b = Number(row[colBooth]) || row[colBooth];
+    const r = String(row[colRating] || "").toUpperCase();
+    if (!b) continue;
+
+    const key = (uid || ("row_" + i)) + "_" + b;
+    if (visited[key]) continue;
+    visited[key] = true;
+
     if (!booths[b]) booths[b] = { up: 0, down: 0 };
-    if (item.vote === "UP") {
+    if (r === "UP") {
       booths[b].up++;
       totalUpCount++;
-    } else if (item.vote === "DOWN") {
+    } else if (r === "DOWN") {
       booths[b].down++;
     }
   }

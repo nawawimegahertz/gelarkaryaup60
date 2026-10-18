@@ -1776,16 +1776,22 @@ const Rating = {
     if (!allStats[p]) allStats[p] = { up: 0, down: 0 };
 
     const oldVote = ratings[p];
+    let nextState = "NONE";
+
     if (oldVote === vote) {
+      // Pembatalan vote (Unvote) -> hapus dari ratings
       delete ratings[p];
       if (vote === "up" && allStats[p].up > 0) allStats[p].up--;
       if (vote === "down" && allStats[p].down > 0) allStats[p].down--;
+      nextState = "NONE";
     } else {
+      // Vote baru atau perpindahan suara (misal UP -> DOWN)
       if (oldVote === "up" && allStats[p].up > 0) allStats[p].up--;
       if (oldVote === "down" && allStats[p].down > 0) allStats[p].down--;
       ratings[p] = vote;
       if (vote === "up") allStats[p].up++;
       if (vote === "down") allStats[p].down++;
+      nextState = vote.toUpperCase();
     }
 
     store.set("ratings", ratings);
@@ -1796,7 +1802,8 @@ const Rating = {
       boothNo: p,
       boothJudul: d ? d.judul : "-",
       boothFak: d ? d.fak : "-",
-      vote: vote,
+      state: nextState,
+      vote: nextState,
       totalUp: allStats[p].up,
       totalDown: allStats[p].down,
     });
@@ -1806,7 +1813,9 @@ const Rating = {
     } catch (e) {}
 
     toast(
-      vote === "up"
+      nextState === "NONE"
+        ? "Penilaian dibatalkan."
+        : nextState === "UP"
         ? "Apresiasi 👍 dicatat! Terima kasih."
         : "Umpan balik 👎 dicatat! Terima kasih.",
     );
@@ -1865,18 +1874,27 @@ async function logRatingToGas(info) {
 
   try {
     let queue = store.get("ratingQueue", []);
-    queue.push(payload);
+    // Coalesce / Idempotent: jika dalam antrean sudah ada permintaan untuk booth ini, ganti dengan state terakhir
+    const existingIdx = queue.findIndex((x) => x.boothNo === payload.boothNo);
+    if (existingIdx !== -1) {
+      queue[existingIdx] = payload;
+    } else {
+      queue.push(payload);
+    }
     store.set("ratingQueue", queue);
   } catch (e) {}
 
   flushRatingQueue();
 }
 
+let isFlushingRating = false;
 async function flushRatingQueue() {
+  if (isFlushingRating) return;
   if (!CONFIG.gasUrl && S.att.mode !== "gas") return;
   let queue = store.get("ratingQueue", []);
   if (!queue || !queue.length) return;
 
+  isFlushingRating = true;
   const item = queue[0];
   try {
     if (S.att.mode === "gas" && window.google && google.script && google.script.run) {
@@ -1885,10 +1903,13 @@ async function flushRatingQueue() {
           let q = store.get("ratingQueue", []);
           q.shift();
           store.set("ratingQueue", q);
+          isFlushingRating = false;
           if (q.length) setTimeout(flushRatingQueue, 350);
           else setTimeout(() => Rating.syncFromGas(), 1000);
         })
-        .withFailureHandler(() => {})
+        .withFailureHandler(() => {
+          isFlushingRating = false;
+        })
         .recordRating(item);
       return;
     }
@@ -1902,9 +1923,12 @@ async function flushRatingQueue() {
     let q = store.get("ratingQueue", []);
     q.shift();
     store.set("ratingQueue", q);
+    isFlushingRating = false;
     if (q.length) setTimeout(flushRatingQueue, 350);
     else setTimeout(() => Rating.syncFromGas(), 1200);
-  } catch (e) {}
+  } catch (e) {
+    isFlushingRating = false;
+  }
 }
 
 window.addEventListener("online", flushRatingQueue);
