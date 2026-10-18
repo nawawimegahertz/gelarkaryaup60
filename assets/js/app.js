@@ -3437,9 +3437,14 @@ async function submitFeedback(ev) {
     store.set("umpan", true);
     store.set("myFb", row);
 
-    // Perbarui data lokal segera (optimistic UI)
+    // Perbarui data lokal segera (optimistic UI) - Idempotent
     let rowsFb = store.get("rowsFb", []);
-    rowsFb.push(row);
+    const existingIdx = rowsFb.findIndex((x) => x.uid === row.uid);
+    if (existingIdx !== -1) {
+      rowsFb[existingIdx] = row;
+    } else {
+      rowsFb.push(row);
+    }
     store.set("rowsFb", rowsFb);
     if (!S.fb.n) {
       S.fb = { n: rowsFb.length, avg: row.nilai };
@@ -3912,21 +3917,29 @@ async function logScanToGas(info) {
     ...info,
   };
 
-  // Simpan ke antrean lokal (offline-first resilience)
+  // Simpan ke antrean lokal (offline-first resilience) dengan idempotensi antrean
   try {
     let queue = store.get("scanQueue", []);
-    queue.push(payload);
+    const existingIdx = queue.findIndex((x) => x.boothNo === payload.boothNo);
+    if (existingIdx !== -1) {
+      queue[existingIdx] = payload;
+    } else {
+      queue.push(payload);
+    }
     store.set("scanQueue", queue);
   } catch (e) {}
 
   flushScanQueue();
 }
 
+let isFlushingScan = false;
 async function flushScanQueue() {
+  if (isFlushingScan) return;
   if (!CONFIG.gasUrl && S.att.mode !== "gas") return;
   let queue = store.get("scanQueue", []);
   if (!queue || !queue.length) return;
 
+  isFlushingScan = true;
   const item = queue[0];
   try {
     if (S.att.mode === "gas" && window.google && google.script && google.script.run) {
@@ -3935,9 +3948,12 @@ async function flushScanQueue() {
           let q = store.get("scanQueue", []);
           q.shift();
           store.set("scanQueue", q);
+          isFlushingScan = false;
           if (q.length) setTimeout(flushScanQueue, 350);
         })
-        .withFailureHandler(() => {})
+        .withFailureHandler(() => {
+          isFlushingScan = false;
+        })
         .recordScan(item);
       return;
     }
@@ -3952,9 +3968,11 @@ async function flushScanQueue() {
     let q = store.get("scanQueue", []);
     q.shift();
     store.set("scanQueue", q);
+    isFlushingScan = false;
     if (q.length) setTimeout(flushScanQueue, 350);
   } catch (e) {
     // Offline / jaringan terputus sementara: biarkan tetap di antrean
+    isFlushingScan = false;
   }
 }
 
@@ -4312,13 +4330,26 @@ async function submitUndian(ev) {
       const e = $("#ue");
       e.textContent = m;
       e.hidden = false;
+      const b = ev.target.querySelector("button[type=submit]");
+      if (b) {
+        b.disabled = false;
+        b.textContent = "Daftarkan Kupon Undian";
+      }
     };
   if (!nama) return err("Isi nama lengkap Anda.");
   if (!/^(\+62|62|0)8\d{7,12}$/.test(wa))
     return err("Nomor WhatsApp tidak valid. Contoh: 08123456789.");
-  const tu = new Date().toISOString(),
-    kode = undianKode(nama, tu),
-    rec = { nama, wa, kode, tu };
+
+  const btn = ev.target.querySelector("button[type=submit]");
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Mendaftarkan Kupon...";
+  }
+
+  const existing = store.get("undian");
+  const tu = existing && existing.tu ? existing.tu : new Date().toISOString(),
+    kode = existing && existing.kode ? existing.kode : undianKode(nama, tu),
+    rec = { nama, wa, kode, tu, boothCount: Object.keys(S.stamp).length };
   store.set("undian", rec);
   if (S.att.mode === "gas") {
     try {
@@ -4333,6 +4364,7 @@ async function submitUndian(ev) {
             boothCount: Object.keys(S.stamp).length,
             peran: S.peran || "",
             asal: store.get("asal", ""),
+            uid: Undi.id(),
           });
       });
     } catch (e) {}

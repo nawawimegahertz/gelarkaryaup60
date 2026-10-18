@@ -105,82 +105,229 @@ function doPost(e) {
   }
 }
 
-// 3. Pencatatan Kehadiran (Sheet "Hadir")
+// 3. Pencatatan Kehadiran (Sheet "Hadir") - Idempotent In-Place Upsert per UID
 function recordAttendance(data) {
   data = data || {};
-  const sheet = getOrCreateSheet("Hadir", ["Timestamp", "Nama", "Peran", "Fakultas / Asal", "ID Pengunjung"]);
-  const t = data.t ? new Date(data.t) : new Date();
-  const nama = sanitize_(data.nama || "-");
-  const peran = sanitize_(data.peran || "umum");
-  const asal = sanitize_(data.asal || "-");
-  const uid = sanitize_(data.uid || "-");
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) {
+    return { status: "busy", message: "Server sedang sibuk memproses antrean" };
+  }
 
-  sheet.appendRow([t, nama, peran, asal, uid]);
-  return { status: "success", stats: getLiveStats() };
+  try {
+    const sheet = getOrCreateSheet("Hadir", ["Timestamp", "Nama", "Peran", "Fakultas / Asal", "ID Pengunjung"]);
+    const t = data.t ? new Date(data.t) : new Date();
+    const nama = sanitize_(data.nama || "-");
+    const peran = sanitize_(data.peran || "umum");
+    const asal = sanitize_(data.asal || "-");
+    const uid = sanitize_(data.uid || "-");
+
+    const values = sheet.getDataRange().getValues();
+    const headers = values[0] || [];
+    const colUid = headers.indexOf("ID Pengunjung") !== -1 ? headers.indexOf("ID Pengunjung") : 4;
+    const colTime = headers.indexOf("Timestamp") !== -1 ? headers.indexOf("Timestamp") : 0;
+    const colNama = headers.indexOf("Nama") !== -1 ? headers.indexOf("Nama") : 1;
+    const colPeran = headers.indexOf("Peran") !== -1 ? headers.indexOf("Peran") : 2;
+    const colAsal = headers.indexOf("Fakultas / Asal") !== -1 ? headers.indexOf("Fakultas / Asal") : 3;
+
+    let rowIndex = -1;
+    if (uid && uid !== "-") {
+      for (let i = 1; i < values.length; i++) {
+        if (String(values[i][colUid]).trim() === uid) {
+          rowIndex = i + 1;
+          break;
+        }
+      }
+    }
+
+    if (rowIndex > 0) {
+      // Update data pengunjung yang sudah ada (hindari duplikasi kehadiran)
+      sheet.getRange(rowIndex, colTime + 1).setValue(t);
+      if (nama && nama !== "-") sheet.getRange(rowIndex, colNama + 1).setValue(nama);
+      sheet.getRange(rowIndex, colPeran + 1).setValue(peran);
+      sheet.getRange(rowIndex, colAsal + 1).setValue(asal);
+      return { status: "success", action: "updated", stats: getLiveStats() };
+    } else {
+      // Pengunjung baru pertama kali hadir
+      sheet.appendRow([t, nama, peran, asal, uid]);
+      return { status: "success", action: "created", stats: getLiveStats() };
+    }
+  } finally {
+    lock.releaseLock();
+  }
 }
 
-// 4. Pencatatan Umpan Balik (Sheet "UmpanBalik") - Relasional dengan Nama & ID Pengunjung
+// 4. Pencatatan Umpan Balik (Sheet "UmpanBalik") - Idempotent In-Place Upsert per UID
 function recordFeedback(data) {
   data = data || {};
-  const sheet = getOrCreateSheet("UmpanBalik", ["Timestamp", "Nama", "Peran", "Fakultas / Asal", "Nilai", "Karya", "Komentar", "ID Pengunjung"]);
-  const t = data.t ? new Date(data.t) : new Date();
-  const nama = sanitize_(data.nama || "-");
-  const peran = sanitize_(data.peran || "umum");
-  const asal = sanitize_(data.asal || "-");
-  const nilai = Number(data.nilai) || 0;
-  const karya = data.karya ? Number(data.karya) : "";
-  const komentar = sanitize_(data.komentar || "");
-  const uid = sanitize_(data.uid || "-");
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) {
+    return { status: "busy", message: "Server sedang sibuk memproses antrean" };
+  }
 
-  sheet.appendRow([t, nama, peran, asal, nilai, karya, komentar, uid]);
-  return { status: "success", fb: getFeedbackStats() };
+  try {
+    const sheet = getOrCreateSheet("UmpanBalik", ["Timestamp", "Nama", "Peran", "Fakultas / Asal", "Nilai", "Karya", "Komentar", "ID Pengunjung"]);
+    const t = data.t ? new Date(data.t) : new Date();
+    const nama = sanitize_(data.nama || "-");
+    const peran = sanitize_(data.peran || "umum");
+    const asal = sanitize_(data.asal || "-");
+    const nilai = Number(data.nilai) || 0;
+    const karya = data.karya ? Number(data.karya) : "";
+    const komentar = sanitize_(data.komentar || "");
+    const uid = sanitize_(data.uid || "-");
+
+    const values = sheet.getDataRange().getValues();
+    const headers = values[0] || [];
+    const colUid = headers.indexOf("ID Pengunjung") !== -1 ? headers.indexOf("ID Pengunjung") : 7;
+    const colTime = headers.indexOf("Timestamp") !== -1 ? headers.indexOf("Timestamp") : 0;
+    const colNama = headers.indexOf("Nama") !== -1 ? headers.indexOf("Nama") : 1;
+    const colPeran = headers.indexOf("Peran") !== -1 ? headers.indexOf("Peran") : 2;
+    const colAsal = headers.indexOf("Fakultas / Asal") !== -1 ? headers.indexOf("Fakultas / Asal") : 3;
+    const colNilai = headers.indexOf("Nilai") !== -1 ? headers.indexOf("Nilai") : 4;
+    const colKarya = headers.indexOf("Karya") !== -1 ? headers.indexOf("Karya") : 5;
+    const colKomentar = headers.indexOf("Komentar") !== -1 ? headers.indexOf("Komentar") : 6;
+
+    let rowIndex = -1;
+    if (uid && uid !== "-") {
+      for (let i = 1; i < values.length; i++) {
+        if (String(values[i][colUid]).trim() === uid) {
+          rowIndex = i + 1;
+          break;
+        }
+      }
+    }
+
+    if (rowIndex > 0) {
+      // Revisi feedback dari pengunjung yang sama (in-place update)
+      sheet.getRange(rowIndex, colTime + 1).setValue(t);
+      if (nama && nama !== "-") sheet.getRange(rowIndex, colNama + 1).setValue(nama);
+      sheet.getRange(rowIndex, colPeran + 1).setValue(peran);
+      sheet.getRange(rowIndex, colAsal + 1).setValue(asal);
+      sheet.getRange(rowIndex, colNilai + 1).setValue(nilai);
+      sheet.getRange(rowIndex, colKarya + 1).setValue(karya);
+      sheet.getRange(rowIndex, colKomentar + 1).setValue(komentar);
+      return { status: "success", action: "updated", fb: getFeedbackStats() };
+    } else {
+      // Umpan balik baru
+      sheet.appendRow([t, nama, peran, asal, nilai, karya, komentar, uid]);
+      return { status: "success", action: "created", fb: getFeedbackStats() };
+    }
+  } finally {
+    lock.releaseLock();
+  }
 }
 
-// 5. Pencatatan Undian Kunjungan Booth (Sheet "Undian")
+// 5. Pencatatan Undian Kunjungan Booth (Sheet "Undian") - Idempotent: 1 Kupon per UID
 function recordUndian(data) {
   data = data || {};
-  const sheet = getOrCreateSheet("Undian", ["Timestamp", "Nama", "WhatsApp", "Kode", "Jumlah Booth", "Peran", "Asal", "ID Pengunjung"]);
-  const t = new Date();
-  const nama = sanitize_(data.nama || "Tes Panitia");
-  const wa = sanitize_(data.wa || "-");
-  const kode = sanitize_(data.kode || "TEST");
-  const boothCount = Number(data.boothCount) || 0;
-  const peran = sanitize_(data.peran || "-");
-  const asal = sanitize_(data.asal || "-");
-  const uid = sanitize_(data.uid || "-");
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) {
+    return { status: "busy", message: "Server sedang sibuk memproses antrean" };
+  }
 
-  sheet.appendRow([t, nama, wa, kode, boothCount, peran, asal, uid]);
-  return { status: "success" };
+  try {
+    const sheet = getOrCreateSheet("Undian", ["Timestamp", "Nama", "WhatsApp", "Kode", "Jumlah Booth", "Peran", "Asal", "ID Pengunjung"]);
+    const t = new Date();
+    const nama = sanitize_(data.nama || "Tes Panitia");
+    const wa = sanitize_(data.wa || "-");
+    const kodeInput = sanitize_(data.kode || "");
+    const boothCount = Number(data.boothCount) || 0;
+    const peran = sanitize_(data.peran || "-");
+    const asal = sanitize_(data.asal || "-");
+    const uid = sanitize_(data.uid || "-");
+
+    const values = sheet.getDataRange().getValues();
+    const headers = values[0] || [];
+    const colUid = headers.indexOf("ID Pengunjung") !== -1 ? headers.indexOf("ID Pengunjung") : 7;
+    const colTime = headers.indexOf("Timestamp") !== -1 ? headers.indexOf("Timestamp") : 0;
+    const colNama = headers.indexOf("Nama") !== -1 ? headers.indexOf("Nama") : 1;
+    const colWa = headers.indexOf("WhatsApp") !== -1 ? headers.indexOf("WhatsApp") : 2;
+    const colKode = headers.indexOf("Kode") !== -1 ? headers.indexOf("Kode") : 3;
+    const colBooth = headers.indexOf("Jumlah Booth") !== -1 ? headers.indexOf("Jumlah Booth") : 4;
+
+    let rowIndex = -1;
+    let existingKode = "";
+    if (uid && uid !== "-") {
+      for (let i = 1; i < values.length; i++) {
+        if (String(values[i][colUid]).trim() === uid) {
+          rowIndex = i + 1;
+          existingKode = values[i][colKode];
+          break;
+        }
+      }
+    }
+
+    if (rowIndex > 0) {
+      // Kupon sudah pernah dibuat untuk UID ini! Jangan buat kupon baru, pertahankan kode yang sudah ada
+      sheet.getRange(rowIndex, colTime + 1).setValue(t);
+      if (nama && nama !== "-") sheet.getRange(rowIndex, colNama + 1).setValue(nama);
+      if (wa && wa !== "-") sheet.getRange(rowIndex, colWa + 1).setValue(wa);
+      if (boothCount > 0) sheet.getRange(rowIndex, colBooth + 1).setValue(boothCount);
+      return { status: "success", action: "already_registered", kode: existingKode || kodeInput };
+    } else {
+      // Pendaftaran kupon undian pertama kali
+      const finalKode = kodeInput || ("UP60-" + Math.floor(1000 + Math.random() * 9000));
+      sheet.appendRow([t, nama, wa, finalKode, boothCount, peran, asal, uid]);
+      return { status: "success", action: "created", kode: finalKode };
+    }
+  } finally {
+    lock.releaseLock();
+  }
 }
 
-// 6. Pencatatan Scan QR Booth (Sheet "ScanBooth") - Relasional & Realtime
+// 6. Pencatatan Scan QR Booth (Sheet "ScanBooth") - Idempotent: 1 Stempel per (UID, No Booth)
 function recordScan(data) {
   data = data || {};
-  const sheet = getOrCreateSheet("ScanBooth", [
-    "Timestamp",
-    "ID Pengunjung",
-    "Nama",
-    "Peran",
-    "Fakultas / Asal",
-    "No Booth",
-    "Judul Karya",
-    "Fakultas Booth",
-    "Total Stempel",
-    "Metode"
-  ]);
-  const t = data.t ? new Date(data.t) : new Date();
-  const uid = sanitize_(data.uid || "-");
-  const nama = sanitize_(data.nama || "-");
-  const peran = sanitize_(data.peran || "umum");
-  const asal = sanitize_(data.asal || "-");
-  const boothNo = data.boothNo !== undefined ? Number(data.boothNo) || sanitize_(data.boothNo) : "-";
-  const boothJudul = sanitize_(data.boothJudul || "-");
-  const boothFak = sanitize_(data.boothFak || "-");
-  const totalStempel = Number(data.totalStempel) || 0;
-  const metode = sanitize_(data.metode || "kamera");
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) {
+    return { status: "busy", message: "Server sedang sibuk memproses antrean" };
+  }
 
-  sheet.appendRow([t, uid, nama, peran, asal, boothNo, boothJudul, boothFak, totalStempel, metode]);
-  return { status: "success", count: totalStempel };
+  try {
+    const sheet = getOrCreateSheet("ScanBooth", [
+      "Timestamp",
+      "ID Pengunjung",
+      "Nama",
+      "Peran",
+      "Fakultas / Asal",
+      "No Booth",
+      "Judul Karya",
+      "Fakultas Booth",
+      "Total Stempel",
+      "Metode"
+    ]);
+
+    const t = data.t ? new Date(data.t) : new Date();
+    const uid = sanitize_(data.uid || "-");
+    const nama = sanitize_(data.nama || "-");
+    const peran = sanitize_(data.peran || "umum");
+    const asal = sanitize_(data.asal || "-");
+    const boothNo = data.boothNo !== undefined ? Number(data.boothNo) || sanitize_(data.boothNo) : "-";
+    const boothJudul = sanitize_(data.boothJudul || "-");
+    const boothFak = sanitize_(data.boothFak || "-");
+    const totalStempel = Number(data.totalStempel) || 0;
+    const metode = sanitize_(data.metode || "kamera");
+
+    const values = sheet.getDataRange().getValues();
+    const headers = values[0] || [];
+    const colUid = headers.indexOf("ID Pengunjung") !== -1 ? headers.indexOf("ID Pengunjung") : 1;
+    const colBooth = headers.indexOf("No Booth") !== -1 ? headers.indexOf("No Booth") : 5;
+
+    // Cek apakah kombinasi (UID, No Booth) sudah pernah tercatat
+    if (uid && uid !== "-" && boothNo && boothNo !== "-") {
+      for (let i = 1; i < values.length; i++) {
+        if (String(values[i][colUid]).trim() === uid && String(values[i][colBooth]) === String(boothNo)) {
+          // Stempel booth ini sudah pernah tercatat untuk pengunjung ini, abaikan duplikasi
+          return { status: "success", action: "duplicate_ignored", count: totalStempel };
+        }
+      }
+    }
+
+    // Stempel baru pertama kali
+    sheet.appendRow([t, uid, nama, peran, asal, boothNo, boothJudul, boothFak, totalStempel, metode]);
+    return { status: "success", action: "created", count: totalStempel };
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 // 7. Pencatatan Rating Thumbs Up / Down Booth (Sheet "RatingBooth") - Idempotent In-Place Upsert
