@@ -220,5 +220,3 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 - [x] Pengujian visual pada resolusi mobile sempit (360px), standar (390px - 412px), dan desktop.
 - [x] Verifikasi kontras teks WCAG AAA pada kartu biru dan dock aktif.
 - [x] Audit performa: zero layout shift (CLS 0) dan transisi responsif 60fps.
-
-

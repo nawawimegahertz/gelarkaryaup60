@@ -1541,13 +1541,13 @@ function questCard(opt = {}) {
       </div>
       <div class="quest-reward">
         <span>Hadiah Undian</span>
-        <b class="reward-val">${esc(CONFIG.undian.hadiah)} <small style="font-size:11px;font-weight:600;opacity:0.9">(3 Pemenang)</small></b>
+        <b class="reward-val">${esc(CONFIG.undian.hadiah)}</b>
       </div>
     </div>
 
     <div class="quest-body">
       <div class="quest-headline-row">
-        <h2 class="quest-title">Undian ${esc(CONFIG.undian.hadiah)} (3 Pemenang)</h2>
+        <h2 class="quest-title">Undian ${esc(CONFIG.undian.hadiah)}</h2>
         <span class="quest-tier-pill">${level === 5 ? "🏆 Master 60/60" : `Level ${level} • ${n}/${target}`}</span>
       </div>
       <div class="quest-tier-name">${esc(levelTitle)}</div>
@@ -4044,7 +4044,7 @@ function viewQrBooth() {
           <small class="qcard-screen-note"><b>Pindai untuk mencatat kunjungan</b></small>
           <div class="qcard-print-footer">
             <div class="qcard-instruksi">Pindai QR dengan kamera ponsel atau fitur Scan di web aplikasi</div>
-            <div class="qcard-note">Kumpulkan 60 booth untuk klaim Kupon Doorprize Rp 150.000 (3 Pemenang)!</div>
+            <div class="qcard-note">Kumpulkan 60 booth untuk klaim Kupon Doorprize Rp 150.000!</div>
           </div>
         </div>`;
       })
