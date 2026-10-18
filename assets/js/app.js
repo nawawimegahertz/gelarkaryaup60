@@ -1853,7 +1853,7 @@ function promptBoothRating(p) {
       </div>
 
       <div class="row" style="justify-content:center;margin-top:4px">
-        <button class="rating-skip-btn" data-close="1" aria-label="Lewati rating dan lanjut menjelajah">Lewati (Lanjut Menjelajah) →</button>
+        <button class="rating-skip-btn" data-close="1" aria-label="Lewati rating dan lanjut menjelajah">Lanjut Menjelajah →</button>
       </div>
     </div>
   </div>`;
