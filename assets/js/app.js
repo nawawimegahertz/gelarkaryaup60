@@ -4039,10 +4039,12 @@ function promptScanSuccess(r) {
         </div>
       </div>
 
-      <div class="scan-rate-footer">
-        <button class="btn gold scan-continue-btn" data-act="scanRateClose">
-          ${r.n >= target ? "🎉 Lengkap! Buka Undian Sekarang →" : "📷 Lanjut Pindai Booth Lain"}
-        </button>
+      <div class="scan-rate-footer" style="text-align:center;margin-top:2px">
+        ${
+          r.n >= target
+            ? `<button class="btn gold scan-continue-btn" data-act="scanRateClose">🎉 Lengkap! Buka Undian Sekarang →</button>`
+            : `<button class="rating-skip-btn" data-act="scanRateClose" style="font-size:12.5px;padding:7px 16px">Lewati (Lanjut Memindai) →</button>`
+        }
       </div>
     </div>
   </div>`;
@@ -4473,7 +4475,7 @@ document.addEventListener("click", async (e) => {
         closeScan();
         setTimeout(openUndian, 300);
       }
-    }, 650);
+    }, 250);
     return;
   }
   if (d.act === "scanRateClose") {
