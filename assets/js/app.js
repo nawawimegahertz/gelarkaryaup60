@@ -1240,6 +1240,11 @@ const store = {
       localStorage.setItem("up60." + k, JSON.stringify(v));
     } catch (e) {}
   },
+  del(k) {
+    try {
+      localStorage.removeItem("up60." + k);
+    } catch (e) {}
+  },
 };
 const rp = (n) =>
   n >= 1e9
@@ -1483,7 +1488,7 @@ function workCard(d, opt = {}) {
       <div class="rate-thumbs" role="group" aria-label="Apresiasi karya booth ${panel}">
         <button class="thumb-btn up ${rate.myVote === "up" ? "active" : ""}" data-rate="${panel}" data-vote="up" title="Suka / Menginspirasi" aria-label="Suka karya panel ${panel}">
           <span class="thumb-icon">👍</span>
-          <span class="thumb-cnt">${rate.up}</span>
+          ${rate.up > 0 ? `<span class="thumb-cnt">${rate.up}</span>` : ""}
         </button>
         <button class="thumb-btn down ${rate.myVote === "down" ? "active" : ""}" data-rate="${panel}" data-vote="down" title="Biasa saja" aria-label="Biasa saja karya panel ${panel}">
           <span class="thumb-icon">👎</span>
@@ -2638,12 +2643,12 @@ function openDetail(no) {
           <div class="detail-rate-bar">
             <div class="detail-rate-info">
               <span class="detail-rate-label">Apresiasi Pengunjung</span>
-              <span class="detail-rate-sub">${Rating.get(panelOf(d)).pct}% pengunjung menyukai inovasi ini (${Rating.get(panelOf(d)).up} suka)</span>
+              <span class="detail-rate-sub">${Rating.get(panelOf(d)).up > 0 ? `${Rating.get(panelOf(d)).pct}% pengunjung menyukai inovasi ini (${Rating.get(panelOf(d)).up} suka)` : "Belum ada apresiasi. Jadilah yang pertama!"}</span>
             </div>
             <div class="rate-thumbs" role="group" aria-label="Penilaian booth">
               <button class="thumb-btn up ${Rating.get(panelOf(d)).myVote === "up" ? "active" : ""}" data-rate="${panelOf(d)}" data-vote="up" aria-label="Suka inovasi ini">
                 <span class="thumb-icon">👍</span>
-                <span class="thumb-cnt">${Rating.get(panelOf(d)).up}</span>
+                ${Rating.get(panelOf(d)).up > 0 ? `<span class="thumb-cnt">${Rating.get(panelOf(d)).up}</span>` : ""}
               </button>
               <button class="thumb-btn down ${Rating.get(panelOf(d)).myVote === "down" ? "active" : ""}" data-rate="${panelOf(d)}" data-vote="down" aria-label="Biasa saja">
                 <span class="thumb-icon">👎</span>
@@ -4715,13 +4720,16 @@ document.addEventListener("keydown", (e) => {
 function boot() {
   document.documentElement.setAttribute("data-theme", "light");
 
-  // Hapus data dummy lama jika ada, lalu sinkronkan rating riil dari Google Sheets
-  if (!store.get("ratingSynced_v2", 0)) {
-    store.del("ratingStats");
-    store.set("ratingSynced_v2", 1);
+  try {
+    if (!store.get("ratingSynced_v2", 0)) {
+      store.del("ratingStats");
+      store.set("ratingSynced_v2", 1);
+    }
+    Rating.syncFromGas();
+    setInterval(() => Rating.syncFromGas(), 45000);
+  } catch (e) {
+    console.warn("Rating sync init:", e);
   }
-  Rating.syncFromGas();
-  setInterval(() => Rating.syncFromGas(), 45000);
 
   const h = location.hash.slice(1);
   const initialTab =
