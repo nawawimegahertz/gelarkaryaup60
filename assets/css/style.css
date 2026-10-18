@@ -3314,6 +3314,10 @@ button,
   line-height: 1;
 }
 
+.qcard .pn1::before {
+  content: "Panel ";
+}
+
 .qcard .cd {
   font:
     700 15px/1.2 ui-monospace,
@@ -3336,56 +3340,268 @@ button,
   place-items: center;
 }
 
+.qcard .qi img,
+.qcard .qi canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+}
+
+.qcard-print-header,
+.qcard-print-footer,
+.qcard-panel-lbl,
+.qcard-code-lbl {
+  display: none;
+}
+
 @media print {
   @page {
-    size: A4;
-    margin: 10mm;
+    size: A4 portrait;
+    margin: 8mm 10mm;
+  }
+
+  html,
+  body,
+  main,
+  #app,
+  .wrap,
+  #v-qrbooth {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
   }
 
   .hero,
   nav.tabs,
   .noprint,
   footer,
-  .toast {
+  .toast,
+  #layer {
     display: none !important;
   }
 
   body {
     background: #fff;
     padding: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
+  /* Default Mode: 1 QR per 1 Lembar A4 (Poster Booth) */
   .qrgrid {
-    grid-template-columns: 1fr 1fr;
-    gap: 8mm;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   .qcard {
-    border: 1px solid #999;
-    padding: 8mm 5mm;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 188mm !important;
+    height: 272mm !important;
+    max-height: 275mm !important;
+    margin: 0 auto !important;
+    padding: 8mm 10mm !important;
+    border: 3px solid #0b1f3a !important;
+    border-radius: 6mm !important;
+    background: #ffffff !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
+  .qcard:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  .qcard-print-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+    border-bottom: 2px solid #0b1f3a !important;
+    padding-bottom: 4mm !important;
+  }
+
+  .qcard-univ {
+    font-size: 14pt !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.08em !important;
+    color: #0b1f3a !important;
+    text-transform: uppercase !important;
+  }
+
+  .qcard-event {
+    font-size: 11pt !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+    margin-top: 1mm !important;
+  }
+
+  .qcard-panel-wrap {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    margin-top: 2mm !important;
+  }
+
+  .qcard-panel-lbl {
+    display: block !important;
+    font-size: 13pt !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.12em !important;
+    color: #64748b !important;
+    text-transform: uppercase !important;
+  }
+
+  .qcard .pn1 {
+    font-size: 56pt !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    color: #0b1f3a !important;
+    margin: 1mm 0 0 !important;
+  }
+
+  .qcard .pn1::before {
+    content: "" !important;
   }
 
   .qcard .qi {
-    width: 62mm;
-    height: 62mm;
+    width: 125mm !important;
+    height: 125mm !important;
+    margin: 2mm auto !important;
+    padding: 3mm !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 4mm !important;
+    background: #ffffff !important;
+    box-sizing: border-box !important;
   }
 
   .qcard .qi img,
   .qcard .qi canvas {
-    width: 62mm !important;
-    height: 62mm !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
   }
 
-  .qcard .pn1 {
-    font-size: 34pt;
+  .qcard-code-wrap {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 80% !important;
+    border: 2px dashed #0b1f3a !important;
+    background: #f8fafc !important;
+    border-radius: 4mm !important;
+    padding: 3mm 6mm !important;
+    box-sizing: border-box !important;
+  }
+
+  .qcard-code-lbl {
+    display: block !important;
+    font-size: 9.5pt !important;
+    font-weight: 700 !important;
+    color: #64748b !important;
+    letter-spacing: 0.05em !important;
   }
 
   .qcard .cd {
-    font-size: 14pt;
+    font-size: 22pt !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.12em !important;
+    color: #0b1f3a !important;
+    margin-top: 1mm !important;
   }
 
-  .qcard small {
-    font-size: 10pt;
+  .qcard-screen-note {
+    display: none !important;
+  }
+
+  .qcard-print-footer {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+    border-top: 1.5px solid #cbd5e1 !important;
+    padding-top: 3mm !important;
+  }
+
+  .qcard-instruksi {
+    font-size: 11pt !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+  }
+
+  .qcard-note {
+    font-size: 9pt !important;
+    color: #64748b !important;
+    margin-top: 1mm !important;
+  }
+
+  /* Mode Alternatif: Format Lembar Stiker (6 per Lembar A4) */
+  body.print-stiker .qrgrid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8mm !important;
+  }
+
+  body.print-stiker .qcard {
+    height: auto !important;
+    max-height: 65mm !important;
+    padding: 6mm 4mm !important;
+    border: 1px solid #94a3b8 !important;
+    border-radius: 3mm !important;
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  body.print-stiker .qcard-print-header,
+  body.print-stiker .qcard-print-footer,
+  body.print-stiker .qcard-panel-lbl,
+  body.print-stiker .qcard-code-lbl {
+    display: none !important;
+  }
+
+  body.print-stiker .qcard-panel-wrap {
+    margin: 0 !important;
+  }
+
+  body.print-stiker .qcard .pn1 {
+    font-size: 26pt !important;
+  }
+
+  body.print-stiker .qcard .qi {
+    width: 40mm !important;
+    height: 40mm !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 1mm auto !important;
+  }
+
+  body.print-stiker .qcard-code-wrap {
+    width: auto !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+
+  body.print-stiker .qcard .cd {
+    font-size: 13pt !important;
+  }
+
+  body.print-stiker .qcard-screen-note {
+    display: block !important;
+    font-size: 9pt !important;
+    color: #64748b !important;
   }
 }
 

@@ -4021,12 +4021,31 @@ function viewQrBooth() {
     web = u.startsWith("http://") || u.startsWith("https://");
   $("#v-qrbooth").innerHTML =
     `<div class="noprint"><button class="link" data-go="hadir">← Kembali ke kehadiran</button>
-    <div class="sec" style="margin-top:0"><h2>QR booth untuk dicetak</h2><p class="lead">Satu QR per panel; tempel di bawah poster nomor yang sama. ${web ? `QR berisi tautan web <b>${esc(u)}</b> beserta kode panel.` : "Tautan publik belum diisi di halaman Kehadiran, jadi QR hanya berisi kode dan hanya terbaca oleh pemindai di dalam halaman ini."}</p>
-    <div class="row"><button class="btn gold" data-act="print">Cetak (2 × 3 per A4)</button></div></div></div>
+    <div class="sec" style="margin-top:0"><h2>QR Booth untuk Dicetak Panitia</h2><p class="lead">Format utama: <b>1 QR per 1 lembar A4</b> untuk dipajang sebagai standing poster di setiap meja booth (panel 1 s.d. 60). ${web ? `QR berisi tautan web <b>${esc(u)}</b> beserta kode panel otomatis.` : "Tautan publik belum diisi di halaman Kehadiran, jadi QR hanya berisi kode teks."}</p>
+    <div class="row" style="gap:10px;flex-wrap:wrap"><button class="btn gold" data-act="print-a4" style="font-weight:700">🖨️ Cetak (1 QR per Lembar A4)</button><button class="btn ghost" data-act="print-stiker" style="font-size:13px">📑 Format Lembar Stiker (6 per A4)</button></div></div></div>
     <div class="qrgrid" style="margin-top:14px">${DATA.map((d) => panelOf(d))
       .sort((a, b) => a - b)
       .map((p) => {
-        return `<div class="qcard"><span class="pn1">Panel ${p}</span><div class="qi" id="qb${p}"></div><span class="cd">${boothCode(p)}</span><small><b>Pindai untuk mencatat kunjungan</b></small></div>`;
+        return `<div class="qcard">
+          <div class="qcard-print-header">
+            <div class="qcard-univ">UNIVERSITAS PANCASILA · DIES NATALIS KE-60</div>
+            <div class="qcard-event">Gelar Karya Inovasi &amp; Riset 2026</div>
+          </div>
+          <div class="qcard-panel-wrap">
+            <span class="qcard-panel-lbl">BOOTH / PANEL</span>
+            <span class="pn1">${p}</span>
+          </div>
+          <div class="qi" id="qb${p}"></div>
+          <div class="qcard-code-wrap">
+            <span class="qcard-code-lbl">KODE MANUAL:</span>
+            <span class="cd">${boothCode(p)}</span>
+          </div>
+          <small class="qcard-screen-note"><b>Pindai untuk mencatat kunjungan</b></small>
+          <div class="qcard-print-footer">
+            <div class="qcard-instruksi">Pindai QR dengan kamera ponsel atau fitur Scan di web aplikasi</div>
+            <div class="qcard-note">Kumpulkan 60 booth untuk klaim Kupon Doorprize Rp 250.000!</div>
+          </div>
+        </div>`;
       })
       .join("")}</div>`;
   if (typeof QRCode === "undefined") return;
@@ -4038,8 +4057,8 @@ function viewQrBooth() {
     try {
       new QRCode(box, {
         text: web ? u.replace(/#.*$/, "") + "#b=" + c : c,
-        width: 176,
-        height: 176,
+        width: 380,
+        height: 380,
         correctLevel: QRCode.CorrectLevel.M,
       });
     } catch (e) {}
@@ -4228,8 +4247,21 @@ document.addEventListener("click", async (e) => {
     go("jelajah");
     return;
   }
-  if (d.act === "print") {
+  if (d.act === "print-a4" || d.act === "print") {
+    document.body.classList.remove("print-stiker");
     window.print();
+    return;
+  }
+  if (d.act === "print-stiker") {
+    document.body.classList.add("print-stiker");
+    window.print();
+    window.addEventListener(
+      "afterprint",
+      () => {
+        document.body.classList.remove("print-stiker");
+      },
+      { once: true },
+    );
     return;
   }
   if (d.act === "form") {

@@ -197,7 +197,13 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 ### Milestone 22: Penyederhanaan Cetak Kartu QR Booth Panitia (Tanpa Judul Karya)
 - [x] Hapus elemen judul karya (`d.judul`) dari kartu QR cetak panitia (`viewQrBooth`), karena judul penelitian sudah tertera jelas di poster pameran masing-masing booth.
 - [x] Pertahankan struktur utama: Nomor Panel (`Panel X`), Gambar QR Code beresolusi tajam, Kode Manual unik (`UP60-07-XXXX`), dan panduan singkat (*"Pindai untuk mencatat kunjungan"*).
-- [x] Optimalkan kerapihan layout cetak (format 2 × 3 kartu per lembar kertas A4) agar lebih luas, bebas kepenuhan teks, dan lebih cepat dipindai pengunjung.
+- [x] Optimalkan kerapihan layout cetak agar lebih luas, bebas kepenuhan teks, dan lebih cepat dipindai pengunjung.
+
+### Milestone 23: Format Cetak 1 QR per 1 Lembar A4 (Standing Poster Booth & High-Res QR)
+- [x] Ubah format cetak utama di `#qrbooth` menjadi **1 QR per 1 lembar A4** (`page-break-after: always`, `height: 272mm`, no-spill margin).
+- [x] Tambahkan header resmi Dies Natalis ke-60 UP, nomor booth ekstra besar (56pt), QR code super tajam (125mm x 125mm dengan resolusi canvas 380px), dan box kode manual bergaris putus-putus.
+- [x] Sertakan instruksi pameran di footer cetak untuk memandu pengunjung memindai via kamera atau web app.
+- [x] Berikan opsi fleksibel bagi panitia: Tombol *"🖨️ Cetak (1 QR per Lembar A4)"* dan opsi alternatif *"📑 Format Lembar Stiker (6 per A4)"*.
 
 ---
 
