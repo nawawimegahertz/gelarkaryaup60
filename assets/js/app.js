@@ -33,7 +33,8 @@ const CONFIG = {
     fields: { nama: "", peran: "", asal: "" }, // kode entry.XXXXXXX tiap pertanyaan
   },
   undian: {
-    hadiah: "Rp 250.000", // hadiah undian bagi pengunjung yang memindai booth
+    hadiah: "Rp 150.000", // hadiah undian bagi pengunjung yang memindai booth
+    kuota: 3, // 3 pemenang penerima doorprize @ Rp 150.000
     target: 60, // Syarat 60 booth lengkap konsisten dengan #jelajah
     garam: "up60-gk-2026", // ubah sebelum mencetak QR; kode booth dihitung dari nilai ini
     jeda: 8, // detik minimal antarpindaian, mencegah pindai beruntun tanpa berkunjung
@@ -1540,13 +1541,13 @@ function questCard(opt = {}) {
       </div>
       <div class="quest-reward">
         <span>Hadiah Undian</span>
-        <b class="reward-val">${esc(CONFIG.undian.hadiah)}</b>
+        <b class="reward-val">${esc(CONFIG.undian.hadiah)} <small style="font-size:11px;font-weight:600;opacity:0.9">(3 Pemenang)</small></b>
       </div>
     </div>
 
     <div class="quest-body">
       <div class="quest-headline-row">
-        <h2 class="quest-title">Undian ${esc(CONFIG.undian.hadiah)}</h2>
+        <h2 class="quest-title">Undian ${esc(CONFIG.undian.hadiah)} (3 Pemenang)</h2>
         <span class="quest-tier-pill">${level === 5 ? "🏆 Master 60/60" : `Level ${level} • ${n}/${target}`}</span>
       </div>
       <div class="quest-tier-name">${esc(levelTitle)}</div>
@@ -3981,7 +3982,7 @@ function drawWinner() {
         $("#layer").innerHTML =
           `<div class="scrim" data-close="1"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="wt"><button class="x" data-close="1" aria-label="Tutup">×</button><h2 id="wt">Pemenang undian</h2>
           <div class="loc" style="margin-top:14px"><b>★</b><span><b style="font-size:20px;color:#FFD36B">${esc(w.nama)}</b><br>${esc(w.wa)} · ${esc(w.kode)}<br>${esc(w.asal || "")}</span></div>
-          <p style="color:var(--mut);font-size:14px">Pemenang diundi acak langsung dari sheet "Undian". Panggil nama pemenang di aula dan cocokkan kodenya.</p>
+          <p style="color:var(--mut);font-size:14px">Pemenang diundi acak langsung dari sheet "Undian" (Kuota: 3 orang @ ${esc(CONFIG.undian.hadiah)}). Panggil nama pemenang di aula dan cocokkan kodenya.</p>
           <div class="row"><button class="btn gold" data-act="draw">Undi lagi</button></div></div></div>`;
       })
       .drawLotteryWinner();
@@ -3999,9 +4000,9 @@ function drawWinner() {
   won.push(w.kode);
   store.set("pemenang", won);
   $("#layer").innerHTML =
-    `<div class="scrim" data-close="1"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="wt"><button class="x" data-close="1" aria-label="Tutup">×</button><h2 id="wt">Pemenang undian</h2>
+    `<div class="scrim" data-close="1"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="wt"><button class="x" data-close="1" aria-label="Tutup">×</button><h2 id="wt">Pemenang undian (${won.length}/3)</h2>
     <div class="loc" style="margin-top:14px"><b>★</b><span><b style="font-size:20px;color:#FFD36B">${esc(w.nama)}</b><br>${esc(w.wa)} · ${esc(w.kode)}<br>${esc(w.asal || "")}</span></div>
-    <p style="color:var(--mut);font-size:14px">Dari ${pool.length} peserta yang tersisa. Panggil nama ini di lokasi dan cocokkan dengan kode undian di ponsel pemenang.</p>
+    <p style="color:var(--mut);font-size:14px">Pemenang ke-${won.length} dari 3 kuota doorprize @ ${esc(CONFIG.undian.hadiah)}. Panggil nama ini di lokasi dan cocokkan dengan kode undian di ponsel pemenang.</p>
     <div class="row"><button class="btn gold" data-act="draw">Undi lagi</button></div></div></div>`;
 }
 /* QR booth untuk dicetak panitia */
@@ -4043,7 +4044,7 @@ function viewQrBooth() {
           <small class="qcard-screen-note"><b>Pindai untuk mencatat kunjungan</b></small>
           <div class="qcard-print-footer">
             <div class="qcard-instruksi">Pindai QR dengan kamera ponsel atau fitur Scan di web aplikasi</div>
-            <div class="qcard-note">Kumpulkan 60 booth untuk klaim Kupon Doorprize Rp 250.000!</div>
+            <div class="qcard-note">Kumpulkan 60 booth untuk klaim Kupon Doorprize Rp 150.000 (3 Pemenang)!</div>
           </div>
         </div>`;
       })

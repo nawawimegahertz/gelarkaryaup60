@@ -210,6 +210,10 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 - [x] Sembunyikan blok `.stats` dan tanggal berukuran besar dari header agar Beranda tampil jauh lebih minimalis dan bersih.
 - [x] Menjadikan **Card MISI UNDIAN ("Misi Penjelajah Booth")** langsung tampil menonjol sebagai hero visual pertama saat pengguna membuka Beranda.
 
+### Milestone 25: Penyesuaian Doorprize Rp 150.000 (3 Pemenang)
+- [x] Sesuaikan nominal doorprize dari Rp 250.000 menjadi **Rp 150.000** dengan kuota tetap **3 penerima/pemenang** di seluruh sistem (`CONFIG.undian`, `questCard()`, dialog pengundian, cetak QR, dan mockup).
+- [x] Tambahkan keterangan jelas *"3 Pemenang"* pada quest card dan badge hadiah agar ekspektasi pengunjung transparan dan memotivasi partisipasi.
+
 ---
 
 ### Milestone 7: QA Polish, Performance, & Accessibility Audit

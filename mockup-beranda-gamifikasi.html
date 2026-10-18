@@ -768,10 +768,10 @@
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
             Misi Undian Booth
           </span>
-          <span class="quest-reward">Hadiah: <b>Undian Rp250.000</b></span>
+          <span class="quest-reward">Hadiah: <b>Undian Rp150.000 (3 Pemenang)</b></span>
         </div>
 
-        <h2 class="quest-headline">Undian Rp 250.000</h2>
+        <h2 class="quest-headline">Undian Rp 150.000 (3 Pemenang)</h2>
         <div id="questLevelTitle" style="font-size:14px; font-weight:700; color:var(--primary); margin:2px 0 4px;">Level 2: Pantang Nyerah</div>
         <div class="quest-sprint-badge" id="questSprintBadge">✨ Momentum Bagus! Tinggal <b>6 booth lagi</b> menuju Titik Separuh (30 Booth).</div>
         <p class="quest-desc" id="questDesc">
@@ -989,13 +989,13 @@
           lvl = 5;
           title = "Level 5: Calon Juara Undian";
           badge = "🏆 Target 60/60 Tercapai! Kupon Undian Siap Diundi.";
-          desc = "Seluruh 60 booth tuntas! Daftarkan kupon undian doorprize Rp 250.000 Anda sekarang.";
+          desc = "Seluruh 60 booth tuntas! Daftarkan kupon undian doorprize Rp 150.000 (3 Pemenang) Anda sekarang.";
         } else if (currentStamps >= 45) {
           lvl = 4;
           title = "Level 4: Hampir Juara";
           const s = 60 - currentStamps;
           badge = `🔥 Sprint Akhir: Tinggal <b>${s} booth lagi</b> menuju Kupon Undian!`;
-          desc = `Tinggal selangkah lagi untuk membuka tiket undian Doorprize Rp 250.000.`;
+          desc = `Tinggal selangkah lagi untuk membuka tiket undian Doorprize Rp 150.000 (3 Pemenang).`;
         } else if (currentStamps >= 30) {
           lvl = 3;
           title = "Level 3: Panutan";
@@ -1037,7 +1037,7 @@
           currentStamps++;
           updateGamificationUI();
           if (currentStamps === targetStamps) {
-            alert("SELAMAT! Target 60/60 Tercapai!\nKupon undian Doorprize Rp250.000 kini telah AKTIF!");
+            alert("SELAMAT! Target 60/60 Tercapai!\nKupon undian Doorprize Rp150.000 (3 Pemenang) kini telah AKTIF!");
           }
         } else {
           alert("Lengkap! Seluruh 60 booth telah dikunjungi (60/60)!");
