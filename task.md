@@ -216,6 +216,7 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 
 ### Milestone 26: Fitur Booth Terfavorit (Micro-Rating Thumbs Up/Down & Logging ke Google Sheets)
 - [x] **Micro-Rating Modal:** Tampilkan bottom sheet otomatis pasca-scan sukses untuk 1-tap rating thumbs up 👍 / down 👎 (lengkap dengan opsi *"Lewati"*).
+- [x] **Kontras & Aksesibilitas Tombol Lewati:** Mengganti styling tombol *"Lewati (Lanjut Menjelajah)"* dari kombinasi default yang sebelumnya tenggelam menjadi tombol pill berdefinisi tinggi (`.rating-skip-btn`, rasio kontras > 12:1, border halus, feedback sentuhan ramah jempol, dan dukungan tema gelap).
 - [x] **Rating Interaktif di Seluruh Kartu:** Tambahkan tombol mini 👍/👎 interaktif pada seluruh komponen `workCard` di Beranda, Jelajah, Rute, SDGs, serta di dalam Detail Sheet.
 - [x] **Seksi "🏆 3 Booth Paling Favorit":** Tampilkan kurasi 3 booth dengan likes tertinggi di Beranda serta opsi filter/sort *"⭐ Terfavorit"* di halaman Jelajah.
 - [x] **Logging ke Google Sheets:** Buat handler `action === "rating"` di backend `Kode.gs` dan antrean offline-resilient `logRatingToGas` yang otomatis mencatat suara ke Sheet *"RatingBooth"*.

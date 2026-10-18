@@ -690,6 +690,20 @@ main {
   border: 1.5px solid var(--line);
 }
 
+.btn.text {
+  background: transparent !important;
+  color: #1e293b !important;
+  border: 0 !important;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.btn.text:hover {
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #0f172a !important;
+}
+
 .btn.sm {
   min-height: var(--touch-min);
   padding: 0 var(--space-sm);
@@ -4067,6 +4081,49 @@ button,
   font-weight: 800;
   color: #1e293b;
   line-height: 1.25;
+}
+
+.rating-skip-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1.5px solid #cbd5e1;
+  border-radius: var(--radius-pill);
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.rating-skip-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+.rating-skip-btn:active {
+  transform: scale(0.97);
+}
+
+:root[data-theme="dark"] .rating-skip-btn {
+  background: #1e293b;
+  color: #f1f5f9;
+  border-color: #334155;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+:root[data-theme="dark"] .rating-skip-btn:hover {
+  background: #334155;
+  color: #ffffff;
+  border-color: #475569;
 }
 
 /* 3. Seksi Booth Terfavorit di Beranda */
