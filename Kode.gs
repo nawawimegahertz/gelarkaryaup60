@@ -213,7 +213,7 @@ function recordRating(data) {
   return { status: "success", boothNo: boothNo, rating: rating };
 }
 
-// Rekapitulasi Statistik Rating per Booth
+// Rekapitulasi Statistik Rating per Booth (Anti Duplikasi per Pengunjung)
 function getRatingStats() {
   const sheet = getOrCreateSheet("RatingBooth", [
     "Timestamp",
@@ -228,18 +228,33 @@ function getRatingStats() {
     "Total Down"
   ]);
   const values = sheet.getDataRange().getValues();
-  const booths = {};
+  const latestVote = {}; // `${uid}_${booth}` -> vote
 
   for (let i = 1; i < values.length; i++) {
     const row = values[i];
+    const uid = String(row[1] || "").trim();
     const b = Number(row[5]) || row[5];
     const r = String(row[7] || "").toUpperCase();
-    if (!booths[b]) booths[b] = { up: 0, down: 0 };
-    if (r === "UP") booths[b].up++;
-    else if (r === "DOWN") booths[b].down++;
+    if (!b) continue;
+    const key = (uid || ("row_" + i)) + "_" + b;
+    latestVote[key] = { booth: b, vote: r };
   }
 
-  return { totalRatings: values.length - 1, booths: booths };
+  const booths = {};
+  let totalUpCount = 0;
+  for (const k in latestVote) {
+    const item = latestVote[k];
+    const b = item.booth;
+    if (!booths[b]) booths[b] = { up: 0, down: 0 };
+    if (item.vote === "UP") {
+      booths[b].up++;
+      totalUpCount++;
+    } else if (item.vote === "DOWN") {
+      booths[b].down++;
+    }
+  }
+
+  return { totalRatings: totalUpCount, booths: booths };
 }
 
 // 7. Hitung Statistik Pengunjung Live

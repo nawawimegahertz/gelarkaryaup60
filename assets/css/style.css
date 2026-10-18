@@ -4126,6 +4126,204 @@ button,
   border-color: #475569;
 }
 
+/* Scanner In-Camera Micro-Rating Sheet (1 Pintu) */
+.scan-rate-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(11, 24, 52, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 25;
+  animation: scanFadeIn 0.2s ease-out;
+}
+
+@keyframes scanFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.scan-rate-sheet {
+  background: #ffffff;
+  color: #0f172a;
+  width: 100%;
+  max-width: 520px;
+  border-radius: 24px 24px 0 0;
+  padding: 20px 18px 24px;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.35);
+  animation: scanSlideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@keyframes scanSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.scan-rate-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.scan-rate-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+}
+
+.scan-rate-close {
+  border: 0;
+  background: #f1f5f9;
+  color: #475569;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.scan-rate-close:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.scan-rate-title {
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.35;
+  color: #0f172a;
+  margin: 0;
+}
+
+.scan-rate-sub {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: -6px;
+}
+
+.scan-rate-progress-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.scan-rate-progress-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+  color: #334155;
+}
+
+.scan-rate-progress-text b {
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.scan-rate-bar {
+  height: 7px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.scan-rate-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1857c4, #3b82f6);
+  border-radius: 999px;
+  transition: width 0.35s ease;
+}
+
+.scan-rate-box {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 12px 14px;
+  text-align: center;
+}
+
+.scan-rate-q {
+  font-size: 13px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 10px;
+}
+
+.scan-continue-btn {
+  width: 100%;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 12px;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 2px 8px rgba(245, 168, 0, 0.35);
+}
+
+:root[data-theme="dark"] .scan-rate-sheet {
+  background: #182032;
+  color: #f1f5f9;
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.6);
+}
+
+:root[data-theme="dark"] .scan-rate-title {
+  color: #f8fafc;
+}
+
+:root[data-theme="dark"] .scan-rate-sub {
+  color: #94a3b8;
+}
+
+:root[data-theme="dark"] .scan-rate-progress-box {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+:root[data-theme="dark"] .scan-rate-progress-text {
+  color: #94a3b8;
+}
+
+:root[data-theme="dark"] .scan-rate-progress-text b {
+  color: #f8fafc;
+}
+
+:root[data-theme="dark"] .scan-rate-box {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+:root[data-theme="dark"] .scan-rate-q {
+  color: #f1f5f9;
+}
+
+:root[data-theme="dark"] .scan-rate-close {
+  background: #334155;
+  color: #f1f5f9;
+}
+
 /* 3. Seksi Booth Terfavorit di Beranda */
 .fav-grid {
   display: grid;

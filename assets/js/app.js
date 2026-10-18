@@ -1672,31 +1672,19 @@ const Rating = {
   get(p) {
     p = Number(p);
     const ratings = store.get("ratings", {});
-    const allStats = store.get("ratingStats", null) || this.seedStats();
-    const s = allStats[p] || { up: 12, down: 0 };
+    const allStats = store.get("ratingStats", {}) || {};
+    const s = allStats[p] || { up: 0, down: 0 };
     const myVote = ratings[p] || null;
     const total = (s.up || 0) + (s.down || 0);
     const pct = total ? Math.round(((s.up || 0) / total) * 100) : 100;
     return { up: s.up || 0, down: s.down || 0, myVote, pct };
   },
 
-  seedStats() {
-    const s = {};
-    DATA.forEach((d) => {
-      const p = panelOf(d);
-      const baseUp = 8 + ((p * 7) % 23);
-      const baseDown = p % 6 === 0 ? 1 : 0;
-      s[p] = { up: baseUp, down: baseDown };
-    });
-    store.set("ratingStats", s);
-    return s;
-  },
-
   vote(p, vote) {
     p = Number(p);
     const ratings = store.get("ratings", {});
-    const allStats = store.get("ratingStats", null) || this.seedStats();
-    if (!allStats[p]) allStats[p] = { up: 10, down: 0 };
+    const allStats = store.get("ratingStats", {}) || {};
+    if (!allStats[p]) allStats[p] = { up: 0, down: 0 };
 
     const oldVote = ratings[p];
     if (oldVote === vote) {
@@ -1744,7 +1732,7 @@ const Rating = {
   },
 
   getTopFav(limit = 3) {
-    const allStats = store.get("ratingStats", null) || this.seedStats();
+    const allStats = store.get("ratingStats", {}) || {};
     return [...DATA]
       .map((d) => {
         const p = panelOf(d);
@@ -1753,8 +1741,25 @@ const Rating = {
         const pct = total ? Math.round((s.up / total) * 100) : 100;
         return { ...d, up: s.up, down: s.down, pct, p };
       })
+      .filter((d) => d.up > 0)
       .sort((a, b) => b.up - a.up || a.p - b.p)
       .slice(0, limit);
+  },
+
+  async syncFromGas() {
+    if (!CONFIG.gasUrl) return;
+    try {
+      const res = await fetch(CONFIG.gasUrl + "?action=ratingStats");
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data && data.booths) {
+        store.set("ratingStats", data.booths);
+        if (S.tab === "beranda") viewBeranda();
+        else if (S.tab === "jelajah") renderList();
+      }
+    } catch (e) {
+      // offline / kendala jaringan, biarkan memakai cache localStorage
+    }
   },
 };
 
@@ -1792,6 +1797,7 @@ async function flushRatingQueue() {
           q.shift();
           store.set("ratingQueue", q);
           if (q.length) setTimeout(flushRatingQueue, 350);
+          else setTimeout(() => Rating.syncFromGas(), 1000);
         })
         .withFailureHandler(() => {})
         .recordRating(item);
@@ -1808,6 +1814,7 @@ async function flushRatingQueue() {
     q.shift();
     store.set("ratingQueue", q);
     if (q.length) setTimeout(flushRatingQueue, 350);
+    else setTimeout(() => Rating.syncFromGas(), 1200);
   } catch (e) {}
 }
 
@@ -3871,8 +3878,9 @@ function openScan() {
     <div class="scan-view"><video id="sc-v" playsinline muted></video><div class="scan-frame"></div></div>
     <div class="scan-msg" id="sc-m" role="status" aria-live="polite">Memulai kamera. Pilih Izinkan bila diminta.</div>
     <form class="scan-man" id="sc-f" novalidate><label>Kamera tidak bisa dipakai? Ketik kode di bawah QR<input id="sc-i" placeholder="UP60-07-XXXX" autocapitalize="characters" autocomplete="off" spellcheck="false"></label><button class="btn gold" type="submit">Catat</button></form>
+    <div id="sc-sheet-slot"></div>
   </div>`;
-  scanState = { stream: null, on: true, lastRaw: "", lastAt: 0 };
+  scanState = { stream: null, on: true, paused: false, lastRaw: "", lastAt: 0 };
   scanStart();
 }
 function scanMsg(t, k) {
@@ -3931,6 +3939,10 @@ async function scanStart() {
     cx = cv.getContext("2d", { willReadFrequently: true });
   const tick = async () => {
     if (!st.on) return;
+    if (st.paused) {
+      setTimeout(tick, 200);
+      return;
+    }
     let raw = "";
     try {
       if (v.readyState >= 2 && v.videoWidth) {
@@ -3971,17 +3983,76 @@ function scanResult(r) {
   if (p)
     p.textContent =
       "Stempel " + Object.keys(S.stamp).length + " dari " + target + " booth";
-  if (r.ok && r.n >= target && !store.get("undian", null)) {
-    closeScan();
-    setTimeout(openUndian, 300);
-    return;
-  }
+
   if (r.ok && r.p) {
-    setTimeout(() => {
-      promptBoothRating(r.p);
-    }, 450);
+    promptScanSuccess(r);
   }
 }
+
+function promptScanSuccess(r) {
+  const slot = $("#sc-sheet-slot");
+  if (!slot) return;
+  const p = r.p;
+  const d = DATA.find((x) => panelOf(x) === p);
+  if (!d) return;
+  const rate = Rating.get(p);
+  const target = BOOTH_N;
+  const pct = Math.min(100, Math.round((r.n / target) * 100));
+
+  if (scanState) scanState.paused = true;
+
+  slot.innerHTML = `
+  <div class="scan-rate-scrim" data-act="scanRateClose">
+    <div class="scan-rate-sheet" role="dialog" aria-modal="true" aria-labelledby="sc-r-title" onclick="event.stopPropagation()">
+      <div class="scan-rate-header">
+        <span class="scan-rate-pill">✅ Stempel Booth ${p} Berhasil Dicatat!</span>
+        <button class="scan-rate-close" data-act="scanRateClose" aria-label="Lanjut Memindai">×</button>
+      </div>
+
+      <h3 id="sc-r-title" class="scan-rate-title">${esc(d.judul)}</h3>
+      <div class="scan-rate-sub">${esc(d.ketua)} · ${esc(shortFak(fakOf(d)))}</div>
+
+      <div class="scan-rate-progress-box">
+        <div class="scan-rate-progress-text">
+          <b>Total ${r.n} dari ${target} Booth</b>
+          <span>${r.n >= target ? "🎉 Kupon Undian Siap Dibuka!" : `(Tinggal ${target - r.n} booth lagi ke undian)`}</span>
+        </div>
+        <div class="scan-rate-bar"><div class="scan-rate-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+
+      <div class="scan-rate-box">
+        <p class="scan-rate-q">Bagaimana kesan Anda terhadap inovasi ini?</p>
+        <div class="rating-choice-grid">
+          <button class="rating-large-btn up ${rate.myVote === "up" ? "active" : ""}" data-scan-rate="${p}" data-vote="up">
+            <span class="r-emoji">👍</span>
+            <span class="r-lbl">Keren &amp; Menginspirasi</span>
+          </button>
+          <button class="rating-large-btn down ${rate.myVote === "down" ? "active" : ""}" data-scan-rate="${p}" data-vote="down">
+            <span class="r-emoji">👎</span>
+            <span class="r-lbl">Biasa Saja</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="scan-rate-footer">
+        <button class="btn gold scan-continue-btn" data-act="scanRateClose">
+          ${r.n >= target ? "🎉 Lengkap! Buka Undian Sekarang →" : "📷 Lanjut Pindai Booth Lain"}
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function closeScanRateSheet() {
+  const slot = $("#sc-sheet-slot");
+  if (slot) slot.innerHTML = "";
+  if (scanState) {
+    scanState.paused = false;
+    scanState.lastRaw = "";
+    scanState.lastAt = Date.now();
+  }
+}
+
 function scanManual() {
   const i = $("#sc-i");
   if (!i || !i.value.trim()) return;
@@ -4376,10 +4447,40 @@ function delRoute(n) {
 
 document.addEventListener("click", async (e) => {
   const t = e.target.closest(
-    "[data-go],[data-open],[data-open-sdg],[data-add],[data-del],[data-filter],[data-seg],[data-peran],[data-fr],[data-nilai],[data-act],[data-close],[data-map],[data-mseg],[data-mkl],[data-mroute],[data-mz],[data-rate],[data-sort]",
+    "[data-go],[data-open],[data-open-sdg],[data-add],[data-del],[data-filter],[data-seg],[data-peran],[data-fr],[data-nilai],[data-act],[data-close],[data-map],[data-mseg],[data-mkl],[data-mroute],[data-mz],[data-rate],[data-sort],[data-scan-rate]",
   );
   if (!t) return;
   const d = t.dataset;
+  if (d.scanRate && d.vote) {
+    e.stopPropagation();
+    Rating.vote(+d.scanRate, d.vote);
+    const parent = t.closest(".rating-choice-grid");
+    if (parent) {
+      parent.querySelectorAll(".rating-large-btn").forEach((btn) => {
+        if (btn === t) btn.classList.add("active");
+        else btn.classList.remove("active");
+      });
+    }
+    const currentN = Object.keys(S.stamp).length;
+    setTimeout(() => {
+      closeScanRateSheet();
+      if (currentN >= BOOTH_N && !store.get("undian", null)) {
+        closeScan();
+        setTimeout(openUndian, 300);
+      }
+    }, 650);
+    return;
+  }
+  if (d.act === "scanRateClose") {
+    e.stopPropagation();
+    const currentN = Object.keys(S.stamp).length;
+    closeScanRateSheet();
+    if (currentN >= BOOTH_N && !store.get("undian", null)) {
+      closeScan();
+      setTimeout(openUndian, 300);
+    }
+    return;
+  }
   if (d.rate && d.vote) {
     e.stopPropagation();
     Rating.vote(+d.rate, d.vote);
@@ -4613,6 +4714,15 @@ document.addEventListener("keydown", (e) => {
 
 function boot() {
   document.documentElement.setAttribute("data-theme", "light");
+
+  // Hapus data dummy lama jika ada, lalu sinkronkan rating riil dari Google Sheets
+  if (!store.get("ratingSynced_v2", 0)) {
+    store.del("ratingStats");
+    store.set("ratingSynced_v2", 1);
+  }
+  Rating.syncFromGas();
+  setInterval(() => Rating.syncFromGas(), 45000);
+
   const h = location.hash.slice(1);
   const initialTab =
     TABS.some((t) => t[0] === h) || h === "hadir" || h === "qrbooth"

@@ -214,12 +214,10 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 - [x] Sesuaikan nominal doorprize dari Rp 250.000 menjadi **Rp 150.000** dengan kuota tetap **3 penerima/pemenang** di seluruh sistem (`CONFIG.undian`, `questCard()`, dialog pengundian, cetak QR, dan mockup).
 - [x] Bersihkan label repetitif `(3 Pemenang)` dari judul kartu, badge, dan alert agar tampilan UI tetap minimalis dan ringkas.
 
-### Milestone 26: Fitur Booth Terfavorit (Micro-Rating Thumbs Up/Down & Logging ke Google Sheets)
-- [x] **Micro-Rating Modal:** Tampilkan bottom sheet otomatis pasca-scan sukses untuk 1-tap rating thumbs up 👍 / down 👎 (lengkap dengan opsi *"Lewati"*).
-- [x] **Kontras & Aksesibilitas Tombol Lewati:** Mengganti styling tombol *"Lewati (Lanjut Menjelajah)"* dari kombinasi default yang sebelumnya tenggelam menjadi tombol pill berdefinisi tinggi (`.rating-skip-btn`, rasio kontras > 12:1, border halus, feedback sentuhan ramah jempol, dan dukungan tema gelap).
-- [x] **Rating Interaktif di Seluruh Kartu:** Tambahkan tombol mini 👍/👎 interaktif pada seluruh komponen `workCard` di Beranda, Jelajah, Rute, SDGs, serta di dalam Detail Sheet.
-- [x] **Seksi "🏆 3 Booth Paling Favorit":** Tampilkan kurasi 3 booth dengan likes tertinggi di Beranda serta opsi filter/sort *"⭐ Terfavorit"* di halaman Jelajah.
-- [x] **Logging ke Google Sheets:** Buat handler `action === "rating"` di backend `Kode.gs` dan antrean offline-resilient `logRatingToGas` yang otomatis mencatat suara ke Sheet *"RatingBooth"*.
+- [x] **Modal 1-Pintu di Kamera Scanner (`#sc-sheet-slot`):** Tampilan sheet interaktif terpadu langsung di atas viewfinder kamera saat scan sukses (berisi stempel berhasil, status sisa booth undian + progress bar, thumbs up/down micro-rating, serta tombol lanjut pindai booth lain tanpa harus keluar atau bentrok tampilan).
+- [x] **Hapus Data Dummy & Tampilkan Empty Space:** Menghapus fungsi generator data tiruan (`seedStats` yang sebelumnya mengisi angka semu hingga 30 likes). Jika belum ada rating riil masuk dari pengunjung, seksi booth favorit akan tampil sebagai *empty space* bersih tanpa card palsu.
+- [x] **Sinkronisasi Otomatis Google Sheets ke LocalStorage:** Menambahkan `Rating.syncFromGas()` yang secara otomatis mengambil rekapitulasi data riil dari Google Sheets (`action=ratingStats`) saat boot, setiap interval berkala (45s), dan setelah vote dicatat, serta membersihkan cache data dummy lama dari peramban pengguna.
+- [x] **Penyempurnaan Backend `Kode.gs`:** Handler `getRatingStats()` kini dilengkapi pelacakan suara terbaru berbasis pasangan UID + Booth untuk mencegah duplikasi agregasi rating jika pengunjung mengubah atau memberi penilaian ulang.
 
 ---
 
