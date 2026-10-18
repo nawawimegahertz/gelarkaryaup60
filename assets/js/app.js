@@ -2266,7 +2266,7 @@ function viewJelajah() {
         )
         .join("")}</select>
       <select id="selFak" aria-label="Filter fakultas"><option value="">Semua fakultas</option>${faks.map((x) => `<option value="${esc(x)}">${esc(shortFak(x))}</option>`).join("")}${DATA.some((d) => !d.fak) ? '<option value="-">Belum tercantum</option>' : ""}</select></div>
-    </div><div class="count"><span id="cnt"></span><span style="display:flex;align-items:center;gap:10px"><button class="link ${f.sort === "fav" ? "active" : ""}" data-sort="fav" style="font-weight:700">${f.sort === "fav" ? "✓ Terfavorit" : "⭐ Urutkan Terfavorit"}</button><button class="link" data-act="reset">Atur Ulang</button></span></div><div class="grid" id="list"></div>`;
+    </div><div class="count count-bar"><span class="count-label" id="cnt"></span><div class="count-actions"><button type="button" class="btn-sort-fav ${f.sort === "fav" ? "active" : ""}" data-sort="fav" aria-pressed="${f.sort === "fav"}" title="Urutkan berdasarkan jumlah bintang"><span class="sort-icon">${f.sort === "fav" ? "✓" : "⭐"}</span><span class="sort-text">${f.sort === "fav" ? "Terfavorit" : "Urutkan Terfavorit"}</span></button><button type="button" class="btn-reset-filter" data-act="reset" title="Atur ulang filter"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg><span>Atur Ulang</span></button></div></div><div class="grid" id="list"></div>`;
     $("#q").addEventListener("input", (e) => {
       S.f.q = e.target.value;
       renderList();
@@ -2311,6 +2311,16 @@ function renderList() {
     .join("");
   const list = filtered();
   $("#cnt").textContent = list.length + " dari " + DATA.length + " karya";
+  const sortBtn = $(".btn-sort-fav");
+  if (sortBtn) {
+    const isFav = f.sort === "fav";
+    sortBtn.classList.toggle("active", isFav);
+    sortBtn.setAttribute("aria-pressed", isFav ? "true" : "false");
+    const icon = sortBtn.querySelector(".sort-icon");
+    const txt = sortBtn.querySelector(".sort-text");
+    if (icon) icon.textContent = isFav ? "✓" : "⭐";
+    if (txt) txt.textContent = isFav ? "Terfavorit" : "Urutkan Terfavorit";
+  }
   $("#list").innerHTML = list.length
     ? list.map((d) => workCard(d)).join("")
     : `<div class="empty-state" style="grid-column:1/-1">
