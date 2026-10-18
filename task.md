@@ -194,6 +194,11 @@ Dokumen pelacak progres dan roadmap berjenjang untuk refactoring antarmuka mobil
 - [x] Hubungkan live-fetch dan periodic polling (`Fb.fetchLive()` setiap 20 detik): memastikan angka rata-rata bintang dan total responden di kartu pameran selalu sinkron dengan data Google Spreadsheet riil.
 - [x] Pastikan callback submit form di dialog/bottom sheet otomatis me-refresh tampilan halaman `#umpan` di belakang layar tanpa perlu refresh browser.
 
+### Milestone 22: Penyederhanaan Cetak Kartu QR Booth Panitia (Tanpa Judul Karya)
+- [x] Hapus elemen judul karya (`d.judul`) dari kartu QR cetak panitia (`viewQrBooth`), karena judul penelitian sudah tertera jelas di poster pameran masing-masing booth.
+- [x] Pertahankan struktur utama: Nomor Panel (`Panel X`), Gambar QR Code beresolusi tajam, Kode Manual unik (`UP60-07-XXXX`), dan panduan singkat (*"Pindai untuk mencatat kunjungan"*).
+- [x] Optimalkan kerapihan layout cetak (format 2 × 3 kartu per lembar kertas A4) agar lebih luas, bebas kepenuhan teks, dan lebih cepat dipindai pengunjung.
+
 ---
 
 ### Milestone 7: QA Polish, Performance, & Accessibility Audit

@@ -4026,8 +4026,7 @@ function viewQrBooth() {
     <div class="qrgrid" style="margin-top:14px">${DATA.map((d) => panelOf(d))
       .sort((a, b) => a - b)
       .map((p) => {
-        const d = DATA.find((x) => panelOf(x) === p);
-        return `<div class="qcard"><span class="pn1">Panel ${p}</span><div class="qi" id="qb${p}"></div><span class="cd">${boothCode(p)}</span><small>${esc(d.judul.length > 80 ? d.judul.slice(0, 78) + "…" : d.judul)}</small><small><b>Pindai untuk mencatat kunjungan</b></small></div>`;
+        return `<div class="qcard"><span class="pn1">Panel ${p}</span><div class="qi" id="qb${p}"></div><span class="cd">${boothCode(p)}</span><small><b>Pindai untuk mencatat kunjungan</b></small></div>`;
       })
       .join("")}</div>`;
   if (typeof QRCode === "undefined") return;
