@@ -70,6 +70,10 @@ function doGet(e) {
       return ContentService.createTextOutput(JSON.stringify(confirmLotteryWinner(e.parameter.kode, e.parameter.nama, e.parameter.hadiah, e.parameter.uid)))
         .setMimeType(ContentService.MimeType.JSON);
     }
+    if (action === "resetWinners") {
+      return ContentService.createTextOutput(JSON.stringify(resetLotteryWinners()))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
   }
 
   // Fallback jika dibuka langsung via link Web App GAS
@@ -737,4 +741,17 @@ function drawLotteryWinner() {
   }
   const winner = poolRes.pool[Math.floor(Math.random() * poolRes.pool.length)];
   return { status: "success", winner: winner };
+}
+
+// 13. Reset Seluruh Riwayat Pemenang Doorprize
+function resetLotteryWinners() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName("PemenangUndian");
+  if (sheet) {
+    const lastRow = sheet.getLastRow();
+    if (lastRow > 1) {
+      sheet.deleteRows(2, lastRow - 1);
+    }
+  }
+  return { status: "success", message: "Sheet PemenangUndian berhasil direset." };
 }
