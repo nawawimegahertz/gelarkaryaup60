@@ -5308,7 +5308,7 @@ function viewPengundian() {
         <div class="table-top-bar">
           <div class="table-nav-tabs">
             <button class="tab-btn active" id="tabBtnValid" data-utab="valid">
-              <span>Eligble</span>
+              <span>Eligible</span>
               <span class="tab-count" id="badgeCountValid">0</span>
             </button>
             <button class="tab-btn" id="tabBtnAnomaly" data-utab="anomaly">
@@ -5323,12 +5323,14 @@ function viewPengundian() {
           <input type="search" id="inputSearch" class="table-search-input" placeholder="Cari nama atau nomor kupon..." />
         </div>
 
-        <table class="data-table-el">
-          <thead>
-            <tr id="tableHeaderRow"></tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
+        <div class="table-responsive-wrapper">
+          <table class="data-table-el">
+            <thead>
+              <tr id="tableHeaderRow"></tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
       </div>
     </section>
 
