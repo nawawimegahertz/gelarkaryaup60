@@ -1570,8 +1570,9 @@ function workCard(d, opt = {}) {
     ${meta}
     <div class="foot">
       <div class="rate-thumbs" role="group" aria-label="Apresiasi karya booth ${panel}">
-        <button class="thumb-btn up ${rate.myVote === "up" ? "active" : ""}" data-rate="${panel}" data-vote="up" title="Suka / Menginspirasi" aria-label="Suka karya panel ${panel}">
-          <span class="thumb-icon">👍</span>
+        <button class="thumb-btn up ${rate.myVote === "up" ? "active" : ""}" data-rate="${panel}" data-vote="up" title="Sukai karya ini" aria-label="Sukai karya panel ${panel}">
+          <span class="thumb-icon">👍🏻</span>
+          <span class="thumb-txt">Sukai</span>
           ${rate.up > 0 ? `<span class="thumb-cnt">${rate.up}</span>` : ""}
         </button>
       </div>
@@ -1946,8 +1947,8 @@ function promptBoothRating(p) {
         <p class="rating-box-q">Bagaimana kesan Anda terhadap inovasi ini?</p>
         <div class="rating-choice-grid">
           <button class="rating-large-btn up ${rate.myVote === "up" ? "active" : ""}" data-rate="${p}" data-vote="up" data-autoclose="1">
-            <span class="r-emoji">👍</span>
-            <span class="r-lbl">Keren &amp; Menginspirasi</span>
+            <span class="r-emoji">👍🏻</span>
+            <span class="r-lbl">Sukai</span>
           </button>
         </div>
       </div>
@@ -2756,8 +2757,9 @@ function openDetail(no) {
               <span class="detail-rate-sub">${Rating.get(panelOf(d)).up > 0 ? `${Rating.get(panelOf(d)).pct}% pengunjung menyukai inovasi ini (${Rating.get(panelOf(d)).up} suka)` : "Belum ada apresiasi. Jadilah yang pertama!"}</span>
             </div>
             <div class="rate-thumbs" role="group" aria-label="Penilaian booth">
-              <button class="thumb-btn up ${Rating.get(panelOf(d)).myVote === "up" ? "active" : ""}" data-rate="${panelOf(d)}" data-vote="up" aria-label="Suka inovasi ini">
-                <span class="thumb-icon">👍</span>
+              <button class="thumb-btn up ${Rating.get(panelOf(d)).myVote === "up" ? "active" : ""}" data-rate="${panelOf(d)}" data-vote="up" aria-label="Sukai inovasi ini">
+                <span class="thumb-icon">👍🏻</span>
+                <span class="thumb-txt">Sukai</span>
                 ${Rating.get(panelOf(d)).up > 0 ? `<span class="thumb-cnt">${Rating.get(panelOf(d)).up}</span>` : ""}
               </button>
             </div>
@@ -4153,8 +4155,8 @@ function promptScanSuccess(r) {
         <p class="scan-rate-q">Bagaimana kesan Anda terhadap inovasi ini?</p>
         <div class="rating-choice-grid">
           <button class="rating-large-btn up ${rate.myVote === "up" ? "active" : ""}" data-scan-rate="${p}" data-vote="up">
-            <span class="r-emoji">👍</span>
-            <span class="r-lbl">Keren &amp; Menginspirasi</span>
+            <span class="r-emoji">👍🏻</span>
+            <span class="r-lbl">Sukai</span>
           </button>
         </div>
       </div>

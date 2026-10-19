@@ -4063,28 +4063,30 @@ button,
 .thumb-btn {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   background: transparent;
-  border: none;
-  padding: 4px 7px;
+  border: 1px solid var(--line);
+  padding: 4px 9px;
   border-radius: var(--radius-pill);
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
   color: var(--mut);
   cursor: pointer;
   transition: all 0.15s ease;
   line-height: 1;
+  user-select: none;
 }
 
 .thumb-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.04);
   color: var(--ink);
+  border-color: #cbd5e1;
 }
 
 .thumb-btn.up.active {
   background: #ecfdf5;
   color: #065f46;
-  border: 1px solid #a7f3d0;
+  border-color: #a7f3d0;
 }
 
 .thumb-btn.down.active {
@@ -4094,14 +4096,21 @@ button,
 }
 
 .thumb-btn .thumb-icon {
-  font-size: 12px;
+  font-size: 12.5px;
   display: inline-block;
+  line-height: 1;
+}
+
+.thumb-btn .thumb-txt {
+  font-size: 11.5px;
+  font-weight: 700;
   line-height: 1;
 }
 
 .thumb-btn .thumb-cnt {
   font-variant-numeric: tabular-nums;
   font-weight: 800;
+  margin-left: 2px;
 }
 
 /* 2. Micro-Rating Sheet (Muncul Setelah Berhasil Scan) */
