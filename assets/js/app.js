@@ -5220,35 +5220,6 @@ function viewPengundian() {
   if (!sec) return;
 
   sec.innerHTML = `
-    <!-- Header Panggung -->
-    <header class="stage-header">
-      <div class="header-brand">
-        <span class="brand-tag">Dies Natalis 60 UP</span>
-        <div class="header-title-box">
-          <h1>Sesi Pengundian Doorprize</h1>
-          <p>Gelar Karya Penelitian dan Pengabdian kepada Masyarakat</p>
-        </div>
-      </div>
-      <div class="header-actions">
-        <button class="btn-header-tool" id="btnSyncSheet" title="Tarik dan sinkronkan data terbaru dari Google Sheets">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-          <span id="syncLabel">Sinkronkan Sheets</span>
-        </button>
-        <button class="btn-header-tool" id="btnSound">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-          <span id="soundLabel">${undianSoundEnabled ? "Audio: Aktif" : "Audio: Senyap"}</span>
-        </button>
-        <button class="btn-header-tool" id="btnFullscreen">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
-          <span>Layar Penuh</span>
-        </button>
-        <button class="btn-header-tool" data-go="beranda">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-          <span>Kembali</span>
-        </button>
-      </div>
-    </header>
-
     <!-- Konten Panggung Utama -->
     <main class="stage-content">
       <!-- Arena Roda -->
