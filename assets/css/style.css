@@ -10,13 +10,20 @@
   --on-primary: #ffffff;
   --tint: #f1f5f9;
   --gold: #f5a800;
+  --gold-dark: #b45309;
+  --gold-surface: #fffbeb;
+  --gold-border: #fde68a;
   --on-gold: #2e1f00;
   --ok: #0f7b4b;
+  --ok-bg: #ecfdf5;
+  --ok-border: #a7f3d0;
   --warn: #7a5200;
   --warnbg: #fff2cf;
   --bar: #1857c4;
   --bar-bg: #e3eaf7;
   --err: #b3261e;
+  --err-bg: #fef2f2;
+  --err-border: #fecaca;
   --r-dosen: #1857c4;
   --r-mahasiswa: #0e8f82;
   --r-mitra: #d98e00;
@@ -4581,16 +4588,6 @@ button,
 /* ==========================================================================
    PENGUNDIAN DOORPRIZE VIEW (#v-pengundian)
    ========================================================================== */
-:root {
-  --gold-dark: #b45309;
-  --gold-surface: #fffbeb;
-  --gold-border: #fde68a;
-  --ok-bg: #ecfdf5;
-  --ok-border: #a7f3d0;
-  --err-bg: #fef2f2;
-  --err-border: #fecaca;
-}
-
 #v-pengundian {
   width: 100%;
   animation: fadeIn 0.2s ease;
