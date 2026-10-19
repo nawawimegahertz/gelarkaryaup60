@@ -1574,10 +1574,6 @@ function workCard(d, opt = {}) {
           <span class="thumb-icon">👍</span>
           ${rate.up > 0 ? `<span class="thumb-cnt">${rate.up}</span>` : ""}
         </button>
-        <button class="thumb-btn down ${rate.myVote === "down" ? "active" : ""}" data-rate="${panel}" data-vote="down" title="Biasa saja" aria-label="Biasa saja karya panel ${panel}">
-          <span class="thumb-icon">👎</span>
-          ${rate.down > 0 ? `<span class="thumb-cnt">${rate.down}</span>` : ""}
-        </button>
       </div>
       <span class="row card-actions" style="gap:8px;margin-left:auto;justify-content:flex-end">
         <button class="maplink" data-map="${d.no}" aria-label="Lihat panel ${panel} di denah"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="margin-right:3px"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon></svg><u>Denah</u></button>
@@ -1952,10 +1948,6 @@ function promptBoothRating(p) {
           <button class="rating-large-btn up ${rate.myVote === "up" ? "active" : ""}" data-rate="${p}" data-vote="up" data-autoclose="1">
             <span class="r-emoji">👍</span>
             <span class="r-lbl">Keren &amp; Menginspirasi</span>
-          </button>
-          <button class="rating-large-btn down ${rate.myVote === "down" ? "active" : ""}" data-rate="${p}" data-vote="down" data-autoclose="1">
-            <span class="r-emoji">👎</span>
-            <span class="r-lbl">Biasa Saja</span>
           </button>
         </div>
       </div>
@@ -2767,10 +2759,6 @@ function openDetail(no) {
               <button class="thumb-btn up ${Rating.get(panelOf(d)).myVote === "up" ? "active" : ""}" data-rate="${panelOf(d)}" data-vote="up" aria-label="Suka inovasi ini">
                 <span class="thumb-icon">👍</span>
                 ${Rating.get(panelOf(d)).up > 0 ? `<span class="thumb-cnt">${Rating.get(panelOf(d)).up}</span>` : ""}
-              </button>
-              <button class="thumb-btn down ${Rating.get(panelOf(d)).myVote === "down" ? "active" : ""}" data-rate="${panelOf(d)}" data-vote="down" aria-label="Biasa saja">
-                <span class="thumb-icon">👎</span>
-                ${Rating.get(panelOf(d)).down > 0 ? `<span class="thumb-cnt">${Rating.get(panelOf(d)).down}</span>` : ""}
               </button>
             </div>
           </div>
@@ -4167,10 +4155,6 @@ function promptScanSuccess(r) {
           <button class="rating-large-btn up ${rate.myVote === "up" ? "active" : ""}" data-scan-rate="${p}" data-vote="up">
             <span class="r-emoji">👍</span>
             <span class="r-lbl">Keren &amp; Menginspirasi</span>
-          </button>
-          <button class="rating-large-btn down ${rate.myVote === "down" ? "active" : ""}" data-scan-rate="${p}" data-vote="down">
-            <span class="r-emoji">👎</span>
-            <span class="r-lbl">Biasa Saja</span>
           </button>
         </div>
       </div>

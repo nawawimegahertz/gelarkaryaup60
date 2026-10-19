@@ -4156,9 +4156,21 @@ button,
 }
 
 .rating-choice-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  justify-content: center;
   gap: 10px;
+}
+
+.rating-choice-grid .rating-large-btn {
+  flex: 1;
+  max-width: 280px;
+}
+
+/* Sembunyikan tombol downvote di seluruh antarmuka frontend */
+.thumb-btn.down,
+.rating-large-btn.down,
+[data-vote="down"] {
+  display: none !important;
 }
 
 .rating-large-btn {
