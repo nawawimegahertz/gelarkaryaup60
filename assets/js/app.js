@@ -34,7 +34,7 @@ const CONFIG = {
   },
   undian: {
     hadiah: "Rp 150.000", // hadiah undian bagi pengunjung yang memindai booth
-    kuota: 3, // 3 pemenang penerima doorprize @ Rp 150.000
+    kuota: 10, // 10 pemenang penerima doorprize @ Rp 150.000
     target: 60, // Syarat 60 booth lengkap konsisten dengan #jelajah
     garam: "up60-gk-2026", // ubah sebelum mencetak QR; kode booth dihitung dari nilai ini
     jeda: 8, // detik minimal antarpindaian, mencegah pindai beruntun tanpa berkunjung
@@ -4515,7 +4515,7 @@ function drawWinner() {
         $("#layer").innerHTML =
           `<div class="scrim" data-close="1"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="wt"><button class="x" data-close="1" aria-label="Tutup">×</button><h2 id="wt">Pemenang undian</h2>
           <div class="loc" style="margin-top:14px"><b>★</b><span><b style="font-size:20px;color:#FFD36B">${esc(w.nama)}</b><br>${esc(w.wa)} · ${esc(w.kode)}<br>${esc(w.asal || "")}</span></div>
-          <p style="color:var(--mut);font-size:14px">Pemenang diundi acak langsung dari sheet "Undian" (Kuota: 3 orang @ ${esc(CONFIG.undian.hadiah)}). Panggil nama pemenang di aula dan cocokkan kodenya.</p>
+          <p style="color:var(--mut);font-size:14px">Pemenang diundi acak langsung dari sheet "Undian" (Kuota: ${CONFIG.undian.kuota} orang @ ${esc(CONFIG.undian.hadiah)}). Panggil nama pemenang di aula dan cocokkan kodenya.</p>
           <div class="row"><button class="btn gold" data-act="draw">Undi lagi</button></div></div></div>`;
       })
       .drawLotteryWinner();
@@ -4533,9 +4533,9 @@ function drawWinner() {
   won.push(w.kode);
   store.set("pemenang", won);
   $("#layer").innerHTML =
-    `<div class="scrim" data-close="1"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="wt"><button class="x" data-close="1" aria-label="Tutup">×</button><h2 id="wt">Pemenang undian (${won.length}/3)</h2>
+    `<div class="scrim" data-close="1"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="wt"><button class="x" data-close="1" aria-label="Tutup">×</button><h2 id="wt">Pemenang undian (${won.length}/${CONFIG.undian.kuota})</h2>
     <div class="loc" style="margin-top:14px"><b>★</b><span><b style="font-size:20px;color:#FFD36B">${esc(w.nama)}</b><br>${esc(w.wa)} · ${esc(w.kode)}<br>${esc(w.asal || "")}</span></div>
-    <p style="color:var(--mut);font-size:14px">Pemenang ke-${won.length} dari 3 kuota doorprize @ ${esc(CONFIG.undian.hadiah)}. Panggil nama ini di lokasi dan cocokkan dengan kode undian di ponsel pemenang.</p>
+    <p style="color:var(--mut);font-size:14px">Pemenang ke-${won.length} dari ${CONFIG.undian.kuota} kuota doorprize @ ${esc(CONFIG.undian.hadiah)}. Panggil nama ini di lokasi dan cocokkan dengan kode undian di ponsel pemenang.</p>
     <div class="row"><button class="btn gold" data-act="draw">Undi lagi</button></div></div></div>`;
 }
 /* QR booth untuk dicetak panitia */
@@ -4897,8 +4897,9 @@ function spinUndianWheelAction() {
     return;
   }
   const verifiedCount = (undianWinnersAudit || []).filter((w) => w.status === "verified").length;
-  if (verifiedCount >= 3) {
-    toast("Kuota pemenang (3 orang) telah terpenuhi.");
+  const kuotaMax = CONFIG.undian?.kuota || 10;
+  if (verifiedCount >= kuotaMax) {
+    toast(`Kuota pemenang (${kuotaMax} orang) telah terpenuhi.`);
     return;
   }
   undianIsSpinning = true;
@@ -5086,12 +5087,13 @@ function renderUndianTable() {
 
 function renderUndianAllViews() {
   drawUndianWheel();
+  const kuotaMax = CONFIG.undian?.kuota || 10;
   const verifiedWinners = (undianWinnersAudit || []).filter((w) => w.status === "verified");
-  const isComplete = verifiedWinners.length >= 3;
+  const isComplete = verifiedWinners.length >= kuotaMax;
 
   const chip = document.getElementById("winnerCountChip");
   if (chip) {
-    chip.textContent = isComplete ? "3 / 3 Kuota Terpenuhi" : `${verifiedWinners.length} / 3 Terpilih`;
+    chip.textContent = isComplete ? `${kuotaMax} / ${kuotaMax} Kuota Terpenuhi` : `${verifiedWinners.length} / ${kuotaMax} Terpilih`;
     chip.className = isComplete ? "badge-chip active" : "badge-chip";
   }
 
@@ -5100,14 +5102,14 @@ function renderUndianAllViews() {
   if (spinBtn && spinText) {
     if (isComplete) {
       spinBtn.disabled = true;
-      spinText.textContent = "Semua 3 Pemenang Telah Sah";
+      spinText.textContent = `Semua ${kuotaMax} Pemenang Telah Sah`;
     } else if ((undianActivePool || []).length === 0) {
       spinBtn.disabled = true;
       spinText.textContent = "Menunggu Peserta Sah (60 Booth)";
     } else {
       if (!undianIsSpinning) {
         spinBtn.disabled = false;
-        spinText.textContent = `Putar Undian`;
+        spinText.textContent = `Putar Undian (Pemenang ke-${verifiedWinners.length + 1})`;
       }
     }
   }
@@ -5120,7 +5122,7 @@ function renderUndianAllViews() {
   const podiumList = document.getElementById("podiumSlotsList");
   if (podiumList) {
     let slotsHtml = "";
-    for (let i = 1; i <= 3; i++) {
+    for (let i = 1; i <= kuotaMax; i++) {
       const winner = verifiedWinners[i - 1];
       if (winner) {
         slotsHtml += `
@@ -5258,7 +5260,7 @@ function viewPengundian() {
         <div class="prize-banner">
           <div>
             <div class="prize-title-text">Hadiah Utama: Saldo Rp 150.000</div>
-            <div style="font-size:12px;color:var(--mut);margin-top:2px">Kuota: 3 Orang Pemenang · Wajib Hadir Fisik & Scan 60/60 Booth</div>
+            <div style="font-size:12px;color:var(--mut);margin-top:2px">Kuota: ${CONFIG.undian.kuota} Orang Pemenang · Wajib Hadir Fisik & Scan 60/60 Booth</div>
           </div>
           <span class="prize-rule-badge">Syarat: 60 Booth Lengkap</span>
         </div>
@@ -5284,9 +5286,9 @@ function viewPengundian() {
           <div class="card-heading">
             <div>
               <h2>Daftar Pemenang Sah</h2>
-              <p style="font-size:12px;color:var(--mut);margin-top:2px">Saldo Rp 150.000 (3 Kuota)</p>
+              <p style="font-size:12px;color:var(--mut);margin-top:2px">Saldo Rp 150.000 (${CONFIG.undian.kuota} Kuota)</p>
             </div>
-            <span class="badge-chip active" id="winnerCountChip">0 / 3 Terpilih</span>
+            <span class="badge-chip active" id="winnerCountChip">0 / ${CONFIG.undian.kuota} Terpilih</span>
           </div>
 
           <div class="podium-slots-list" id="podiumSlotsList"></div>

@@ -703,7 +703,7 @@ function getUndianPool() {
   return {
     status: "success",
     hadiah: "Hadiah Utama Saldo Rp 150.000",
-    kuota: 3,
+    kuota: 10,
     pool: pool,
     flagged: flagged,
     winners: winnersList
