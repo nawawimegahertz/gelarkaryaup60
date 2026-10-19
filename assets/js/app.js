@@ -5734,7 +5734,7 @@ function boot() {
 
   const h = location.hash.slice(1);
   const initialTab =
-    TABS.some((t) => t[0] === h) || h === "hadir" || h === "qrbooth"
+    TABS.some((t) => t[0] === h) || h === "hadir" || h === "qrbooth" || h === "pengundian"
       ? h
       : h === "umpan"
         ? "umpan"
@@ -5742,7 +5742,7 @@ function boot() {
   show(initialTab);
   renderStats();
   renderTabs();
-  if (!S.checked && h !== "hadir" && h !== "qrbooth" && h !== "umpan")
+  if (!S.checked && h !== "hadir" && h !== "qrbooth" && h !== "umpan" && h !== "pengundian")
     openGate();
   if (h === "umpan") openFeedback();
   if (h.startsWith("b=")) handleDeepCode(h.slice(2), true);
