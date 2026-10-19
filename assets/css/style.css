@@ -25,6 +25,7 @@
   --err-bg: #fef2f2;
   --err-border: #fecaca;
   --r-dosen: #1857c4;
+  --r-rektorat: #961526;
   --r-mahasiswa: #0e8f82;
   --r-mitra: #d98e00;
   --r-umum: #7a55cc;
@@ -821,7 +822,7 @@ main {
 
 @media (min-width: 540px) {
   .roles {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   }
 }
 

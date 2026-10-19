@@ -471,13 +471,18 @@ function getLiveStats() {
   const sheet = getOrCreateSheet("Hadir", ["Timestamp", "Nama", "Peran", "Fakultas / Asal", "ID Pengunjung"]);
   const values = sheet.getDataRange().getValues();
 
-  const counts = { dosen: 0, mahasiswa: 0, mitra: 0, umum: 0 };
+  const counts = { dosen: 0, rektorat: 0, mahasiswa: 0, mitra: 0, umum: 0 };
   const hours = {};
 
   for (let i = 1; i < values.length; i++) {
     const row = values[i];
     const t = new Date(row[0]);
-    const peran = String(row[2] || "").toLowerCase().trim();
+    let peran = String(row[2] || "").toLowerCase().trim();
+    if (peran.indexOf("rektorat") !== -1) peran = "rektorat";
+    else if (peran.indexOf("dosen") !== -1 || peran.indexOf("tendik") !== -1) peran = "dosen";
+    else if (peran.indexOf("mahasiswa") !== -1) peran = "mahasiswa";
+    else if (peran.indexOf("mitra") !== -1) peran = "mitra";
+    else peran = "umum";
 
     if (counts[peran] !== undefined) counts[peran]++;
     if (!isNaN(t.getHours())) {

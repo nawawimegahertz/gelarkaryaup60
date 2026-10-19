@@ -1263,6 +1263,11 @@ const PERAN = {
     ket: "Skema dan kolaborasi",
     warna: "var(--r-dosen)",
   },
+  rektorat: {
+    nama: "Rektorat",
+    ket: "Pimpinan & Kebijakan",
+    warna: "var(--r-rektorat)",
+  },
   mahasiswa: {
     nama: "Mahasiswa",
     ket: "Topik dan inspirasi",
@@ -1493,6 +1498,14 @@ const SOROT = {
     ket: "Karya dengan pendanaan tertinggi untuk pertimbangan kolaborasi riset lanjutan.",
     pick: () => [...DATA].sort((a, b) => b.dana - a.dana).slice(0, 4),
   },
+  rektorat: {
+    judul: "Dampak Strategis & Unggulan Institusi",
+    ket: "Karya inovasi berbobot strategis dengan capaian pendanaan, hilirisasi, dan kontribusi IKU tertinggi.",
+    pick: () =>
+      [...DATA]
+        .sort((a, b) => b.dana - a.dana || b.sdg.length - a.sdg.length)
+        .slice(0, 4),
+  },
   mahasiswa: {
     judul: "Inspirasi Lintas Bidang",
     ket: "Karya perwakilan bidang dengan kaitan SDGs terluas sebagai referensi tugas akhir atau magang.",
@@ -1544,7 +1557,7 @@ function workCard(d, opt = {}) {
     panel = panelOf(d),
     rate = Rating.get(panel);
   let meta = "";
-  if (p === "dosen")
+  if (p === "dosen" || p === "rektorat")
     meta = `<div class="meta"><div><span class="k">Skema</span><br>${esc(d.hibah)} · ${esc(d.skema)}</div><div><span class="k">Dana disetujui</span><br><b class="num">${rp(d.dana)}</b></div></div>`;
   else if (p === "mahasiswa")
     meta = `<div class="meta"><div class="chips">${d.sdg.map(sdgChip).join("")}</div><div class="who">${esc(shortFak(fakOf(d)))}</div></div>`;
@@ -2670,6 +2683,7 @@ function openDetail(no) {
 
   const cta =
     {
+      rektorat: "Pantau inovasi unggulan",
       dosen: "Catat untuk kolaborasi",
       mahasiswa: "Simpan sebagai inspirasi",
       mitra: "Catat untuk kemitraan",
@@ -2766,7 +2780,7 @@ function openDetail(no) {
           </div>
 
           <div class="desktop-grid">
-            <div class="info-card ${p === "dosen" ? "highlight" : ""}">
+            <div class="info-card ${p === "dosen" || p === "rektorat" ? "highlight" : ""}">
               <div class="info-card-header">
                 <span class="info-card-label">Skema & Pendanaan</span>
                 <span class="tag-pill" style="font-size:10.5px;padding:2px 8px;">${esc(d.sumber)}</span>
@@ -3119,28 +3133,36 @@ const opts = (arr, ph) =>
 function renderDyn(focus) {
   const box = $("#dyn");
   if (!box) return;
-  const p = S.peran,
-    needName = S.att.mode !== "db";
+  const p = S.peran;
   let h = "";
-  if (p === "mahasiswa" || p === "dosen")
-    h += `<label class="f">Fakultas Asal<select class="txt" id="fa" required>${opts(CONFIG.fakultas, "Pilih fakultas")}</select></label>`;
-  else if (p === "mitra")
-    h += `<label class="f">Jenis Mitra<select class="txt" id="fj" required>${opts(CONFIG.jenisMitra, "Pilih jenis mitra")}</select></label><label class="f">Nama Instansi<input class="txt" id="fi" autocomplete="organization" required></label>`;
-  if (needName)
-    h += `<label class="f">${p === "mitra" ? "Nama Anda" : "Nama Lengkap"}<input class="txt" id="fn" autocomplete="name" required></label>`;
-  if (!h && p)
-    h = `<p style="margin:0;color:var(--mut);font-size:14px">Tidak ada isian tambahan. Ketuk tombol di bawah untuk mencatat kehadiran.</p>`;
+  if (p === "mahasiswa" || p === "dosen") {
+    h += `<label class="f">Fakultas Asal <span style="color:var(--err);font-weight:700">*</span><select class="txt" id="fa" required>${opts(CONFIG.fakultas, "Pilih fakultas")}</select></label>`;
+  } else if (p === "rektorat") {
+    h += `<label class="f">Jabatan / Unit Kerja <span style="color:var(--err);font-weight:700">*</span><input class="txt" id="fa" placeholder="Contoh: Rektorat / WR / Lembaga / Biro" required></label>`;
+  } else if (p === "mitra") {
+    h += `<label class="f">Jenis Mitra <span style="color:var(--err);font-weight:700">*</span><select class="txt" id="fj" required>${opts(CONFIG.jenisMitra, "Pilih jenis mitra")}</select></label><label class="f">Nama Instansi <span style="color:var(--err);font-weight:700">*</span><input class="txt" id="fi" autocomplete="organization" placeholder="Nama perusahaan / instansi" required></label>`;
+  } else if (p === "umum") {
+    h += `<label class="f">Asal Instansi / Kota <span style="font-size:11.5px;color:var(--mut);font-weight:normal">(opsional)</span><input class="txt" id="fa" placeholder="Contoh: Alumni UP / Praktisi / Jakarta"></label>`;
+  }
+  // Nama Lengkap wajib diisi untuk semua peran
+  if (p) {
+    h += `<label class="f">Nama Lengkap <span style="color:var(--err);font-weight:700">*</span><input class="txt" id="fn" autocomplete="name" required placeholder="Masukkan nama lengkap Anda"></label>`;
+  }
   box.innerHTML = h;
 
   // Isi otomatis dari riwayat localStorage
   const savedNama = store.get("nama", ""),
     savedAsal = store.get("asal", ""),
     savedFak = store.get("fakultas", ""),
+    savedUnit = store.get("unitKerja", ""),
     savedJenis = store.get("jenisMitra", ""),
     savedInstansi = store.get("instansi", "");
 
   const fa = $("#fa");
-  if (fa && (savedFak || savedAsal)) fa.value = savedFak || savedAsal;
+  if (fa) {
+    if (p === "rektorat" && (savedUnit || savedAsal)) fa.value = savedUnit || savedAsal;
+    else if (savedFak || savedAsal) fa.value = savedFak || savedAsal;
+  }
   const fj = $("#fj");
   if (fj && savedJenis) fj.value = savedJenis;
   const fi = $("#fi");
@@ -3180,7 +3202,7 @@ function openForm() {
         <div class="sheet-scroll-body">
           <div class="hero-card">
             <h2 id="ft" class="hero-title">Presensi Pengunjung</h2>
-            <p style="color:var(--mut);margin:0;font-size:13.5px;line-height:1.5">Untuk mencatat pengunjung tambahan atau mengganti peran. Isian menyesuaikan peran yang dipilih.</p>
+            <p style="color:var(--mut);margin:0;font-size:13.5px;line-height:1.5">Untuk mencatat kehadiran atau mengganti peran. Isian menyesuaikan peran yang dipilih.</p>
           </div>
           <div class="info-card">
             <div class="kv" style="margin-top:0;gap:14px">${formFields(false)}</div>
@@ -3193,14 +3215,13 @@ function openForm() {
   if (first) first.focus();
 }
 function openGate() {
-  const dbm = S.att.mode === "db";
   $("#layer").innerHTML =
     `<div class="gate" role="dialog" aria-modal="true" aria-labelledby="gt">
     <div class="hero"><div class="wrap"><img src="${$("header.hero img").src}" alt="Logo Dies Natalis ke-60 Universitas Pancasila" width="76" height="72"><div><p class="eyebrow">Selamat datang</p><h1 id="gt">Gelar Karya Penelitian dan PKM, 60 Tahun UP</h1></div></div></div>
     <form class="wrapin" id="hf" novalidate>
       <ol class="flow" aria-label="Alur kunjungan"><li class="on"><b>1</b>Hadir</li><li><b>2</b>Jelajah</li><li><b>3</b>Rute</li><li><b>4</b>Umpan balik</li></ol>
       <h2 style="font-size:20px">Daftar hadir dulu</h2>
-      <p style="color:var(--mut);margin:6px 0 16px;font-size:14.5px">Mulai dari peran Anda; isian berikutnya menyesuaikan. ${dbm ? "Nama tidak disimpan; hanya peran dan asal untuk penghitungan." : "Data dipakai untuk penghitungan pengunjung dan e-sertifikat."} Peran juga menentukan informasi yang ditonjolkan di katalog.</p>
+      <p style="color:var(--mut);margin:6px 0 16px;font-size:14.5px">Mulai dari peran Anda; isian berikutnya menyesuaikan. Data digunakan untuk absensi kehadiran, interaksi booth pameran, dan kelayakan undian doorprize Dies Natalis ke-60 UP. Peran juga menentukan rekomendasi yang ditonjolkan di katalog.</p>
       <div class="kv" style="margin-top:0;gap:14px">${formFields(true)}</div>
       <div style="text-align:center;margin-top:12px"><button type="button" class="link" data-act="skip">Lewati dulu, lihat katalog</button></div>
     </form></div>`;
@@ -3217,23 +3238,46 @@ async function submitForm(ev) {
     e.textContent = m;
     e.hidden = false;
   };
-  if (!peran) return err("Pilih peran Anda.");
+  if (!peran) return err("Pilih peran Anda terlebih dahulu.");
+  if (!nama) {
+    if ($("#fn")) $("#fn").focus();
+    return err("Nama lengkap wajib diisi.");
+  }
   let asal = "";
   if (peran === "mahasiswa" || peran === "dosen") {
     asal = $("#fa") ? $("#fa").value : "";
-    if (!asal) return err("Pilih fakultas asal Anda.");
+    if (!asal) {
+      if ($("#fa")) $("#fa").focus();
+      return err("Pilih fakultas asal Anda.");
+    }
     store.set("fakultas", asal);
-  }
-  if (peran === "mitra") {
+  } else if (peran === "rektorat") {
+    asal = $("#fa") ? ($("#fa").value || "").trim() : "";
+    if (!asal) {
+      if ($("#fa")) $("#fa").focus();
+      return err("Isi jabatan atau unit kerja Anda di Rektorat.");
+    }
+    store.set("unitKerja", asal);
+    store.set("fakultas", asal);
+  } else if (peran === "mitra") {
     const j = $("#fj") ? $("#fj").value : "",
       n = $("#fi") ? ($("#fi").value || "").trim() : "";
-    if (!j) return err("Pilih jenis mitra.");
-    if (!n) return err("Isi nama instansi.");
+    if (!j) {
+      if ($("#fj")) $("#fj").focus();
+      return err("Pilih jenis mitra.");
+    }
+    if (!n) {
+      if ($("#fi")) $("#fi").focus();
+      return err("Isi nama instansi mitra.");
+    }
     asal = j + " - " + n;
     store.set("jenisMitra", j);
     store.set("instansi", n);
+  } else if (peran === "umum") {
+    asal = $("#fa") ? ($("#fa").value || "").trim() : "";
+    if (!asal) asal = "Umum";
+    store.set("asal", asal);
   }
-  if ($("#fn") && !nama) return err("Isi nama Anda.");
   const btn = ev.target.querySelector("button[type=submit]");
   btn.disabled = true;
   try {
@@ -3735,7 +3779,7 @@ const Att = {
     if (S.att.mode === "db") {
       if (!S.att.canWrite) throw new Error("readonly");
       const ref = S.att.uid ? this.col.doc(S.att.uid) : this.col.doc();
-      await ref.set({ peran: row.peran, asal: row.asal, t: row.t });
+      await ref.set({ nama: row.nama, peran: row.peran, asal: row.asal, t: row.t });
       return;
     }
     if (S.att.mode === "sheet" && CONFIG.hadir.formAction) {
@@ -3753,20 +3797,22 @@ const Att = {
       return;
     }
     const rows = store.get("rowsLocal", []);
-    rows.push({ peran: row.peran, t: row.t });
+    rows.push({ nama: row.nama, peran: row.peran, asal: row.asal, t: row.t });
     store.set("rowsLocal", rows);
     this.ingest(rows);
   },
 };
 function normPeran(v) {
   v = String(v || "").toLowerCase();
-  return (v.includes("dosen") || v.includes("tendik"))
-    ? "dosen"
-    : v.includes("mahasiswa")
-      ? "mahasiswa"
-      : v.includes("mitra")
-        ? "mitra"
-        : "umum";
+  return v.includes("rektorat")
+    ? "rektorat"
+    : (v.includes("dosen") || v.includes("tendik"))
+      ? "dosen"
+      : v.includes("mahasiswa")
+        ? "mahasiswa"
+        : v.includes("mitra")
+          ? "mitra"
+          : "umum";
 }
 function hourOf(t) {
   if (!t) return null;
