@@ -1259,7 +1259,7 @@ const AREA = [[1,6,"Dinding kanan aula, dekat pintu masuk"],[7,13,"Dinding kanan
 const KCOL = { IPTEKS: "#1857C4", Kesehatan: "#0E8F82", Soshum: "#C77D00" };
 const PERAN = {
   dosen: {
-    nama: "Dosen",
+    nama: "Dosen Tendik",
     ket: "Skema dan kolaborasi",
     warna: "var(--r-dosen)",
   },
@@ -3760,7 +3760,7 @@ const Att = {
 };
 function normPeran(v) {
   v = String(v || "").toLowerCase();
-  return v.includes("dosen")
+  return (v.includes("dosen") || v.includes("tendik"))
     ? "dosen"
     : v.includes("mahasiswa")
       ? "mahasiswa"
@@ -4557,62 +4557,111 @@ function viewQrBooth() {
 let undianAudioCtx = null;
 let undianTickCount = 0;
 let undianSoundEnabled = true;
-let undianActivePool = null;
-let undianFlaggedList = null;
-let undianWinnersAudit = null;
+let undianActivePool = [];
+let undianFlaggedList = [];
+let undianWinnersAudit = [];
 let undianTableTab = "valid";
 let undianIsSpinning = false;
 let undianSelectedWinner = null;
 let undianCurrentAngle = 0;
 let undianConfettiList = [];
 
-const DEFAULT_UNDIAN_PARTICIPANTS = [
-  { id: 1, nama: "Ananda Rizky Pratama", fak: "Fakultas Teknik", wa: "0812-****-8821", kode: "#UP60-94821", stempel: 60, peran: "Mahasiswa", uid: "u_tech01" },
-  { id: 2, nama: "Dr. Siti Rahmawati, M.Si.", fak: "Fakultas Farmasi", wa: "0813-****-4412", kode: "#UP60-12847", stempel: 60, peran: "Dosen", uid: "u_pharm02" },
-  { id: 3, nama: "Muhammad Fadhil", fak: "Fakultas Ekonomi & Bisnis", wa: "0857-****-9102", kode: "#UP60-55931", stempel: 60, peran: "Mahasiswa", uid: "u_feb03" },
-  { id: 4, nama: "Nadia Putri Maharani", fak: "Fakultas Hukum", wa: "0878-****-1094", kode: "#UP60-31845", stempel: 60, peran: "Mahasiswa", uid: "u_law04" },
-  { id: 5, nama: "Prof. Ir. Hendra Gunawan", fak: "Fakultas Teknik", wa: "0812-****-5501", kode: "#UP60-44912", stempel: 60, peran: "Dosen", uid: "u_tech05" },
-  { id: 6, nama: "Gita Cahyani", fak: "Sekolah Pascasarjana", wa: "0813-****-9981", kode: "#UP60-22104", stempel: 60, peran: "Mahasiswa", uid: "u_sps06" },
-  { id: 7, nama: "Jessica Aurelia", fak: "Fakultas Farmasi", wa: "0812-****-1198", kode: "#UP60-55192", stempel: 60, peran: "Mahasiswa", uid: "u_pharm07" },
-  { id: 8, nama: "Budi Santoso, S.Kom.", fak: "Mitra Industri (PT Telkom)", wa: "0811-****-3390", kode: "#UP60-84729", stempel: 60, peran: "Mitra", uid: "u_mitra08" }
-];
+function evaluateLocalUndianRows() {
+  const pool = [];
+  const flagged = [];
+  const seenUids = {};
+  const wonCodes = new Set((undianWinnersAudit || []).filter((w) => w.status === "verified").map((w) => w.kode));
 
-const DEFAULT_UNDIAN_FLAGGED = [
-  { id: 101, nama: "Ahmad Zulkarnaen", fak: "Fakultas Ilmu Komunikasi", wa: "0819-****-6721", kode: "#UP60-66291", stempel: 42, alasan: "Stempel belum lengkap (42/60 booth)", kategoriAnomali: "Syarat Belum Terpenuhi" },
-  { id: 102, nama: "Rian Hidayat", fak: "Fakultas Teknik", wa: "0821-****-9901", kode: "#UP60-77112", stempel: 60, alasan: "Durasi pemindaian tidak wajar (2.5 menit untuk 60 booth)", kategoriAnomali: "Anomali Kecepatan (Speedrunning)" },
-  { id: 103, nama: "Dodi Kurniawan", fak: "Umum", wa: "0812-****-3344", kode: "#UP60-11029", stempel: 60, alasan: "Tidak tercatat di buku tamu registrasi aula", kategoriAnomali: "Kehadiran Fisik Belum Terdata" },
-  { id: 104, nama: "Akun Kloning B", fak: "Fakultas Hukum", wa: "0878-****-1094", kode: "#UP60-99482", stempel: 60, alasan: "Perangkat terdeteksi mendaftarkan nama ganda", kategoriAnomali: "Multi-Akun Perangkat Sama" }
-];
+  // Ambil data kupon lokal dari store
+  const savedMyUndian = store.get("undian", null);
+  const rows = [...(Undi.rows || [])];
+  if (savedMyUndian && savedMyUndian.kode && !rows.some((r) => r.kode === savedMyUndian.kode)) {
+    rows.push({
+      nama: savedMyUndian.nama || S.nama || "Pengunjung",
+      wa: savedMyUndian.wa || "",
+      kode: savedMyUndian.kode,
+      n: Object.keys(S.stamp || {}).length,
+      peran: S.peran || "umum",
+      asal: S.asal || "Universitas Pancasila",
+      uid: S.uid || ""
+    });
+  }
+
+  rows.forEach((r, idx) => {
+    if (!r || !r.kode) return;
+    const stempel = Number(r.n || (r.stamps ? r.stamps.length : 0)) || 0;
+    const uid = String(r.uid || "").trim();
+    const nama = sanitize_(r.nama || "-");
+    const wa = sanitize_(r.wa || "-");
+    const kode = sanitize_(r.kode || "");
+
+    let maskedWa = wa;
+    if (wa.length >= 8) {
+      maskedWa = wa.slice(0, 4) + "-****-" + wa.slice(-4);
+    }
+
+    const candidate = {
+      id: idx + 1,
+      nama: nama,
+      wa: maskedWa,
+      kode: kode,
+      stempel: stempel,
+      peran: r.peran ? (PERAN[r.peran] ? PERAN[r.peran].nama : r.peran) : "Pengunjung",
+      fak: r.asal || "Universitas Pancasila",
+      uid: uid
+    };
+
+    // Rule 1: Wajib 60 Booth
+    if (stempel < BOOTH_N) {
+      flagged.push({
+        ...candidate,
+        alasan: `Stempel belum lengkap (${stempel}/${BOOTH_N} booth)`,
+        kategoriAnomali: "Syarat Belum Terpenuhi"
+      });
+      return;
+    }
+
+    // Rule 2: Anti-Duplikasi Pemenang Sah Terdahulu
+    if (wonCodes.has(kode)) {
+      flagged.push({
+        ...candidate,
+        alasan: "Sudah terdata sebagai pemenang sah sebelumnya",
+        kategoriAnomali: "Pemenang Terdahulu"
+      });
+      return;
+    }
+
+    // Rule 3: Deteksi Multi-Akun Perangkat Sama
+    if (uid) {
+      seenUids[uid] = (seenUids[uid] || 0) + 1;
+      if (seenUids[uid] > 1) {
+        flagged.push({
+          ...candidate,
+          alasan: "Perangkat terdeteksi mendaftarkan nama/kupon ganda",
+          kategoriAnomali: "Multi-Akun Perangkat Sama"
+        });
+        return;
+      }
+    }
+
+    // Lolos Verifikasi Sah Masuk Roda
+    pool.push(candidate);
+  });
+
+  return { pool, flagged };
+}
 
 function initUndianDataset() {
-  if (!undianActivePool) {
-    const savedPool = store.get("undian_pool", null);
-    if (savedPool && savedPool.length) {
-      undianActivePool = savedPool;
-    } else {
-      undianActivePool = [...DEFAULT_UNDIAN_PARTICIPANTS];
-      const done = (Undi.rows || []).filter((r) => r.kode && (r.n || 0) >= BOOTH_N);
-      done.forEach((d) => {
-        if (!undianActivePool.some((p) => p.kode === d.kode)) {
-          undianActivePool.push({
-            id: d.kode,
-            nama: d.nama,
-            fak: d.peran || "Pengunjung",
-            wa: d.wa || "",
-            kode: d.kode,
-            stempel: d.n || BOOTH_N,
-            peran: d.peran || "Pengunjung",
-            uid: d.uid || ""
-          });
-        }
-      });
-    }
-  }
-  if (!undianFlaggedList) {
-    undianFlaggedList = store.get("undian_flagged", [...DEFAULT_UNDIAN_FLAGGED]);
-  }
-  if (!undianWinnersAudit) {
-    undianWinnersAudit = store.get("undian_winners", []);
+  undianWinnersAudit = store.get("undian_winners", []) || [];
+  const cachedPool = store.get("undian_pool", null);
+  const cachedFlagged = store.get("undian_flagged", null);
+  if (Array.isArray(cachedPool)) {
+    undianActivePool = cachedPool;
+    undianFlaggedList = Array.isArray(cachedFlagged) ? cachedFlagged : [];
+  } else {
+    const localEval = evaluateLocalUndianRows();
+    undianActivePool = localEval.pool;
+    undianFlaggedList = localEval.flagged;
   }
 }
 
@@ -4728,13 +4777,34 @@ function drawUndianWheel() {
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
   const num = (undianActivePool || []).length;
-  if (!num) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    return;
-  }
-  const arc = (2 * Math.PI) / num;
   const radius = canvas.width / 2;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (!num) {
+    ctx.save();
+    ctx.translate(radius, radius);
+    ctx.beginPath();
+    ctx.arc(0, 0, radius - 14, 0, 2 * Math.PI);
+    ctx.fillStyle = "#f8fafc";
+    ctx.fill();
+    ctx.lineWidth = 3;
+    ctx.setLineDash([8, 8]);
+    ctx.strokeStyle = "#cbd5e1";
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = "700 24px 'Plus Jakarta Sans', sans-serif";
+    ctx.fillStyle = "#475569";
+    ctx.fillText("Menunggu Peserta Sah", 0, -12);
+    ctx.font = "600 15px 'Plus Jakarta Sans', sans-serif";
+    ctx.fillStyle = "#94a3b8";
+    ctx.fillText("Wajib Menyelesaikan 60 Booth", 0, 18);
+    ctx.restore();
+    return;
+  }
+
+  const arc = (2 * Math.PI) / num;
   ctx.save();
   ctx.translate(radius, radius);
   ctx.rotate(undianCurrentAngle);
@@ -4777,7 +4847,7 @@ function drawUndianWheel() {
 function spinUndianWheelAction() {
   if (undianIsSpinning) return;
   if (!undianActivePool || undianActivePool.length === 0) {
-    toast("Tidak ada peserta sah yang tersisa untuk diundi.");
+    toast("Belum ada peserta sah yang menyelesaikan 60 booth di Google Sheets.");
     return;
   }
   const verifiedCount = (undianWinnersAudit || []).filter((w) => w.status === "verified").length;
@@ -4878,7 +4948,7 @@ function renderUndianTable() {
         (p.fak && p.fak.toLowerCase().includes(q))
     );
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--mut)">Tidak ada peserta sah yang sesuai dengan pencarian.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:36px 20px;color:var(--mut)"><div style="font-weight:800;font-size:14px;color:var(--ink);margin-bottom:6px">Belum Ada Peserta Sah yang Memenuhi Syarat</div><div style="font-size:12.5px;max-width:480px;margin:0 auto;line-height:1.5">Pengunjung harus menyelesaikan pemindaian seluruh 60 booth dan terdata di buku tamu registrasi aula agar masuk ke roda undian.</div></td></tr>`;
       return;
     }
     tbody.innerHTML = filtered
@@ -4913,7 +4983,7 @@ function renderUndianTable() {
         (p.alasan && p.alasan.toLowerCase().includes(q))
     );
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--mut)">Tidak ada anomali atau data kecurangan terdeteksi.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:36px 20px;color:var(--mut)"><div style="font-weight:800;font-size:14px;color:var(--ink);margin-bottom:6px">Tidak Ada Anomali Terdeteksi</div><div style="font-size:12.5px;max-width:480px;margin:0 auto;line-height:1.5">Seluruh data yang masuk diverifikasi secara berkala dari Google Sheets.</div></td></tr>`;
       return;
     }
     tbody.innerHTML = filtered
@@ -4947,7 +5017,7 @@ function renderUndianTable() {
         p.kode.toLowerCase().includes(q)
     );
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--mut)">Belum ada riwayat pemenang.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:36px 20px;color:var(--mut)"><div style="font-weight:800;font-size:14px;color:var(--ink);margin-bottom:6px">Belum Ada Riwayat Pemenang</div><div style="font-size:12.5px;max-width:480px;margin:0 auto;line-height:1.5">Putar roda undian di atas untuk menetapkan pemenang doorprize resmi.</div></td></tr>`;
       return;
     }
     tbody.innerHTML = filtered
@@ -4985,6 +5055,9 @@ function renderUndianAllViews() {
     if (isComplete) {
       spinBtn.disabled = true;
       spinText.textContent = "Semua 3 Pemenang Telah Sah";
+    } else if ((undianActivePool || []).length === 0) {
+      spinBtn.disabled = true;
+      spinText.textContent = "Menunggu Peserta Sah (60 Booth)";
     } else {
       if (!undianIsSpinning) {
         spinBtn.disabled = false;
@@ -5048,15 +5121,18 @@ function renderUndianAllViews() {
   renderUndianTable();
 }
 
-async function syncUndianFromGoogleSheets() {
+async function syncUndianFromGoogleSheets(silent = false) {
   const btn = document.getElementById("btnSyncSheet");
   const lbl = document.getElementById("syncLabel");
+  const bSheet = document.getElementById("sheetStatusBadge");
   if (btn) btn.classList.add("loading");
   if (lbl) lbl.textContent = "Menghubungkan...";
+  if (bSheet) bSheet.textContent = "Menyinkronkan...";
+
   try {
     const res = await fetch(CONFIG.gasUrl + "?action=getUndianPool");
     const json = await res.json();
-    if (json && json.status === "success") {
+    if (json && (json.status === "success" || json.status === "empty")) {
       undianActivePool = json.pool || [];
       undianFlaggedList = json.flagged || [];
       if (json.winners && json.winners.length > 0) {
@@ -5065,15 +5141,24 @@ async function syncUndianFromGoogleSheets() {
       store.set("undian_pool", undianActivePool);
       store.set("undian_flagged", undianFlaggedList);
       store.set("undian_winners", undianWinnersAudit);
-      const bSheet = document.getElementById("sheetStatusBadge");
       if (bSheet) bSheet.textContent = "Live Terhubung";
-      toast(`Berhasil sinkron! ${undianActivePool.length} peserta sah (60 booth).`);
+      if (!silent) {
+        toast(`Data Sheets terhubung: ${undianActivePool.length} peserta sah (60 booth).`);
+      }
     } else {
-      toast("Google Sheets merespons data kosong. Menggunakan cache lokal.");
+      const localEval = evaluateLocalUndianRows();
+      undianActivePool = localEval.pool;
+      undianFlaggedList = localEval.flagged;
+      if (bSheet) bSheet.textContent = "Offline (Lokal)";
+      if (!silent) toast("Google Sheets belum merespons. Menampilkan data lokal.");
     }
   } catch (err) {
-    console.warn("Gagal terhubung ke GAS, menggunakan dataset lokal:", err);
-    toast("Koneksi cloud offline. Menggunakan cache data lokal.");
+    console.warn("Gagal terhubung ke GAS getUndianPool:", err);
+    const localEval = evaluateLocalUndianRows();
+    undianActivePool = localEval.pool;
+    undianFlaggedList = localEval.flagged;
+    if (bSheet) bSheet.textContent = "Offline (Lokal)";
+    if (!silent) toast("Koneksi cloud offline. Menampilkan antrean data lokal.");
   } finally {
     if (btn) btn.classList.remove("loading");
     if (lbl) lbl.textContent = "Sinkronkan Sheets";
@@ -5327,6 +5412,7 @@ function viewPengundian() {
   }
 
   renderUndianAllViews();
+  setTimeout(() => syncUndianFromGoogleSheets(true), 120);
 }
 
 /* ---------- Render & aksi ---------- */
