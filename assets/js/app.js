@@ -1415,7 +1415,7 @@ function renderTabs() {
   ).join("");
 }
 function show(tab, opts = {}) {
-  if (!TABS.some((t) => t[0] === tab) && tab !== "hadir" && tab !== "qrbooth")
+  if (!TABS.some((t) => t[0] === tab) && tab !== "hadir" && tab !== "qrbooth" && tab !== "pengundian")
     tab = "beranda";
   S.tab = tab;
   document.documentElement.dataset.tab = tab;
@@ -1571,7 +1571,7 @@ function workCard(d, opt = {}) {
     <div class="foot">
       <div class="rate-thumbs" role="group" aria-label="Apresiasi karya booth ${panel}">
         <button class="thumb-btn up ${rate.myVote === "up" ? "active" : ""}" data-rate="${panel}" data-vote="up" title="Sukai karya ini" aria-label="Sukai karya panel ${panel}">
-          <span class="thumb-icon">👍🏻</span>
+          <span class="thumb-icon">👍</span>
           <span class="thumb-txt">Sukai</span>
           ${rate.up > 0 ? `<span class="thumb-cnt">${rate.up}</span>` : ""}
         </button>
@@ -4427,7 +4427,7 @@ function undianPanel() {
     <p style="margin:10px 0 0;font-size:14px;color:var(--mut)">Booth paling sedikit dikunjungi: ${low.map(([p, c]) => `<b>${p}</b> (${c})`).join(", ")}.</p>`
           : `<p style="margin:0;color:var(--mut);font-size:14px">Peserta lengkap masuk ke Google Sheets undian.</p>`
     }
-    <div class="row" style="margin-top:12px"><button class="btn ghost" data-act="qrbooth">QR booth untuk dicetak</button>${adm ? '<button class="btn gold" data-act="draw">Undi pemenang</button>' : ""}</div></div></div>`;
+    <div class="row" style="margin-top:12px;gap:8px;flex-wrap:wrap"><button class="btn ghost" data-act="qrbooth">QR booth untuk dicetak</button><button class="btn gold" data-go="pengundian">Buka Panggung Pengundian</button>${adm ? '<button class="btn ghost" data-act="draw" style="font-size:12.5px">Undi Cepat</button>' : ""}</div></div></div>`;
 }
 function drawWinner() {
   if (S.att.mode === "gas-api") {
@@ -4553,6 +4553,782 @@ function viewQrBooth() {
   });
 }
 
+/* ---------- Panggung Pengundian Doorprize (#pengundian) ---------- */
+let undianAudioCtx = null;
+let undianTickCount = 0;
+let undianSoundEnabled = true;
+let undianActivePool = null;
+let undianFlaggedList = null;
+let undianWinnersAudit = null;
+let undianTableTab = "valid";
+let undianIsSpinning = false;
+let undianSelectedWinner = null;
+let undianCurrentAngle = 0;
+let undianConfettiList = [];
+
+const DEFAULT_UNDIAN_PARTICIPANTS = [
+  { id: 1, nama: "Ananda Rizky Pratama", fak: "Fakultas Teknik", wa: "0812-****-8821", kode: "#UP60-94821", stempel: 60, peran: "Mahasiswa", uid: "u_tech01" },
+  { id: 2, nama: "Dr. Siti Rahmawati, M.Si.", fak: "Fakultas Farmasi", wa: "0813-****-4412", kode: "#UP60-12847", stempel: 60, peran: "Dosen", uid: "u_pharm02" },
+  { id: 3, nama: "Muhammad Fadhil", fak: "Fakultas Ekonomi & Bisnis", wa: "0857-****-9102", kode: "#UP60-55931", stempel: 60, peran: "Mahasiswa", uid: "u_feb03" },
+  { id: 4, nama: "Nadia Putri Maharani", fak: "Fakultas Hukum", wa: "0878-****-1094", kode: "#UP60-31845", stempel: 60, peran: "Mahasiswa", uid: "u_law04" },
+  { id: 5, nama: "Prof. Ir. Hendra Gunawan", fak: "Fakultas Teknik", wa: "0812-****-5501", kode: "#UP60-44912", stempel: 60, peran: "Dosen", uid: "u_tech05" },
+  { id: 6, nama: "Gita Cahyani", fak: "Sekolah Pascasarjana", wa: "0813-****-9981", kode: "#UP60-22104", stempel: 60, peran: "Mahasiswa", uid: "u_sps06" },
+  { id: 7, nama: "Jessica Aurelia", fak: "Fakultas Farmasi", wa: "0812-****-1198", kode: "#UP60-55192", stempel: 60, peran: "Mahasiswa", uid: "u_pharm07" },
+  { id: 8, nama: "Budi Santoso, S.Kom.", fak: "Mitra Industri (PT Telkom)", wa: "0811-****-3390", kode: "#UP60-84729", stempel: 60, peran: "Mitra", uid: "u_mitra08" }
+];
+
+const DEFAULT_UNDIAN_FLAGGED = [
+  { id: 101, nama: "Ahmad Zulkarnaen", fak: "Fakultas Ilmu Komunikasi", wa: "0819-****-6721", kode: "#UP60-66291", stempel: 42, alasan: "Stempel belum lengkap (42/60 booth)", kategoriAnomali: "Syarat Belum Terpenuhi" },
+  { id: 102, nama: "Rian Hidayat", fak: "Fakultas Teknik", wa: "0821-****-9901", kode: "#UP60-77112", stempel: 60, alasan: "Durasi pemindaian tidak wajar (2.5 menit untuk 60 booth)", kategoriAnomali: "Anomali Kecepatan (Speedrunning)" },
+  { id: 103, nama: "Dodi Kurniawan", fak: "Umum", wa: "0812-****-3344", kode: "#UP60-11029", stempel: 60, alasan: "Tidak tercatat di buku tamu registrasi aula", kategoriAnomali: "Kehadiran Fisik Belum Terdata" },
+  { id: 104, nama: "Akun Kloning B", fak: "Fakultas Hukum", wa: "0878-****-1094", kode: "#UP60-99482", stempel: 60, alasan: "Perangkat terdeteksi mendaftarkan nama ganda", kategoriAnomali: "Multi-Akun Perangkat Sama" }
+];
+
+function initUndianDataset() {
+  if (!undianActivePool) {
+    const savedPool = store.get("undian_pool", null);
+    if (savedPool && savedPool.length) {
+      undianActivePool = savedPool;
+    } else {
+      undianActivePool = [...DEFAULT_UNDIAN_PARTICIPANTS];
+      const done = (Undi.rows || []).filter((r) => r.kode && (r.n || 0) >= BOOTH_N);
+      done.forEach((d) => {
+        if (!undianActivePool.some((p) => p.kode === d.kode)) {
+          undianActivePool.push({
+            id: d.kode,
+            nama: d.nama,
+            fak: d.peran || "Pengunjung",
+            wa: d.wa || "",
+            kode: d.kode,
+            stempel: d.n || BOOTH_N,
+            peran: d.peran || "Pengunjung",
+            uid: d.uid || ""
+          });
+        }
+      });
+    }
+  }
+  if (!undianFlaggedList) {
+    undianFlaggedList = store.get("undian_flagged", [...DEFAULT_UNDIAN_FLAGGED]);
+  }
+  if (!undianWinnersAudit) {
+    undianWinnersAudit = store.get("undian_winners", []);
+  }
+}
+
+function initUndianAudio() {
+  if (!undianAudioCtx) {
+    undianAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (undianAudioCtx.state === "suspended") {
+    undianAudioCtx.resume();
+  }
+}
+
+function playClockTick(speedFactor = 1) {
+  if (!undianSoundEnabled) return;
+  initUndianAudio();
+  try {
+    undianTickCount++;
+    const isTick = undianTickCount % 2 === 0;
+    const baseFreq = isTick ? 2200 : 1650;
+    const osc = undianAudioCtx.createOscillator();
+    const gain = undianAudioCtx.createGain();
+    const filter = undianAudioCtx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.setValueAtTime(baseFreq + (Math.random() * 80 - 40), undianAudioCtx.currentTime);
+    filter.Q.setValueAtTime(6.5, undianAudioCtx.currentTime);
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(baseFreq, undianAudioCtx.currentTime);
+    const volume = Math.min(0.28, 0.09 + speedFactor * 0.14);
+    gain.gain.setValueAtTime(volume, undianAudioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, undianAudioCtx.currentTime + 0.009);
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(undianAudioCtx.destination);
+    osc.start();
+    osc.stop(undianAudioCtx.currentTime + 0.01);
+  } catch (e) {}
+}
+
+function playCrystalTing() {
+  if (!undianSoundEnabled) return;
+  initUndianAudio();
+  try {
+    const osc = undianAudioCtx.createOscillator();
+    const gain = undianAudioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(1046.5, undianAudioCtx.currentTime);
+    gain.gain.setValueAtTime(0.2, undianAudioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, undianAudioCtx.currentTime + 1.4);
+    osc.connect(gain);
+    gain.connect(undianAudioCtx.destination);
+    osc.start();
+    osc.stop(undianAudioCtx.currentTime + 1.4);
+  } catch (e) {}
+}
+
+function triggerUndianConfetti() {
+  const c = document.getElementById("confettiCanvas");
+  if (!c) return;
+  c.width = window.innerWidth;
+  c.height = window.innerHeight;
+  const ctx = c.getContext("2d");
+  undianConfettiList = [];
+  const palette = ["#0a2a66", "#1857c4", "#f5a800", "#ffd36b", "#0f7b4b", "#ffffff"];
+  for (let i = 0; i < 160; i++) {
+    undianConfettiList.push({
+      x: c.width / 2,
+      y: c.height * 0.4,
+      vx: (Math.random() - 0.5) * 24,
+      vy: (Math.random() - 0.75) * 26,
+      size: Math.random() * 8 + 4,
+      color: palette[Math.floor(Math.random() * palette.length)],
+      rot: Math.random() * 360,
+      vrot: (Math.random() - 0.5) * 14,
+      alpha: 1
+    });
+  }
+  function animate() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    let alive = false;
+    undianConfettiList.forEach((p) => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.45;
+      p.rot += p.vrot;
+      p.alpha -= 0.007;
+      if (p.alpha > 0) {
+        alive = true;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rot * Math.PI) / 180);
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        ctx.restore();
+      }
+    });
+    if (alive) requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+}
+
+const UNDIAN_SECTOR_COLORS = [
+  "#0a2a66",
+  "#1857c4",
+  "#f5a800",
+  "#0f7b4b",
+  "#1e293b",
+  "#0284c7"
+];
+
+function drawUndianWheel() {
+  const canvas = document.getElementById("wheelCanvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const num = (undianActivePool || []).length;
+  if (!num) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    return;
+  }
+  const arc = (2 * Math.PI) / num;
+  const radius = canvas.width / 2;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.translate(radius, radius);
+  ctx.rotate(undianCurrentAngle);
+  for (let i = 0; i < num; i++) {
+    const sectorAngle = i * arc;
+    ctx.beginPath();
+    ctx.fillStyle = UNDIAN_SECTOR_COLORS[i % UNDIAN_SECTOR_COLORS.length];
+    ctx.moveTo(0, 0);
+    ctx.arc(0, 0, radius - 14, sectorAngle, sectorAngle + arc);
+    ctx.lineTo(0, 0);
+    ctx.fill();
+
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.save();
+    ctx.rotate(sectorAngle + arc / 2);
+    ctx.textAlign = "right";
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "700 24px 'Plus Jakarta Sans', sans-serif";
+    ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
+    ctx.shadowBlur = 4;
+    let name = undianActivePool[i].nama;
+    if (name.length > 17) name = name.substring(0, 16) + "…";
+    ctx.fillText(name, radius - 46, 8);
+    ctx.restore();
+
+    ctx.save();
+    ctx.rotate(sectorAngle);
+    ctx.beginPath();
+    ctx.arc(radius - 14, 0, 4, 0, 2 * Math.PI);
+    ctx.fillStyle = "#f5a800";
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+function spinUndianWheelAction() {
+  if (undianIsSpinning) return;
+  if (!undianActivePool || undianActivePool.length === 0) {
+    toast("Tidak ada peserta sah yang tersisa untuk diundi.");
+    return;
+  }
+  const verifiedCount = (undianWinnersAudit || []).filter((w) => w.status === "verified").length;
+  if (verifiedCount >= 3) {
+    toast("Kuota pemenang (3 orang) telah terpenuhi.");
+    return;
+  }
+  undianIsSpinning = true;
+  const btn = document.getElementById("btnSpin");
+  if (btn) btn.disabled = true;
+
+  const randomBuffer = new Uint32Array(1);
+  window.crypto.getRandomValues(randomBuffer);
+  const winnerIdx = randomBuffer[0] % undianActivePool.length;
+  undianSelectedWinner = undianActivePool[winnerIdx];
+
+  const arc = (2 * Math.PI) / undianActivePool.length;
+  const targetAngle = (3 * Math.PI) / 2 - (winnerIdx * arc + arc / 2);
+  const fullRotations = 8;
+  const totalDelta = fullRotations * 2 * Math.PI + (targetAngle - (undianCurrentAngle % (2 * Math.PI)));
+
+  const duration = 6500;
+  const startTime = performance.now();
+  const initialAngle = undianCurrentAngle;
+  let lastPegIndex = Math.floor(undianCurrentAngle / arc);
+  const pointer = document.getElementById("wheelPointer");
+
+  function spinFrame(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 5);
+    undianCurrentAngle = initialAngle + totalDelta * ease;
+    drawUndianWheel();
+
+    const currentPegIndex = Math.floor(undianCurrentAngle / arc);
+    if (currentPegIndex !== lastPegIndex) {
+      const speedFactor = 1 - progress;
+      playClockTick(speedFactor);
+      if (pointer) {
+        pointer.classList.remove("recoil-left", "recoil-right");
+        pointer.classList.add(undianTickCount % 2 === 0 ? "recoil-left" : "recoil-right");
+        setTimeout(() => {
+          if (pointer) pointer.classList.remove("recoil-left", "recoil-right");
+        }, 32);
+      }
+      lastPegIndex = currentPegIndex;
+    }
+
+    if (progress < 1) {
+      requestAnimationFrame(spinFrame);
+    } else {
+      undianIsSpinning = false;
+      if (btn) btn.disabled = false;
+      playCrystalTing();
+      triggerUndianConfetti();
+      openUndianWinnerModal(undianSelectedWinner);
+    }
+  }
+  requestAnimationFrame(spinFrame);
+}
+
+function openUndianWinnerModal(c) {
+  if (!c) return;
+  const modal = document.getElementById("winnerModal");
+  if (!modal) return;
+  const nameEl = document.getElementById("modalWinnerName");
+  const fakEl = document.getElementById("modalWinnerFak");
+  const coupEl = document.getElementById("modalCoupon");
+  const phoneEl = document.getElementById("modalPhone");
+  if (nameEl) nameEl.textContent = c.nama;
+  if (fakEl) fakEl.textContent = `${c.fak || "Universitas Pancasila"} · ${c.peran || "Pengunjung"}`;
+  if (coupEl) coupEl.textContent = c.kode;
+  if (phoneEl) phoneEl.textContent = c.wa || "-";
+  modal.classList.add("show");
+}
+
+function renderUndianTable() {
+  const searchEl = document.getElementById("inputSearch");
+  const q = searchEl ? searchEl.value.toLowerCase() : "";
+  const tbody = document.getElementById("tableBody");
+  const thead = document.getElementById("tableHeaderRow");
+  if (!tbody || !thead) return;
+
+  if (undianTableTab === "valid") {
+    thead.innerHTML = `
+      <th>No</th>
+      <th>Nomor Kupon</th>
+      <th>Nama Lengkap</th>
+      <th>Fakultas / Instansi</th>
+      <th>Kontak Disamarkan</th>
+      <th>Stempel Booth</th>
+      <th>Status Validasi</th>
+    `;
+    const filtered = (undianActivePool || []).filter(
+      (p) =>
+        p.nama.toLowerCase().includes(q) ||
+        p.kode.toLowerCase().includes(q) ||
+        (p.fak && p.fak.toLowerCase().includes(q))
+    );
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--mut)">Tidak ada peserta sah yang sesuai dengan pencarian.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = filtered
+      .map(
+        (p, idx) => `
+      <tr>
+        <td>${idx + 1}</td>
+        <td style="font-family:monospace;font-weight:700;color:var(--primary)">${esc(p.kode)}</td>
+        <td style="font-weight:700">${esc(p.nama)}</td>
+        <td>${esc(p.fak)}</td>
+        <td style="font-family:monospace;color:var(--mut)">${esc(p.wa)}</td>
+        <td><b style="color:var(--ok)">${p.stempel || 60}</b> dari 60 booth</td>
+        <td><span class="badge-status valid">Sah Masuk Roda</span></td>
+      </tr>
+    `
+      )
+      .join("");
+  } else if (undianTableTab === "anomaly") {
+    thead.innerHTML = `
+      <th>No</th>
+      <th>Nomor Kupon</th>
+      <th>Nama Peserta</th>
+      <th>Fakultas / Asal</th>
+      <th>Stempel</th>
+      <th>Kategori Anomali</th>
+      <th>Alasan Diskualifikasi</th>
+    `;
+    const filtered = (undianFlaggedList || []).filter(
+      (p) =>
+        p.nama.toLowerCase().includes(q) ||
+        p.kode.toLowerCase().includes(q) ||
+        (p.alasan && p.alasan.toLowerCase().includes(q))
+    );
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--mut)">Tidak ada anomali atau data kecurangan terdeteksi.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = filtered
+      .map(
+        (p, idx) => `
+      <tr>
+        <td>${idx + 1}</td>
+        <td style="font-family:monospace;font-weight:700;color:var(--mut)">${esc(p.kode)}</td>
+        <td style="font-weight:700">${esc(p.nama)}</td>
+        <td>${esc(p.fak)}</td>
+        <td>${p.stempel}/60</td>
+        <td><span class="badge-status anomaly">${esc(p.kategoriAnomali || "Anomali")}</span></td>
+        <td style="color:var(--err);font-weight:600;font-size:12.5px">${esc(p.alasan)}</td>
+      </tr>
+    `
+      )
+      .join("");
+  } else if (undianTableTab === "winners") {
+    thead.innerHTML = `
+      <th>No</th>
+      <th>Nomor Kupon</th>
+      <th>Nama Pemenang</th>
+      <th>Fakultas / Asal</th>
+      <th>Hadiah</th>
+      <th>Waktu Pengesahan</th>
+      <th>Status Keputusan</th>
+    `;
+    const filtered = (undianWinnersAudit || []).filter(
+      (p) =>
+        p.nama.toLowerCase().includes(q) ||
+        p.kode.toLowerCase().includes(q)
+    );
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--mut)">Belum ada riwayat pemenang.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = filtered
+      .map(
+        (p, idx) => `
+      <tr>
+        <td>${idx + 1}</td>
+        <td style="font-family:monospace;font-weight:700;color:var(--primary)">${esc(p.kode)}</td>
+        <td style="font-weight:700">${esc(p.nama)}</td>
+        <td>${esc(p.fak)}</td>
+        <td><b>${esc(p.prize)}</b></td>
+        <td style="font-family:monospace;color:var(--mut)">${esc(p.time)}</td>
+        <td>${p.status === "verified" ? '<span class="badge-status valid">Resmi Sah</span>' : '<span class="badge-status anomaly">Gugur</span>'}</td>
+      </tr>
+    `
+      )
+      .join("");
+  }
+}
+
+function renderUndianAllViews() {
+  drawUndianWheel();
+  const verifiedWinners = (undianWinnersAudit || []).filter((w) => w.status === "verified");
+  const isComplete = verifiedWinners.length >= 3;
+
+  const chip = document.getElementById("winnerCountChip");
+  if (chip) {
+    chip.textContent = isComplete ? "3 / 3 Kuota Terpenuhi" : `${verifiedWinners.length} / 3 Terpilih`;
+    chip.className = isComplete ? "badge-chip active" : "badge-chip";
+  }
+
+  const spinBtn = document.getElementById("btnSpin");
+  const spinText = document.getElementById("btnSpinText");
+  if (spinBtn && spinText) {
+    if (isComplete) {
+      spinBtn.disabled = true;
+      spinText.textContent = "Semua 3 Pemenang Telah Sah";
+    } else {
+      if (!undianIsSpinning) {
+        spinBtn.disabled = false;
+        spinText.textContent = `Putar Undian (Pemenang ke-${verifiedWinners.length + 1})`;
+      }
+    }
+  }
+
+  const poolLive = document.getElementById("poolLiveText");
+  if (poolLive) {
+    poolLive.textContent = `Peserta Sah di Roda: ${(undianActivePool || []).length} Orang (60 Booth)`;
+  }
+
+  const podiumList = document.getElementById("podiumSlotsList");
+  if (podiumList) {
+    let slotsHtml = "";
+    for (let i = 1; i <= 3; i++) {
+      const winner = verifiedWinners[i - 1];
+      if (winner) {
+        slotsHtml += `
+          <div class="podium-slot filled">
+            <div class="slot-top-row">
+              <span class="slot-label">Pemenang ke-${i}</span>
+              <span class="slot-amount-tag">Rp 150.000</span>
+            </div>
+            <div class="slot-name">${esc(winner.nama)}</div>
+            <div class="slot-meta">
+              <span class="coupon-badge">${esc(winner.kode)}</span>
+              <span>·</span>
+              <span>${esc(winner.fak)}</span>
+              <span style="margin-left:auto;font-family:monospace;color:var(--mut);font-size:11px">${esc(winner.time)}</span>
+            </div>
+          </div>
+        `;
+      } else {
+        const isNext = i === verifiedWinners.length + 1;
+        slotsHtml += `
+          <div class="podium-slot ${isNext ? "active-target" : ""}">
+            <div class="slot-top-row">
+              <span class="slot-label">Slot Pemenang ke-${i}</span>
+              <span style="font-size:11px;color:var(--mut)">Rp 150.000</span>
+            </div>
+            <div class="slot-empty-notice">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span>${isNext ? "Siap diundi pada putaran saat ini" : "Menunggu giliran putaran"}</span>
+            </div>
+          </div>
+        `;
+      }
+    }
+    podiumList.innerHTML = slotsHtml;
+  }
+
+  const bValid = document.getElementById("badgeCountValid");
+  if (bValid) bValid.textContent = (undianActivePool || []).length;
+  const bAnomaly = document.getElementById("badgeCountAnomaly");
+  if (bAnomaly) bAnomaly.textContent = (undianFlaggedList || []).length;
+  const bWinners = document.getElementById("badgeCountWinners");
+  if (bWinners) bWinners.textContent = (undianWinnersAudit || []).length;
+
+  renderUndianTable();
+}
+
+async function syncUndianFromGoogleSheets() {
+  const btn = document.getElementById("btnSyncSheet");
+  const lbl = document.getElementById("syncLabel");
+  if (btn) btn.classList.add("loading");
+  if (lbl) lbl.textContent = "Menghubungkan...";
+  try {
+    const res = await fetch(CONFIG.gasUrl + "?action=getUndianPool");
+    const json = await res.json();
+    if (json && json.status === "success") {
+      undianActivePool = json.pool || [];
+      undianFlaggedList = json.flagged || [];
+      if (json.winners && json.winners.length > 0) {
+        undianWinnersAudit = json.winners;
+      }
+      store.set("undian_pool", undianActivePool);
+      store.set("undian_flagged", undianFlaggedList);
+      store.set("undian_winners", undianWinnersAudit);
+      const bSheet = document.getElementById("sheetStatusBadge");
+      if (bSheet) bSheet.textContent = "Live Terhubung";
+      toast(`Berhasil sinkron! ${undianActivePool.length} peserta sah (60 booth).`);
+    } else {
+      toast("Google Sheets merespons data kosong. Menggunakan cache lokal.");
+    }
+  } catch (err) {
+    console.warn("Gagal terhubung ke GAS, menggunakan dataset lokal:", err);
+    toast("Koneksi cloud offline. Menggunakan cache data lokal.");
+  } finally {
+    if (btn) btn.classList.remove("loading");
+    if (lbl) lbl.textContent = "Sinkronkan Sheets";
+    renderUndianAllViews();
+  }
+}
+
+function viewPengundian() {
+  initUndianDataset();
+  const sec = $("#v-pengundian");
+  if (!sec) return;
+
+  sec.innerHTML = `
+    <!-- Header Panggung -->
+    <header class="stage-header">
+      <div class="header-brand">
+        <span class="brand-tag">Dies Natalis 60 UP</span>
+        <div class="header-title-box">
+          <h1>Sesi Pengundian Doorprize</h1>
+          <p>Gelar Karya Penelitian dan Pengabdian kepada Masyarakat</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-header-tool" id="btnSyncSheet" title="Tarik dan sinkronkan data terbaru dari Google Sheets">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          <span id="syncLabel">Sinkronkan Sheets</span>
+        </button>
+        <button class="btn-header-tool" id="btnSound">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+          <span id="soundLabel">${undianSoundEnabled ? "Audio: Aktif" : "Audio: Senyap"}</span>
+        </button>
+        <button class="btn-header-tool" id="btnFullscreen">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+          <span>Layar Penuh</span>
+        </button>
+        <button class="btn-header-tool" data-go="beranda">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          <span>Kembali</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Konten Panggung Utama -->
+    <main class="stage-content">
+      <!-- Arena Roda -->
+      <section class="arena-card">
+        <div class="prize-banner">
+          <div>
+            <div class="prize-title-text">Hadiah Utama: Saldo Rp 150.000</div>
+            <div style="font-size:12px;color:var(--mut);margin-top:2px">Kuota: 3 Orang Pemenang · Wajib Hadir Fisik & Scan 60/60 Booth</div>
+          </div>
+          <span class="prize-rule-badge">Syarat: 60 Booth Lengkap</span>
+        </div>
+
+        <div class="wheel-stage-wrapper">
+          <div class="wheel-pointer" id="wheelPointer"></div>
+          <canvas id="wheelCanvas" width="880" height="880"></canvas>
+          <div class="wheel-hub">
+            <span class="wheel-hub-text">UP 60</span>
+            <span class="wheel-hub-sub">60 BOOTH</span>
+          </div>
+        </div>
+
+        <button class="btn-spin-action" id="btnSpin">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          <span id="btnSpinText">Putar Roda Undian</span>
+        </button>
+      </section>
+
+      <!-- Sidebar Podium -->
+      <aside class="sidebar-wrapper">
+        <div class="winner-podium-card">
+          <div class="card-heading">
+            <div>
+              <h2>Daftar Pemenang Sah</h2>
+              <p style="font-size:12px;color:var(--mut);margin-top:2px">Saldo Rp 150.000 (3 Kuota)</p>
+            </div>
+            <span class="badge-chip active" id="winnerCountChip">0 / 3 Terpilih</span>
+          </div>
+
+          <div class="podium-slots-list" id="podiumSlotsList"></div>
+
+          <div class="podium-card-footer">
+            <div style="display:flex;align-items:center;gap:6px">
+              <span class="status-dot-pulse"></span>
+              <span id="poolLiveText">Peserta Sah di Roda: 0 Orang</span>
+            </div>
+            <span class="badge-chip" id="sheetStatusBadge">Sheet Sinkron</span>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Bagian Tabel Peserta -->
+    <section class="table-container-section">
+      <div class="table-card-box">
+        <div class="table-top-bar">
+          <div class="table-nav-tabs">
+            <button class="tab-btn active" id="tabBtnValid" data-utab="valid">
+              <span>Peserta Sah (60 Booth)</span>
+              <span class="tab-count" id="badgeCountValid">0</span>
+            </button>
+            <button class="tab-btn" id="tabBtnAnomaly" data-utab="anomaly">
+              <span>Terdeteksi Anomali / Gugur</span>
+              <span class="tab-count" id="badgeCountAnomaly">0</span>
+            </button>
+            <button class="tab-btn" id="tabBtnWinners" data-utab="winners">
+              <span>Riwayat Pemenang</span>
+              <span class="tab-count" id="badgeCountWinners">0</span>
+            </button>
+          </div>
+          <input type="search" id="inputSearch" class="table-search-input" placeholder="Cari nama atau nomor kupon..." />
+        </div>
+
+        <table class="data-table-el">
+          <thead>
+            <tr id="tableHeaderRow"></tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Modal Verifikasi -->
+    <div class="modal-scrim-layer" id="winnerModal">
+      <div class="modal-content-card">
+        <span class="modal-tag">Hadiah Utama: Saldo Rp 150.000</span>
+        <h2 class="modal-winner-title" id="modalWinnerName">Nama Peserta</h2>
+        <p class="modal-winner-affiliation" id="modalWinnerFak">Fakultas Teknik · Mahasiswa</p>
+
+        <div class="modal-details-grid">
+          <div class="detail-row">
+            <span class="detail-label">Nomor Kupon:</span>
+            <span class="detail-value" id="modalCoupon">#UP60-XXXXX</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Nomor WhatsApp:</span>
+            <span class="detail-value" id="modalPhone">0812-****-XXXX</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Validasi Misi:</span>
+            <span class="detail-value" id="modalStamps" style="color:var(--ok)">60 dari 60 Booth Selesai</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Status Hadir:</span>
+            <span class="detail-value" style="color:var(--ok)">Terdaftar di Buku Tamu</span>
+          </div>
+        </div>
+
+        <div class="modal-actions-bar">
+          <button class="btn-modal-confirm" id="btnConfirmWinner">Sahkan Pemenang</button>
+          <button class="btn-modal-disqualify" id="btnDisqualifyWinner">Gugur (Panggil 3x)</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Bind Events
+  const spinBtn = document.getElementById("btnSpin");
+  if (spinBtn) spinBtn.onclick = spinUndianWheelAction;
+
+  const syncBtn = document.getElementById("btnSyncSheet");
+  if (syncBtn) syncBtn.onclick = syncUndianFromGoogleSheets;
+
+  const soundBtn = document.getElementById("btnSound");
+  if (soundBtn) {
+    soundBtn.onclick = () => {
+      undianSoundEnabled = !undianSoundEnabled;
+      const sLbl = document.getElementById("soundLabel");
+      if (sLbl) sLbl.textContent = undianSoundEnabled ? "Audio: Aktif" : "Audio: Senyap";
+      toast(undianSoundEnabled ? "Audio jam berputar diaktifkan" : "Audio dimatikan");
+    };
+  }
+
+  const fsBtn = document.getElementById("btnFullscreen");
+  if (fsBtn) {
+    fsBtn.onclick = () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen();
+      }
+    };
+  }
+
+  const sInput = document.getElementById("inputSearch");
+  if (sInput) sInput.oninput = renderUndianTable;
+
+  document.querySelectorAll("[data-utab]").forEach((btn) => {
+    btn.onclick = () => {
+      document.querySelectorAll("[data-utab]").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      undianTableTab = btn.dataset.utab;
+      renderUndianTable();
+    };
+  });
+
+  const btnConfirm = document.getElementById("btnConfirmWinner");
+  if (btnConfirm) {
+    btnConfirm.onclick = () => {
+      if (!undianSelectedWinner) return;
+      const winner = {
+        nama: undianSelectedWinner.nama,
+        fak: undianSelectedWinner.fak,
+        kode: undianSelectedWinner.kode,
+        prize: "Rp 150.000",
+        status: "verified",
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + " WIB"
+      };
+      undianWinnersAudit.unshift(winner);
+      undianActivePool = undianActivePool.filter((p) => p.kode !== undianSelectedWinner.kode);
+      store.set("undian_pool", undianActivePool);
+      store.set("undian_winners", undianWinnersAudit);
+
+      try {
+        fetch(
+          CONFIG.gasUrl +
+            `?action=confirmWinner&kode=${encodeURIComponent(undianSelectedWinner.kode)}&nama=${encodeURIComponent(undianSelectedWinner.nama)}&hadiah=${encodeURIComponent("Hadiah Utama Saldo Rp 150.000")}&uid=${encodeURIComponent(undianSelectedWinner.uid || "")}`
+        ).catch(() => {});
+      } catch (e) {}
+
+      renderUndianAllViews();
+      const modal = document.getElementById("winnerModal");
+      if (modal) modal.classList.remove("show");
+      toast(`Pemenang ${winner.nama} resmi disahkan!`);
+    };
+  }
+
+  const btnDisqualify = document.getElementById("btnDisqualifyWinner");
+  if (btnDisqualify) {
+    btnDisqualify.onclick = () => {
+      if (!undianSelectedWinner) return;
+      if (confirm(`Sahkan diskualifikasi untuk ${undianSelectedWinner.nama} karena tidak memenuhi 3x panggilan di aula?`)) {
+        undianWinnersAudit.unshift({
+          nama: undianSelectedWinner.nama,
+          fak: undianSelectedWinner.fak,
+          kode: undianSelectedWinner.kode,
+          prize: "Rp 150.000",
+          status: "disqualified",
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + " WIB"
+        });
+        undianActivePool = undianActivePool.filter((p) => p.kode !== undianSelectedWinner.kode);
+        store.set("undian_pool", undianActivePool);
+        store.set("undian_winners", undianWinnersAudit);
+        renderUndianAllViews();
+        const modal = document.getElementById("winnerModal");
+        if (modal) modal.classList.remove("show");
+        toast(`Pemenang digugurkan. Roda siap diundi kembali.`);
+      }
+    };
+  }
+
+  renderUndianAllViews();
+}
+
 /* ---------- Render & aksi ---------- */
 function render(tab) {
   ({
@@ -4564,6 +5340,7 @@ function render(tab) {
     umpan: viewUmpan,
     hadir: viewHadir,
     qrbooth: viewQrBooth,
+    pengundian: viewPengundian,
   })[tab]();
 }
 function toast(m) {
