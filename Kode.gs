@@ -26,6 +26,7 @@ function setupInitialSheets() {
   getOrCreateSheet("Undian", ["Timestamp", "Nama", "WhatsApp", "Kode", "Jumlah Booth", "Peran", "Asal", "ID Pengunjung"]);
   getOrCreateSheet("ScanBooth", ["Timestamp", "ID Pengunjung", "Nama", "Peran", "Fakultas / Asal", "No Booth", "Judul Karya", "Fakultas Booth", "Total Stempel", "Metode"]);
   getOrCreateSheet("RatingBooth", ["Timestamp", "ID Pengunjung", "Nama", "Peran", "Fakultas / Asal", "No Booth", "Judul Karya", "Rating", "Total Up", "Total Down"]);
+  getOrCreateSheet("PemenangUndian", ["Timestamp", "Kode", "Nama", "Hadiah", "Status", "ID Pengunjung"]);
 }
 
 // Helper: Sanitasi input teks
@@ -61,6 +62,14 @@ function doGet(e) {
       return ContentService.createTextOutput(JSON.stringify(getRatingStats()))
         .setMimeType(ContentService.MimeType.JSON);
     }
+    if (action === "getUndianPool") {
+      return ContentService.createTextOutput(JSON.stringify(getUndianPool()))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    if (action === "confirmWinner") {
+      return ContentService.createTextOutput(JSON.stringify(confirmLotteryWinner(e.parameter.kode, e.parameter.nama, e.parameter.hadiah, e.parameter.uid)))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
   }
 
   // Fallback jika dibuka langsung via link Web App GAS
@@ -93,6 +102,8 @@ function doPost(e) {
       result = recordScan(data);
     } else if (action === "rating") {
       result = recordRating(data);
+    } else if (action === "confirmWinner") {
+      result = confirmLotteryWinner(data.kode, data.nama, data.hadiah, data.uid);
     } else {
       result = { status: "unknown_action" };
     }
@@ -523,25 +534,202 @@ function getScanStats() {
   };
 }
 
-// 10. Pengundian Doorprize Acak Langsung dari Sheet Undian
-function drawLotteryWinner() {
-  const sheet = getOrCreateSheet("Undian", ["Timestamp", "Nama", "WhatsApp", "Kode", "Jumlah Booth", "Peran", "Asal", "ID Pengunjung"]);
-  const values = sheet.getDataRange().getValues();
+// 10. Pengundian Doorprize: Penarikan Pool Peserta Sah & Deteksi Anomali / Kecurangan
+function getUndianPool() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
 
-  if (values.length <= 1) {
-    return { status: "empty", message: "Belum ada peserta undian yang terdaftar." };
+  // 1. Data Kehadiran (Hadir) untuk verifikasi kehadiran fisik
+  const hadirSheet = ss.getSheetByName("Hadir");
+  const hadirUids = new Set();
+  const hadirNames = new Set();
+  if (hadirSheet) {
+    const hVals = hadirSheet.getDataRange().getValues();
+    for (let i = 1; i < hVals.length; i++) {
+      const nama = String(hVals[i][1] || "").toLowerCase().trim();
+      const uid = String(hVals[i][4] || "").trim();
+      if (uid) hadirUids.add(uid);
+      if (nama) hadirNames.add(nama);
+    }
   }
 
-  const randomIndex = Math.floor(Math.random() * (values.length - 1)) + 1;
-  const winner = values[randomIndex];
+  // 2. Data Pemenang Terdahulu (PemenangUndian) untuk pencegahan menang ganda
+  const pemenangSheet = getOrCreateSheet("PemenangUndian", ["Timestamp", "Kode", "Nama", "Hadiah", "Status", "ID Pengunjung"]);
+  const wonCodes = new Set();
+  const pVals = pemenangSheet.getDataRange().getValues();
+  const winnersList = [];
+  for (let i = 1; i < pVals.length; i++) {
+    const k = String(pVals[i][1] || "").trim();
+    if (k) wonCodes.add(k);
+    winnersList.push({
+      time: pVals[i][0] ? Utilities.formatDate(new Date(pVals[i][0]), Session.getScriptTimeZone(), "HH:mm") + " WIB" : "",
+      kode: pVals[i][1],
+      nama: pVals[i][2],
+      hadiah: pVals[i][3] || "Hadiah Utama Rp 150.000",
+      status: pVals[i][4] || "verified"
+    });
+  }
+
+  // 3. Data ScanBooth untuk audit durasi & anomali speedrunning
+  const scanSheet = ss.getSheetByName("ScanBooth");
+  const scanTimestamps = {}; // uid -> { min, max, count }
+  if (scanSheet) {
+    const sVals = scanSheet.getDataRange().getValues();
+    for (let i = 1; i < sVals.length; i++) {
+      const t = new Date(sVals[i][0]).getTime();
+      const uid = String(sVals[i][1] || "").trim();
+      if (uid && !isNaN(t)) {
+        if (!scanTimestamps[uid]) {
+          scanTimestamps[uid] = { min: t, max: t, count: 1 };
+        } else {
+          if (t < scanTimestamps[uid].min) scanTimestamps[uid].min = t;
+          if (t > scanTimestamps[uid].max) scanTimestamps[uid].max = t;
+          scanTimestamps[uid].count++;
+        }
+      }
+    }
+  }
+
+  // 4. Data Kupon Undian (Undian)
+  const undianSheet = ss.getSheetByName("Undian");
+  if (!undianSheet) {
+    return { status: "empty", message: "Sheet Undian belum dibuat.", pool: [], flagged: [], winners: winnersList };
+  }
+
+  const uVals = undianSheet.getDataRange().getValues();
+  const pool = [];
+  const flagged = [];
+  const seenUids = {}; // uid -> count (deteksi multi akun dari 1 perangkat)
+
+  for (let i = 1; i < uVals.length; i++) {
+    const row = uVals[i];
+    const timestamp = row[0];
+    const nama = sanitize_(row[1]);
+    const wa = sanitize_(row[2]);
+    const kode = sanitize_(row[3]);
+    const jumlahBooth = Number(row[4]) || 0;
+    const peran = sanitize_(row[5]) || "Umum";
+    const asal = sanitize_(row[6]) || "";
+    const uid = sanitize_(row[7]);
+
+    if (!nama || !kode) continue;
+
+    // Masking nomor telepon untuk privasi panggung (UU PDP)
+    let maskedWa = wa;
+    if (wa.length >= 8) {
+      maskedWa = wa.slice(0, 4) + "-****-" + wa.slice(-4);
+    }
+
+    const candidate = {
+      id: i,
+      nama: nama,
+      wa: maskedWa,
+      kode: kode,
+      stempel: jumlahBooth,
+      peran: peran,
+      fak: asal,
+      uid: uid
+    };
+
+    // Rule 1: Wajib Scan 60/60 Booth
+    if (jumlahBooth < 60) {
+      flagged.push({
+        ...candidate,
+        alasan: "Stempel belum lengkap (" + jumlahBooth + "/60 booth)",
+        kategoriAnomali: "Syarat Tidak Terpenuhi"
+      });
+      continue;
+    }
+
+    // Rule 2: Wajib Hadir di Tempat (Buku Tamu / Hadir)
+    const isHadir = (uid && hadirUids.has(uid)) || hadirNames.has(nama.toLowerCase().trim());
+    if (!isHadir) {
+      flagged.push({
+        ...candidate,
+        alasan: "Tidak terdata di buku tamu registrasi hadir",
+        kategoriAnomali: "Kehadiran Fisik Tidak Terverifikasi"
+      });
+      continue;
+    }
+
+    // Rule 3: Anti-Duplikasi Pemenang (Sudah pernah menang)
+    if (wonCodes.has(kode)) {
+      flagged.push({
+        ...candidate,
+        alasan: "Sudah terdata sebagai pemenang sah sebelumnya",
+        kategoriAnomali: "Pemenang Terdahulu"
+      });
+      continue;
+    }
+
+    // Rule 4: Deteksi Multi-Akun (1 UID mendaftarkan lebih dari 1 kupon/nama)
+    if (uid) {
+      seenUids[uid] = (seenUids[uid] || 0) + 1;
+      if (seenUids[uid] > 1) {
+        flagged.push({
+          ...candidate,
+          alasan: "Perangkat yang sama terdeteksi mendaftarkan lebih dari satu kupon",
+          kategoriAnomali: "Anomali Multi-Akun"
+        });
+        continue;
+      }
+    }
+
+    // Rule 5: Deteksi Anomali Speedrunning Scan (< 5 menit untuk 60 booth)
+    if (uid && scanTimestamps[uid] && scanTimestamps[uid].count >= 60) {
+      const durasiMenit = (scanTimestamps[uid].max - scanTimestamps[uid].min) / 60000;
+      if (durasiMenit < 5) {
+        flagged.push({
+          ...candidate,
+          alasan: "Durasi pemindaian 60 booth tidak wajar (" + Math.round(durasiMenit) + " menit)",
+          kategoriAnomali: "Anomali Kecepatan Scan"
+        });
+        continue;
+      }
+    }
+
+    // Peserta Sah & Lolos Seluruh Aturan!
+    pool.push(candidate);
+  }
 
   return {
     status: "success",
-    winner: {
-      nama: winner[1],
-      wa: winner[2],
-      kode: winner[3],
-      asal: winner[6] || ""
-    }
+    hadiah: "Hadiah Utama Saldo Rp 150.000",
+    kuota: 3,
+    pool: pool,
+    flagged: flagged,
+    winners: winnersList
   };
+}
+
+// 11. Konfirmasi dan Pengesahan Pemenang ke Sheet "PemenangUndian"
+function confirmLotteryWinner(kode, nama, hadiah, uid) {
+  kode = sanitize_(kode);
+  nama = sanitize_(nama);
+  hadiah = sanitize_(hadiah) || "Hadiah Utama Saldo Rp 150.000";
+  uid = sanitize_(uid);
+
+  if (!kode) return { status: "error", message: "Kode kupon wajib diisi" };
+
+  const sheet = getOrCreateSheet("PemenangUndian", ["Timestamp", "Kode", "Nama", "Hadiah", "Status", "ID Pengunjung"]);
+  const vals = sheet.getDataRange().getValues();
+
+  // Idempotency: cek jika kode sudah tercatat
+  for (let i = 1; i < vals.length; i++) {
+    if (String(vals[i][1]).trim() === kode) {
+      return { status: "exists", message: "Pemenang dengan kode ini sudah pernah disahkan." };
+    }
+  }
+
+  sheet.appendRow([new Date(), kode, nama, hadiah, "verified", uid]);
+  return { status: "success", message: "Pemenang resmi disahkan dan dicatat ke sheet PemenangUndian." };
+}
+
+// 12. Fallback Pengundian Cepat
+function drawLotteryWinner() {
+  const poolRes = getUndianPool();
+  if (!poolRes.pool || poolRes.pool.length === 0) {
+    return { status: "empty", message: "Belum ada peserta sah yang memenuhi syarat 60 booth dan terverifikasi hadir." };
+  }
+  const winner = poolRes.pool[Math.floor(Math.random() * poolRes.pool.length)];
+  return { status: "success", winner: winner };
 }
