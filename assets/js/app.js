@@ -5234,10 +5234,6 @@ function viewPengundian() {
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
           <span id="syncLabel">Sinkronkan Sheets</span>
         </button>
-        <button class="btn-header-tool" id="btnResetWinners" title="Kosongkan riwayat pemenang (reset sesi undian)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-          <span>Reset Sesi</span>
-        </button>
         <button class="btn-header-tool" id="btnSound">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
           <span id="soundLabel">${undianSoundEnabled ? "Audio: Aktif" : "Audio: Senyap"}</span>
@@ -5394,23 +5390,6 @@ function viewPengundian() {
         document.documentElement.requestFullscreen().catch(() => {});
       } else {
         document.exitFullscreen();
-      }
-    };
-  }
-
-  const btnReset = document.getElementById("btnResetWinners");
-  if (btnReset) {
-    btnReset.onclick = async () => {
-      if (confirm("Kosongkan daftar pemenang sah dan reset sesi roda undian?\n\n(Tindakan ini akan mengosongkan riwayat lokal dan sheet PemenangUndian)")) {
-        undianWinnersAudit = [];
-        store.set("undian_winners", []);
-        store.set("pemenang", []);
-        try {
-          fetch(CONFIG.gasUrl + "?action=resetWinners").catch(() => {});
-        } catch (e) {}
-        renderUndianAllViews();
-        renderUndianTable();
-        toast("Daftar pemenang berhasil dikosongkan.");
       }
     };
   }
