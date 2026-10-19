@@ -5308,15 +5308,15 @@ function viewPengundian() {
         <div class="table-top-bar">
           <div class="table-nav-tabs">
             <button class="tab-btn active" id="tabBtnValid" data-utab="valid">
-              <span>Peserta Sah (60 Booth)</span>
+              <span>Eligble</span>
               <span class="tab-count" id="badgeCountValid">0</span>
             </button>
             <button class="tab-btn" id="tabBtnAnomaly" data-utab="anomaly">
-              <span>Terdeteksi Anomali / Gugur</span>
+              <span>Gugur</span>
               <span class="tab-count" id="badgeCountAnomaly">0</span>
             </button>
             <button class="tab-btn" id="tabBtnWinners" data-utab="winners">
-              <span>Riwayat Pemenang</span>
+              <span>Pemenang</span>
               <span class="tab-count" id="badgeCountWinners">0</span>
             </button>
           </div>
