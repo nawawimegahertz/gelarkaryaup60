@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pengundian Doorprize · Gelar Karya UP 60</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --ink: #10213f;
+      --mut: #52617d;
+      --line: #e2e8f0;
+      --navy: #0a2a66;
+      --primary: #1857c4;
+      --primary-hover: #1245a1;
+      --tint: #f1f5f9;
+      --gold: #f5a800;
+      --gold-dark: #b45309;
+      --gold-surface: #fffbeb;
+      --gold-border: #fde68a;
+      --ok: #0f7b4b;
+      --ok-bg: #ecfdf5;
+      --ok-border: #a7f3d0;
+      --err: #b3261e;
+      --err-bg: #fef2f2;
+      --err-border: #fecaca;
+      --font: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+      --shadow-lg: 0 20px 40px -10px rgba(15, 23, 42, 0.12);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-pill: 9999px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--ink);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Confetti Canvas */
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Toast Notification */
+    .toast-box {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--navy);
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      font-size: 13px;
+      font-weight: 600;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      z-index: 10000;
+      animation: toastSlideUp 0.25s ease;
+    }
+
+    .toast-box.show {
+      display: flex;
+    }
+
+    @keyframes toastSlideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Stage Header - Pancasila Blue */
+    header.stage-header {
+      background: linear-gradient(135deg, #0a2a66 0%, #113b8a 60%, #1857c4 100%);
+      color: #ffffff;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 4px 18px rgba(10, 42, 102, 0.25);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-tag {
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+    }
+
+    .header-title-box h1 {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      line-height: 1.25;
+    }
+
+    .header-title-box p {
+      font-size: 12.5px;
+      color: #d4e0f8;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-header-tool {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      padding: 7px 14px;
+      border-radius: var(--radius-pill);
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+
+    .btn-header-tool:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .btn-header-tool.loading svg {
+      animation: spinIcon 0.8s linear infinite;
+    }
+
+    @keyframes spinIcon {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Main Stage Layout */
+    main.stage-content {
+      max-width: 1360px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 24px 40px;
+      display: grid;
+      grid-template-columns: 1fr 390px;
+      gap: 24px;
+      flex: 1;
+    }
+
+    @media (max-width: 1024px) {
+      main.stage-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Arena Card */
+    .arena-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 24px 20px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    /* Single Prize Banner */
+    .prize-banner {
+      width: 100%;
+      background: linear-gradient(to right, #fffbeb, #ffffff, #fffbeb);
+      border: 1.5px solid var(--gold-border);
+      border-radius: var(--radius-md);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .prize-title-text {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--gold-dark);
+      letter-spacing: -0.2px;
+    }
+
+    .prize-rule-badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--ok);
+      background: var(--ok-bg);
+      border: 1px solid var(--ok-border);
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+    }
+
+    /* Wheel Container */
+    .wheel-stage-wrapper {
+      position: relative;
+      width: 440px;
+      height: 440px;
+      margin: 6px 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 480px) {
+      .wheel-stage-wrapper {
+        width: 320px;
+        height: 320px;
+      }
+    }
+
+    #wheelCanvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      box-shadow: 0 10px 30px rgba(10, 42, 102, 0.1), 0 0 0 8px #ffffff, 0 0 0 10px var(--line);
+      background: #ffffff;
+    }
+
+    /* Needle Pointer with Physical Spring Recoil */
+    .wheel-pointer {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-top: 30px solid var(--gold);
+      filter: drop-shadow(0 3px 6px rgba(15, 23, 42, 0.25));
+      z-index: 20;
+      transform-origin: 50% 0%;
+      transition: transform 0.04s ease-out;
+    }
+
+    .wheel-pointer.recoil-left {
+      transform: translateX(-50%) rotate(-14deg);
+    }
+
+    .wheel-pointer.recoil-right {
+      transform: translateX(-50%) rotate(10deg);
+    }
+
+    /* Center Hub */
+    .wheel-hub {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid var(--line);
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .wheel-hub-text {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1;
+    }
+
+    .wheel-hub-sub {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--gold-dark);
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+
+    /* Spin Action Button */
+    .btn-spin-action {
+      background: var(--navy);
+      color: #ffffff;
+      border: 1px solid #061e47;
+      border-radius: var(--radius-pill);
+      padding: 14px 44px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 16px rgba(10, 42, 102, 0.2);
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-spin-action:hover:not(:disabled) {
+      background: var(--primary);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(24, 87, 196, 0.25);
+    }
+
+    .btn-spin-action:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .btn-spin-action:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Sidebar Panels */
+    .sidebar-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .card-heading h2 {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .badge-chip {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      background: var(--tint);
+      color: var(--mut);
+      border: 1px solid var(--line);
+    }
+
+    .badge-chip.active {
+      background: var(--ok-bg);
+      color: var(--ok);
+      border-color: var(--ok-border);
+    }
+
+    /* Winner Podium Card in Sidebar */
+    .winner-podium-card {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .podium-slots-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+      margin-top: 4px;
+    }
+
+    .podium-slot {
+      background: var(--tint);
+      border: 1.5px dashed #cbd5e1;
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 105px;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .podium-slot.filled {
+      background: #ffffff;
+      border: 1.5px solid var(--ok-border);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+
+    .podium-slot.filled::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 5px;
+      background: var(--ok);
+      border-top-left-radius: var(--radius-md);
+      border-bottom-left-radius: var(--radius-md);
+    }
+
+    .podium-slot.active-target {
+      border: 1.5px dashed var(--primary);
+      background: rgba(24, 87, 196, 0.03);
+    }
+
+    .slot-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .slot-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--mut);
+    }
+
+    .podium-slot.filled .slot-label {
+      color: var(--navy);
+    }
+
+    .podium-slot.active-target .slot-label {
+      color: var(--primary);
+    }
+
+    .slot-amount-tag {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--gold-dark);
+      background: var(--gold-surface);
+      border: 1px solid var(--gold-border);
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+    }
+
+    .slot-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--ink);
+      line-height: 1.3;
+    }
+
+    .slot-meta {
+      font-size: 12px;
+      color: var(--mut);
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .slot-meta .coupon-badge {
+      font-family: var(--mono);
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .slot-empty-notice {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: #94a3b8;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 8px 0;
+    }
+
+    .podium-card-footer {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--mut);
+    }
+
+    .status-dot-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ok);
+      display: inline-block;
+      box-shadow: 0 0 0 2px rgba(15, 123, 75, 0.2);
+    }
+
+    .winner-meta-sub {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--mut);
+      margin-top: 2px;
+    }
+
+    .winner-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      background: var(--gold-surface);
+      color: var(--gold-dark);
+      border: 1px solid var(--gold-border);
+      white-space: nowrap;
+    }
+
+    /* Full Width Table Section */
+    .table-container-section {
+      max-width: 1360px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+    }
+
+    .table-card-box {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .table-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .table-nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--tint);
+      padding: 4px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--line);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--mut);
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn.active {
+      background: #ffffff;
+      color: var(--ink);
+      border: 1px solid var(--line);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    }
+
+    .tab-count {
+      background: rgba(15, 23, 42, 0.08);
+      padding: 2px 6px;
+      border-radius: var(--radius-pill);
+      font-size: 10.5px;
+    }
+
+    .tab-btn.active .tab-count {
+      background: var(--navy);
+      color: #ffffff;
+    }
+
+    .table-search-input {
+      background: var(--tint);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      font-family: inherit;
+      font-size: 12.5px;
+      width: 260px;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .table-search-input:focus {
+      border-color: var(--primary);
+      background: #ffffff;
+    }
+
+    .data-table-el {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .data-table-el th {
+      text-align: left;
+      padding: 10px 14px;
+      background: var(--tint);
+      color: var(--mut);
+      font-weight: 700;
+      font-size: 11.5px;
+      border-bottom: 1px solid var(--line);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .data-table-el td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      color: var(--ink);
+    }
+
+    .data-table-el tbody tr:hover {
+      background: #fbfcfe;
+    }
+
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+    }
+
+    .badge-status.valid {
+      background: var(--ok-bg);
+      color: var(--ok);
+      border: 1px solid var(--ok-border);
+    }
+
+    .badge-status.anomaly {
+      background: var(--err-bg);
+      color: var(--err);
+      border: 1px solid var(--err-border);
+    }
+
+    /* Modal Verification Card */
+    .modal-scrim-layer {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-scrim-layer.show {
+      display: flex;
+      animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-content-card {
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 480px;
+      padding: 32px 28px;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-tag {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gold-dark);
+      background: var(--gold-surface);
+      border: 1px solid var(--gold-border);
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      display: inline-block;
+      margin-bottom: 14px;
+    }
+
+    .modal-winner-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: -0.4px;
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+
+    .modal-winner-affiliation {
+      font-size: 14px;
+      color: var(--mut);
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .modal-details-grid {
+      background: var(--tint);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-bottom: 24px;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .detail-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .detail-label {
+      color: var(--mut);
+    }
+
+    .detail-value {
+      font-weight: 700;
+      color: var(--ink);
+      font-family: var(--mono);
+    }
+
+    .modal-actions-bar {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-modal-confirm {
+      flex: 1;
+      background: var(--ok);
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .btn-modal-confirm:hover {
+      background: #0d683f;
+    }
+
+    .btn-modal-disqualify {
+      flex: 1;
+      background: var(--err-bg);
+      border: 1px solid var(--err-border);
+      color: var(--err);
+      padding: 12px;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 13.5px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-modal-disqualify:hover {
+      background: #fee2e2;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- Toast Notification -->
+  <div class="toast-box" id="toastBox">
+    <span id="toastMsg">Data berhasil disinkronkan</span>
+  </div>
+
+  <!-- Stage Header (Pancasila Blue) -->
+  <header class="stage-header">
+    <div class="header-brand">
+      <span class="brand-tag">Dies Natalis 60 UP</span>
+      <div class="header-title-box">
+        <h1>Sesi Pengundian Doorprize</h1>
+        <p>Gelar Karya Penelitian dan Pengabdian kepada Masyarakat</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <!-- Sync Button with Google Sheets -->
+      <button class="btn-header-tool" id="btnSyncSheet" title="Tarik dan sinkronkan data terbaru dari Google Sheets">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+        <span id="syncLabel">Sinkronkan Sheets</span>
+      </button>
+
+      <!-- Audio Mute/Unmute Toggle -->
+      <button class="btn-header-tool" id="btnSound">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        <span id="soundLabel">Audio: Aktif</span>
+      </button>
+
+      <!-- Fullscreen Mode -->
+      <button class="btn-header-tool" id="btnFullscreen">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+        <span>Layar Penuh</span>
+      </button>
+
+      <!-- Return Link -->
+      <a href="index.html" class="btn-header-tool">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        <span>Kembali ke Aplikasi</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Stage Content -->
+  <main class="stage-content">
+    <!-- Center: Wheel Arena -->
+    <section class="arena-card">
+      <!-- Single Clear Prize Banner -->
+      <div class="prize-banner">
+        <div>
+          <div class="prize-title-text">Hadiah Utama: Saldo Rp 150.000</div>
+          <div style="font-size:12px;color:var(--mut);margin-top:2px">Kuota Pemenang: 3 Orang · Hadir Fisik & Scan 60/60 Booth</div>
+        </div>
+        <span class="prize-rule-badge">Syarat Mutlak: 60 Booth Lengkap</span>
+      </div>
+
+      <!-- Wheel Stage Wrapper -->
+      <div class="wheel-stage-wrapper">
+        <div class="wheel-pointer" id="wheelPointer"></div>
+        <canvas id="wheelCanvas" width="880" height="880"></canvas>
+        <div class="wheel-hub">
+          <span class="wheel-hub-text">UP 60</span>
+          <span class="wheel-hub-sub">60 BOOTH</span>
+        </div>
+      </div>
+
+      <!-- Spin Action Button -->
+      <button class="btn-spin-action" id="btnSpin">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        <span id="btnSpinText">Putar Roda Undian</span>
+      </button>
+    </section>
+
+    <!-- Right Sidebar: Papan Pemenang Sah (Elevated) -->
+    <aside class="sidebar-wrapper">
+      <div class="info-card winner-podium-card">
+        <div class="card-heading">
+          <div>
+            <h2>Daftar Pemenang Sah</h2>
+            <p style="font-size:12px;color:var(--mut);margin-top:2px">Hadiah Utama Saldo Rp 150.000 (3 Kuota)</p>
+          </div>
+          <span class="badge-chip active" id="winnerCountChip">0 / 3 Terpilih</span>
+        </div>
+
+        <!-- 3-Slot Dedicated Podium -->
+        <div class="podium-slots-list" id="podiumSlotsList">
+          <!-- Rendered via JS: 3 Dedicated Slots for 3 Winners -->
+        </div>
+
+        <!-- Sidebar Summary Footer -->
+        <div class="podium-card-footer">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="status-dot-pulse"></span>
+            <span id="poolLiveText">Peserta Sah di Roda: 0 Orang</span>
+          </div>
+          <span class="badge-chip" id="sheetStatusBadge">Sheet Sinkron</span>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Table Section: Audit Peserta & Deteksi Kecurangan -->
+  <section class="table-container-section">
+    <div class="table-card-box">
+      <div class="table-top-bar">
+        <div class="table-nav-tabs">
+          <button class="tab-btn active" id="tabBtnValid" data-tab="valid">
+            <span>Peserta Sah (60 Booth)</span>
+            <span class="tab-count" id="badgeCountValid">0</span>
+          </button>
+          <button class="tab-btn" id="tabBtnAnomaly" data-tab="anomaly">
+            <span>Terdeteksi Anomali / Gugur</span>
+            <span class="tab-count" id="badgeCountAnomaly">0</span>
+          </button>
+          <button class="tab-btn" id="tabBtnWinners" data-tab="winners">
+            <span>Riwayat Pemenang</span>
+            <span class="tab-count" id="badgeCountWinners">0</span>
+          </button>
+        </div>
+        <input type="search" id="inputSearch" class="table-search-input" placeholder="Cari nama atau nomor kupon..." />
+      </div>
+
+      <!-- Table -->
+      <table class="data-table-el">
+        <thead>
+          <tr id="tableHeaderRow">
+            <th>No</th>
+            <th>Nomor Kupon</th>
+            <th>Nama Lengkap</th>
+            <th>Fakultas / Instansi</th>
+            <th>Kontak Disamarkan</th>
+            <th>Stempel Booth</th>
+            <th>Status Validasi</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- Rows rendered by JS -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Modal Verification -->
+  <div class="modal-scrim-layer" id="winnerModal">
+    <div class="modal-content-card">
+      <span class="modal-tag">Hadiah Utama: Saldo Rp 150.000</span>
+      <h2 class="modal-winner-title" id="modalWinnerName">Nama Peserta</h2>
+      <p class="modal-winner-affiliation" id="modalWinnerFak">Fakultas Teknik · Mahasiswa</p>
+
+      <div class="modal-details-grid">
+        <div class="detail-row">
+          <span class="detail-label">Nomor Kupon:</span>
+          <span class="detail-value" id="modalCoupon">#UP60-XXXXX</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Nomor WhatsApp:</span>
+          <span class="detail-value" id="modalPhone">0812-****-XXXX</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Validasi Misi:</span>
+          <span class="detail-value" id="modalStamps" style="color:var(--ok)">60 dari 60 Booth Selesai</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Status Hadir:</span>
+          <span class="detail-value" style="color:var(--ok)">Terdaftar di Buku Tamu</span>
+        </div>
+      </div>
+
+      <div class="modal-actions-bar">
+        <button class="btn-modal-confirm" id="btnConfirmWinner">Sahkan Pemenang</button>
+        <button class="btn-modal-disqualify" id="btnDisqualifyWinner">Gugur (Panggil 3x)</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* Konfigurasi Endpoint Google Sheets (sinkron dengan app.js) */
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyt1GXR_mPDL5pJo8Gqi8GNRMfNdUHhdHGnXsr4E-R-hdKGz3SgvAp-J_ngJu2PgupD/exec";
+    const PRIZE_NAME = "Hadiah Utama Saldo Rp 150.000";
+    const PRIZE_QUOTA = 3;
+
+    /* Dataset Cadangan Terkurasi (Sampel Uji Standar 60 Booth + Contoh Kasus Anomali) */
+    const BACKUP_PARTICIPANTS = [
+      { id: 1, nama: "Ananda Rizky Pratama", fak: "Fakultas Teknik", wa: "0812-****-8821", kode: "#UP60-94821", stempel: 60, peran: "Mahasiswa", uid: "u_tech01" },
+      { id: 2, nama: "Dr. Siti Rahmawati, M.Si.", fak: "Fakultas Farmasi", wa: "0813-****-4412", kode: "#UP60-12847", stempel: 60, peran: "Dosen", uid: "u_pharm02" },
+      { id: 3, nama: "Muhammad Fadhil", fak: "Fakultas Ekonomi & Bisnis", wa: "0857-****-9102", kode: "#UP60-55931", stempel: 60, peran: "Mahasiswa", uid: "u_feb03" },
+      { id: 4, nama: "Nadia Putri Maharani", fak: "Fakultas Hukum", wa: "0878-****-1094", kode: "#UP60-31845", stempel: 60, peran: "Mahasiswa", uid: "u_law04" },
+      { id: 5, nama: "Prof. Ir. Hendra Gunawan", fak: "Fakultas Teknik", wa: "0812-****-5501", kode: "#UP60-44912", stempel: 60, peran: "Dosen", uid: "u_tech05" },
+      { id: 6, nama: "Gita Cahyani", fak: "Sekolah Pascasarjana", wa: "0813-****-9981", kode: "#UP60-22104", stempel: 60, peran: "Mahasiswa", uid: "u_sps06" },
+      { id: 7, nama: "Jessica Aurelia", fak: "Fakultas Farmasi", wa: "0812-****-1198", kode: "#UP60-55192", stempel: 60, peran: "Mahasiswa", uid: "u_pharm07" },
+      { id: 8, nama: "Budi Santoso, S.Kom.", fak: "Mitra Industri (PT Telkom)", wa: "0811-****-3390", kode: "#UP60-84729", stempel: 60, peran: "Mitra", uid: "u_mitra08" }
+    ];
+
+    const BACKUP_FLAGGED = [
+      { id: 101, nama: "Ahmad Zulkarnaen", fak: "Fakultas Ilmu Komunikasi", wa: "0819-****-6721", kode: "#UP60-66291", stempel: 42, alasan: "Stempel belum lengkap (42/60 booth)", kategoriAnomali: "Syarat Belum Terpenuhi" },
+      { id: 102, nama: "Rian Hidayat", fak: "Fakultas Teknik", wa: "0821-****-9901", kode: "#UP60-77112", stempel: 60, alasan: "Durasi pemindaian tidak wajar (2.5 menit untuk 60 booth)", kategoriAnomali: "Anomali Kecepatan (Speedrunning)" },
+      { id: 103, nama: "Dodi Kurniawan", fak: "Umum", wa: "0812-****-3344", kode: "#UP60-11029", stempel: 60, alasan: "Tidak tercatat di buku tamu registrasi aula", kategoriAnomali: "Kehadiran Fisik Belum Terdata" },
+      { id: 104, nama: "Akun Kloning B", fak: "Fakultas Hukum", wa: "0878-****-1094", kode: "#UP60-99482", stempel: 60, alasan: "Perangkat terdeteksi mendaftarkan nama ganda", kategoriAnomali: "Multi-Akun Perangkat Sama" }
+    ];
+
+    let activePool = [...BACKUP_PARTICIPANTS];
+    let flaggedList = [...BACKUP_FLAGGED];
+    let winnersAudit = [];
+    let currentTableTab = "valid";
+
+    let isSpinning = false;
+    let selectedWinnerCandidate = null;
+    let soundEnabled = true;
+
+    /* ==========================================================================
+       AUTHENTIC MECHANICAL CLOCKWORK ESCAPEMENT SOUND (AUDIO JARUM JAM BERPUTAR CEPAT)
+       - Dual-phase escapement tick-tock micro-clicks
+       - Alternating frequency (Tick: 2200Hz, Tock: 1650Hz)
+       - Ultra-fast ratchet sound when wheel spins fast
+       - Gradually spaces out naturally like a winding clock
+       - Crystal clock chime upon stopping
+       ========================================================================== */
+    let audioCtx = null;
+    let tickCount = 0;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // Single mechanical escapement tick-tock click
+    function playClockTick(speedFactor = 1) {
+      if (!soundEnabled) return;
+      initAudio();
+      try {
+        tickCount++;
+        // Alternating Tick-Tock frequencies
+        const isTick = tickCount % 2 === 0;
+        const baseFreq = isTick ? 2200 : 1650;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        // High mechanical bandpass for crisp wooden/metallic escapement
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(baseFreq + (Math.random() * 80 - 40), audioCtx.currentTime);
+        filter.Q.setValueAtTime(6.5, audioCtx.currentTime);
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(baseFreq, audioCtx.currentTime);
+
+        // Ultra short impulse (6-8ms) like a true mechanical clock escapement
+        const volume = Math.min(0.28, 0.09 + speedFactor * 0.14);
+        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.009);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.01);
+      } catch (e) {}
+    }
+
+    // Crystal Bell Ting Chime on Winning Stop
+    function playCrystalTing() {
+      if (!soundEnabled) return;
+      initAudio();
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1046.5, audioCtx.currentTime); // C6 Crystal
+
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.4);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 1.4);
+      } catch (e) {}
+    }
+
+    /* ==========================================================================
+       CANVAS WHEEL OF FORTUNE ENGINE
+       ========================================================================== */
+    const canvas = document.getElementById("wheelCanvas");
+    const ctx = canvas.getContext("2d");
+    const pointer = document.getElementById("wheelPointer");
+    let currentAngle = 0;
+
+    const SECTOR_COLORS = [
+      "#0a2a66", /* Navy UP */
+      "#1857c4", /* Primary Blue */
+      "#f5a800", /* Gold Dies */
+      "#0f7b4b", /* Green Harmony */
+      "#1e293b", /* Slate Slate */
+      "#0284c7"  /* Sky Accent */
+    ];
+
+    function drawWheel() {
+      const num = activePool.length;
+      if (!num) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+
+      const arc = (2 * Math.PI) / num;
+      const radius = canvas.width / 2;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.save();
+      ctx.translate(radius, radius);
+      ctx.rotate(currentAngle);
+
+      for (let i = 0; i < num; i++) {
+        const sectorAngle = i * arc;
+
+        // Sector Wedge
+        ctx.beginPath();
+        ctx.fillStyle = SECTOR_COLORS[i % SECTOR_COLORS.length];
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, radius - 14, sectorAngle, sectorAngle + arc);
+        ctx.lineTo(0, 0);
+        ctx.fill();
+
+        // Sector Divider Line
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Sector Label (Typography)
+        ctx.save();
+        ctx.rotate(sectorAngle + arc / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "700 24px 'Plus Jakarta Sans', sans-serif";
+        ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
+        ctx.shadowBlur = 4;
+
+        let name = activePool[i].nama;
+        if (name.length > 17) name = name.substring(0, 16) + "…";
+        ctx.fillText(name, radius - 46, 8);
+        ctx.restore();
+
+        // Outer Rim Peg Dot
+        ctx.save();
+        ctx.rotate(sectorAngle);
+        ctx.beginPath();
+        ctx.arc(radius - 14, 0, 4, 0, 2 * Math.PI);
+        ctx.fillStyle = "#f5a800";
+        ctx.fill();
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+
+    /* ==========================================================================
+       CONFETTI BURST (CLEAN MINIMALIST CANVAS)
+       ========================================================================== */
+    const confCanvas = document.getElementById("confettiCanvas");
+    const confCtx = confCanvas.getContext("2d");
+    let confettiList = [];
+
+    function resizeConfetti() {
+      confCanvas.width = window.innerWidth;
+      confCanvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeConfetti);
+    resizeConfetti();
+
+    function triggerConfettiBurst() {
+      confettiList = [];
+      const palette = ["#0a2a66", "#1857c4", "#f5a800", "#ffd36b", "#0f7b4b", "#ffffff"];
+      for (let i = 0; i < 160; i++) {
+        confettiList.push({
+          x: confCanvas.width / 2,
+          y: confCanvas.height * 0.4,
+          vx: (Math.random() - 0.5) * 24,
+          vy: (Math.random() - 0.75) * 26,
+          size: Math.random() * 8 + 4,
+          color: palette[Math.floor(Math.random() * palette.length)],
+          rot: Math.random() * 360,
+          vrot: (Math.random() - 0.5) * 14,
+          alpha: 1
+        });
+      }
+      animateConfetti();
+    }
+
+    function animateConfetti() {
+      confCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+      let alive = false;
+      confettiList.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.45;
+        p.rot += p.vrot;
+        p.alpha -= 0.007;
+        if (p.alpha > 0) {
+          alive = true;
+          confCtx.save();
+          confCtx.translate(p.x, p.y);
+          confCtx.rotate((p.rot * Math.PI) / 180);
+          confCtx.globalAlpha = Math.max(0, p.alpha);
+          confCtx.fillStyle = p.color;
+          confCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          confCtx.restore();
+        }
+      });
+      if (alive) {
+        requestAnimationFrame(animateConfetti);
+      }
+    }
+
+    /* ==========================================================================
+       SPINNING ACTION WITH MECHANICAL CLOCKWORK RATCHET ACCELERATION
+       ========================================================================== */
+    function spinWheelAction() {
+      if (isSpinning) return;
+      if (activePool.length === 0) {
+        toast("Tidak ada peserta sah yang tersisa untuk diundi.");
+        return;
+      }
+      if (winnersAudit.filter(w => w.status === 'verified').length >= PRIZE_QUOTA) {
+        toast(`Kuota pemenang (${PRIZE_QUOTA} orang) telah terpenuhi.`);
+        return;
+      }
+
+      isSpinning = true;
+      document.getElementById("btnSpin").disabled = true;
+
+      // Cryptographically Secure Selection
+      const randomBuffer = new Uint32Array(1);
+      window.crypto.getRandomValues(randomBuffer);
+      const winnerIdx = randomBuffer[0] % activePool.length;
+      selectedWinnerCandidate = activePool[winnerIdx];
+
+      const arc = (2 * Math.PI) / activePool.length;
+      const targetAngle = (3 * Math.PI) / 2 - (winnerIdx * arc + arc / 2);
+      const fullRotations = 8; // full turns
+      const totalDelta = fullRotations * 2 * Math.PI + (targetAngle - (currentAngle % (2 * Math.PI)));
+
+      const duration = 6500; // ms
+      const startTime = performance.now();
+      const initialAngle = currentAngle;
+      let lastPegIndex = Math.floor(currentAngle / arc);
+
+      function spinFrame(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Quintic Deceleration: Very fast clock spin at start, dramatic slow down into individual ticks
+        const ease = 1 - Math.pow(1 - progress, 5);
+
+        currentAngle = initialAngle + totalDelta * ease;
+        drawWheel();
+
+        // Peg crossing detection (Trigger clock escapement tick-tock)
+        const currentPegIndex = Math.floor(currentAngle / arc);
+        if (currentPegIndex !== lastPegIndex) {
+          const speedFactor = 1 - progress;
+          playClockTick(speedFactor);
+
+          // Needle escapement recoil animation
+          pointer.classList.remove("recoil-left", "recoil-right");
+          pointer.classList.add(tickCount % 2 === 0 ? "recoil-left" : "recoil-right");
+          setTimeout(() => pointer.classList.remove("recoil-left", "recoil-right"), 32);
+
+          lastPegIndex = currentPegIndex;
+        }
+
+        if (progress < 1) {
+          requestAnimationFrame(spinFrame);
+        } else {
+          isSpinning = false;
+          document.getElementById("btnSpin").disabled = false;
+          playCrystalTing();
+          triggerConfettiBurst();
+          openWinnerModal(selectedWinnerCandidate);
+        }
+      }
+
+      requestAnimationFrame(spinFrame);
+    }
+
+    /* Modal Display */
+    function openWinnerModal(c) {
+      document.getElementById("modalWinnerName").textContent = c.nama;
+      document.getElementById("modalWinnerFak").textContent = `${c.fak} · ${c.peran}`;
+      document.getElementById("modalCoupon").textContent = c.kode;
+      document.getElementById("modalPhone").textContent = c.wa;
+      document.getElementById("winnerModal").classList.add("show");
+    }
+
+    /* Modal Confirmation Handlers */
+    document.getElementById("btnConfirmWinner").addEventListener("click", () => {
+      if (!selectedWinnerCandidate) return;
+      const winner = {
+        nama: selectedWinnerCandidate.nama,
+        fak: selectedWinnerCandidate.fak,
+        kode: selectedWinnerCandidate.kode,
+        prize: "Rp 150.000",
+        status: "verified",
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " WIB"
+      };
+
+      winnersAudit.unshift(winner);
+      // Remove from pool (Anti-duplikasi pemenang)
+      activePool = activePool.filter(p => p.kode !== selectedWinnerCandidate.kode);
+
+      // Async sync to Google Sheets backend
+      syncWinnerToGas(selectedWinnerCandidate);
+
+      renderAllViews();
+      document.getElementById("winnerModal").classList.remove("show");
+      toast(`Pemenang ${winner.nama} resmi disahkan!`);
+    });
+
+    document.getElementById("btnDisqualifyWinner").addEventListener("click", () => {
+      if (!selectedWinnerCandidate) return;
+      if (confirm(`Sahkan diskualifikasi untuk ${selectedWinnerCandidate.nama} karena tidak memenuhi 3x panggilan di aula?`)) {
+        winnersAudit.unshift({
+          nama: selectedWinnerCandidate.nama,
+          fak: selectedWinnerCandidate.fak,
+          kode: selectedWinnerCandidate.kode,
+          prize: "Rp 150.000",
+          status: "disqualified",
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " WIB"
+        });
+        activePool = activePool.filter(p => p.kode !== selectedWinnerCandidate.kode);
+        renderAllViews();
+        document.getElementById("winnerModal").classList.remove("show");
+        toast(`Pemenang digugurkan. Roda siap diundi kembali.`);
+      }
+    });
+
+    /* ==========================================================================
+       GOOGLE SHEETS SYNCHRONIZATION ENGINE
+       ========================================================================== */
+    async function syncDataFromGoogleSheets() {
+      const btn = document.getElementById("btnSyncSheet");
+      btn.classList.add("loading");
+      document.getElementById("syncLabel").textContent = "Menghubungkan...";
+
+      try {
+        const res = await fetch(GAS_URL + "?action=getUndianPool");
+        const json = await res.json();
+
+        if (json && json.status === "success") {
+          activePool = json.pool || [];
+          flaggedList = json.flagged || [];
+          if (json.winners && json.winners.length > 0) {
+            winnersAudit = json.winners;
+          }
+          document.getElementById("sheetStatusBadge").textContent = "Live Terhubung";
+          toast(`Berhasil sinkron! ${activePool.length} peserta sah (60 booth), ${flaggedList.length} anomali.`);
+        } else {
+          toast("Google Sheets merespons data kosong. Menggunakan pool lokal.");
+        }
+      } catch (err) {
+        console.warn("Gagal terhubung ke GAS, menggunakan dataset lokal terverifikasi:", err);
+        toast("Koneksi cloud offline. Menggunakan cache data lokal.");
+      } finally {
+        btn.classList.remove("loading");
+        document.getElementById("syncLabel").textContent = "Sinkronkan Sheets";
+        renderAllViews();
+      }
+    }
+
+    async function syncWinnerToGas(winnerCandidate) {
+      try {
+        await fetch(GAS_URL + `?action=confirmWinner&kode=${encodeURIComponent(winnerCandidate.kode)}&nama=${encodeURIComponent(winnerCandidate.nama)}&hadiah=${encodeURIComponent(PRIZE_NAME)}&uid=${encodeURIComponent(winnerCandidate.uid || '')}`);
+      } catch (e) {
+        console.warn("Gagal mencatat pemenang ke GAS secara langsung:", e);
+      }
+    }
+
+    document.getElementById("btnSyncSheet").addEventListener("click", syncDataFromGoogleSheets);
+
+    /* ==========================================================================
+       RENDER STATE & TABLES
+       ========================================================================== */
+    function renderAllViews() {
+      drawWheel();
+      const verifiedWinners = winnersAudit.filter(w => w.status === 'verified');
+      const isComplete = verifiedWinners.length >= PRIZE_QUOTA;
+
+      // Update Winner Count Chip
+      const chip = document.getElementById("winnerCountChip");
+      if (chip) {
+        chip.textContent = isComplete ? "3 / 3 Kuota Terpenuhi" : `${verifiedWinners.length} / ${PRIZE_QUOTA} Terpilih`;
+        chip.className = isComplete ? "badge-chip active" : "badge-chip";
+      }
+
+      // Update Spin Button State when Quota is Reached
+      const spinBtn = document.getElementById("btnSpin");
+      const spinText = document.getElementById("btnSpinText");
+      if (isComplete) {
+        spinBtn.disabled = true;
+        spinText.textContent = "Semua 3 Pemenang Telah Sah";
+      } else {
+        if (!isSpinning) {
+          spinBtn.disabled = false;
+          spinText.textContent = `Putar Undian (Pemenang ke-${verifiedWinners.length + 1})`;
+        }
+      }
+
+      // Update Live Wheel Pool Count in Sidebar Footer
+      const poolLive = document.getElementById("poolLiveText");
+      if (poolLive) {
+        poolLive.textContent = `Peserta Sah di Roda: ${activePool.length} Orang (60 Booth)`;
+      }
+
+      // Render 3-Slot Podium in Sidebar
+      const podiumList = document.getElementById("podiumSlotsList");
+      if (podiumList) {
+        let slotsHtml = "";
+        for (let i = 1; i <= PRIZE_QUOTA; i++) {
+          const winner = verifiedWinners[i - 1];
+          if (winner) {
+            slotsHtml += `
+              <div class="podium-slot filled">
+                <div class="slot-top-row">
+                  <span class="slot-label">Pemenang ke-${i}</span>
+                  <span class="slot-amount-tag">Rp 150.000</span>
+                </div>
+                <div class="slot-name">${winner.nama}</div>
+                <div class="slot-meta">
+                  <span class="coupon-badge">${winner.kode}</span>
+                  <span>·</span>
+                  <span>${winner.fak}</span>
+                  <span style="margin-left:auto;font-family:var(--mono);color:var(--mut);font-size:11px">${winner.time}</span>
+                </div>
+              </div>
+            `;
+          } else {
+            const isNext = (i === verifiedWinners.length + 1);
+            slotsHtml += `
+              <div class="podium-slot ${isNext ? 'active-target' : ''}">
+                <div class="slot-top-row">
+                  <span class="slot-label">Slot Pemenang ke-${i}</span>
+                  <span style="font-size:11px;color:var(--mut)">Rp 150.000</span>
+                </div>
+                <div class="slot-empty-notice">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  <span>${isNext ? 'Siap diundi pada putaran saat ini' : 'Menunggu giliran putaran'}</span>
+                </div>
+              </div>
+            `;
+          }
+        }
+        podiumList.innerHTML = slotsHtml;
+      }
+
+      // Update Table Tab Counts
+      document.getElementById("badgeCountValid").textContent = activePool.length;
+      document.getElementById("badgeCountAnomaly").textContent = flaggedList.length;
+      document.getElementById("badgeCountWinners").textContent = winnersAudit.length;
+
+      renderTable();
+    }
+
+    function renderTable() {
+      const q = document.getElementById("inputSearch").value.toLowerCase();
+      const tbody = document.getElementById("tableBody");
+      const thead = document.getElementById("tableHeaderRow");
+
+      if (currentTableTab === "valid") {
+        thead.innerHTML = `
+          <th>No</th>
+          <th>Nomor Kupon</th>
+          <th>Nama Lengkap</th>
+          <th>Fakultas / Instansi</th>
+          <th>Kontak Disamarkan</th>
+          <th>Stempel Booth</th>
+          <th>Status Validasi</th>
+        `;
+
+        const filtered = activePool.filter(p => 
+          p.nama.toLowerCase().includes(q) || 
+          p.kode.toLowerCase().includes(q) || 
+          p.fak.toLowerCase().includes(q)
+        );
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--mut)">Tidak ada peserta sah yang sesuai dengan pencarian.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = filtered.map((p, idx) => `
+          <tr>
+            <td>${idx + 1}</td>
+            <td style="font-family:var(--mono);font-weight:700;color:var(--primary)">${p.kode}</td>
+            <td style="font-weight:700">${p.nama}</td>
+            <td>${p.fak}</td>
+            <td style="font-family:var(--mono);color:var(--mut)">${p.wa}</td>
+            <td><b style="color:var(--ok)">${p.stempel}</b> dari 60 booth</td>
+            <td><span class="badge-status valid">Sah Masuk Roda</span></td>
+          </tr>
+        `).join("");
+
+      } else if (currentTableTab === "anomaly") {
+        thead.innerHTML = `
+          <th>No</th>
+          <th>Nomor Kupon</th>
+          <th>Nama Peserta</th>
+          <th>Fakultas / Asal</th>
+          <th>Stempel</th>
+          <th>Kategori Anomali</th>
+          <th>Alasan Diskualifikasi</th>
+        `;
+
+        const filtered = flaggedList.filter(p => 
+          p.nama.toLowerCase().includes(q) || 
+          p.kode.toLowerCase().includes(q) || 
+          (p.alasan && p.alasan.toLowerCase().includes(q))
+        );
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--mut)">Tidak ada anomali atau data kecurangan terdeteksi.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = filtered.map((p, idx) => `
+          <tr>
+            <td>${idx + 1}</td>
+            <td style="font-family:var(--mono);font-weight:700;color:var(--mut)">${p.kode}</td>
+            <td style="font-weight:700">${p.nama}</td>
+            <td>${p.fak}</td>
+            <td>${p.stempel}/60</td>
+            <td><span class="badge-status anomaly">${p.kategoriAnomali || 'Anomali'}</span></td>
+            <td style="color:var(--err);font-weight:600;font-size:12.5px">${p.alasan}</td>
+          </tr>
+        `).join("");
+
+      } else if (currentTableTab === "winners") {
+        thead.innerHTML = `
+          <th>No</th>
+          <th>Nomor Kupon</th>
+          <th>Nama Pemenang</th>
+          <th>Fakultas / Asal</th>
+          <th>Hadiah</th>
+          <th>Waktu Pengesahan</th>
+          <th>Status Keputusan</th>
+        `;
+
+        const filtered = winnersAudit.filter(p => 
+          p.nama.toLowerCase().includes(q) || 
+          p.kode.toLowerCase().includes(q)
+        );
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--mut)">Belum ada riwayat pemenang.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = filtered.map((p, idx) => `
+          <tr>
+            <td>${idx + 1}</td>
+            <td style="font-family:var(--mono);font-weight:700;color:var(--primary)">${p.kode}</td>
+            <td style="font-weight:700">${p.nama}</td>
+            <td>${p.fak}</td>
+            <td><b>${p.prize}</b></td>
+            <td style="font-family:var(--mono);color:var(--mut)">${p.time}</td>
+            <td>
+              ${p.status === 'verified' 
+                ? '<span class="badge-status valid">Resmi Sah</span>' 
+                : '<span class="badge-status anomaly">Gugur</span>'}
+            </td>
+          </tr>
+        `).join("");
+      }
+    }
+
+    document.getElementById("inputSearch").addEventListener("input", renderTable);
+
+    // Table Tab Navigation
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentTableTab = btn.dataset.tab;
+        renderTable();
+      });
+    });
+
+    /* Audio Toggle */
+    document.getElementById("btnSound").addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      document.getElementById("soundLabel").textContent = soundEnabled ? "Audio: Aktif" : "Audio: Senyap";
+      toast(soundEnabled ? "Audio jam berputar diaktifkan" : "Audio dimatikan");
+    });
+
+    /* Fullscreen Toggle */
+    document.getElementById("btnFullscreen").addEventListener("click", () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen();
+      }
+    });
+
+    /* Toast Helper */
+    let toastTimeout = null;
+    function toast(msg) {
+      const box = document.getElementById("toastBox");
+      document.getElementById("toastMsg").textContent = msg;
+      box.classList.add("show");
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => box.classList.remove("show"), 3200);
+    }
+
+    /* Spin Button Event */
+    document.getElementById("btnSpin").addEventListener("click", spinWheelAction);
+
+    // Initial render
+    renderAllViews();
+  </script>
+</body>
+</html>
