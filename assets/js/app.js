@@ -5107,7 +5107,7 @@ function renderUndianAllViews() {
     } else {
       if (!undianIsSpinning) {
         spinBtn.disabled = false;
-        spinText.textContent = `Putar Undian (Pemenang ke-${verifiedWinners.length + 1})`;
+        spinText.textContent = `Putar Undian`;
       }
     }
   }
