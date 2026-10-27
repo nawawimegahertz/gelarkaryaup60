@@ -3,7 +3,7 @@ const CONFIG = {
   publicUrl: "", // Kosongkan agar otomatis menggunakan URL web aktif saat ini (Vercel / domain UP)
   pinPanitia: "1966", // PIN verifikasi panitia (default: 1966 - tahun berdirinya UP)
   gasUrl:
-    "https://script.google.com/macros/s/AKfycbyt1GXR_mPDL5pJo8Gqi8GNRMfNdUHhdHGnXsr4E-R-hdKGz3SgvAp-J_ngJu2PgupD/exec", // backend endpoint Google Apps Script
+    "https://script.google.com/macros/s/AKfycbxB0E-oDscU3wmRuslFvwlmn3y6oGSXdDKisPBX1ytCGnmLfipuY2fZT3bbHctHR-_Z_A/exec", // backend endpoint Google Apps Script
   panel: {}, // pemetaan nomor karya ke nomor panel bila berbeda, contoh {7: 12}
   jamBuka: 8,
   jamTutup: 16, // rentang grafik kehadiran per jam
