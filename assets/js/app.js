@@ -32,15 +32,6 @@ const CONFIG = {
     formAction: "", // https://docs.google.com/forms/d/e/XXXX/formResponse
     fields: { nama: "", peran: "", asal: "" }, // kode entry.XXXXXXX tiap pertanyaan
   },
-  undian: {
-    hadiah: "Rp 150.000", // hadiah undian bagi pengunjung yang memindai booth
-    kuota: 10, // 10 pemenang penerima doorprize @ Rp 150.000
-    target: 60, // Syarat 60 booth lengkap konsisten dengan #jelajah
-    garam: "up60-gk-2026", // ubah sebelum mencetak QR; kode booth dihitung dari nilai ini
-    jeda: 8, // detik minimal antarpindaian, mencegah pindai beruntun tanpa berkunjung
-    formAction: "", // opsional: Google Form pendaftaran undian
-    fields: { nama: "", wa: "", peran: "", kode: "" },
-  },
   umpan: {
     // Google Form umpan balik (untuk halaman yang di-hosting umum). Kosongkan bila tidak dipakai.
     formAction: "", // https://docs.google.com/forms/d/e/XXXX/formResponse
@@ -465,28 +456,28 @@ function questCard(opt = {}) {
   const n = Object.keys(S.stamp).length;
   const target = BOOTH_N; // 60
   const pct = Math.min(100, Math.round((n / target) * 100));
-  const done = store.get("undian", null);
+  const done = Object.keys(S.stamp).length >= BOOTH_N;
   const inJelajah = !!opt.inJelajah;
 
   // Gamifikasi 5 Level (Bite-sized Sprints @ 15 Booths - Goal-Gradient Effect)
   let level = 1;
   let levelTitle = "Level 1: Penjelajah Pemula";
   let sprintMsg = `🚀 Langkah Awal: Tinggal <b>${15 - n} booth lagi</b> menuju Level 2.`;
-  let desc = `Pindai QR di bawah poster setiap booth untuk kumpulkan stempel undian doorprize.`;
+  let desc = `Pindai QR di bawah poster setiap booth untuk melengkapi jurnal jelajah karya pameran.`;
 
   if (n >= target) {
     level = 5;
-    levelTitle = "Level 5: Calon Juara Undian";
-    sprintMsg = "🏆 Target 60/60 Tercapai! Kupon Undian Siap Diundi.";
+    levelTitle = "Level 5: Penjelajah Utama 60 Karya";
+    sprintMsg = "🏆 Target 60/60 Lengkap! Seluruh Inovasi Telah Anda Jelajahi.";
     desc = done
-      ? `Kupon undian Anda resmi terdaftar: <b>#${esc(done.kode)}</b>. Terima kasih telah menjelajahi karya pameran!`
-      : `Semua 60 booth selesai! Daftarkan kupon undian doorprize ${esc(CONFIG.undian.hadiah)} Anda sekarang.`;
+      ? `Terima kasih telah menjelajahi seluruh karya pameran!`
+      : `Semua 60 booth selesai! Terima kasih telah mengapresiasi inovasi Universitas Pancasila.`;
   } else if (n >= 45) {
     level = 4;
     levelTitle = "Level 4: Hampir Juara";
     const sisa = 60 - n;
-    sprintMsg = `🔥 Sprint akhir: Tinggal <b>${sisa} booth lagi</b> menuju Kupon Undian!`;
-    desc = `Tinggal selangkah lagi untuk mengaktifkan kupon undian doorprize ${esc(CONFIG.undian.hadiah)}.`;
+    sprintMsg = `🔥 Sprint akhir: Tinggal <b>${sisa} booth lagi</b> menuju Penjelajah Lengkap!`;
+    desc = `Tinggal selangkah lagi untuk melengkapi seluruh 60 booth karya Eksplorasi 60 Booth.`;
   } else if (n >= 30) {
     level = 3;
     levelTitle = "Level 3: Panutan";
@@ -502,7 +493,7 @@ function questCard(opt = {}) {
   } else if (n > 0) {
     const sisa = 15 - n;
     sprintMsg = `🚀 Langkah awal! Tinggal <b>${sisa} booth lagi</b> menuju Level 2.`;
-    desc = `Pindai QR di bawah poster setiap booth untuk kumpulkan stempel undian doorprize.`;
+    desc = `Pindai QR di bawah poster setiap booth untuk melengkapi jurnal jelajah karya pameran.`;
   }
 
   return `
@@ -510,17 +501,17 @@ function questCard(opt = {}) {
     <div class="quest-top">
       <div class="quest-badge">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-        <span>Misi Undian</span>
+        <span>Jelajah 60 Karya</span>
       </div>
       <div class="quest-reward">
-        <span>Hadiah Undian</span>
-        <b class="reward-val">${esc(CONFIG.undian.hadiah)}</b>
+        <span>Apresiasi</span>
+        <b class="reward-val">Eksplorasi 60 Booth</b>
       </div>
     </div>
 
     <div class="quest-body">
       <div class="quest-headline-row">
-        <h2 class="quest-title">Undian ${esc(CONFIG.undian.hadiah)}</h2>
+        <h2 class="quest-title">Eksplorasi 60 Booth Inovasi</h2>
         <span class="quest-tier-pill">${level === 5 ? "🏆 Master 60/60" : `Level ${level} • ${n}/${target}`}</span>
       </div>
       <div class="quest-tier-name">${esc(levelTitle)}</div>
@@ -550,7 +541,7 @@ function questCard(opt = {}) {
           </div>
           <div class="quest-milestone-item ${n >= 60 ? "reached" : level === 4 ? "current" : ""}">
             <span class="m-dot"></span>
-            <span>60 (Undian 🏆)</span>
+            <span>60 (Lengkap 🏆)</span>
           </div>
         </div>
       </div>
@@ -564,10 +555,10 @@ function questCard(opt = {}) {
       </button>
       ${
         n >= target && !done
-          ? '<button class="btn sm gold animate-pulse" data-act="undian">Daftar Undian</button>'
+          ? '<button class="btn sm gold" data-act="scan">Lengkap 60 Booth 🏆</button>'
           : ""
       }
-      ${done ? '<button class="btn sm ghost" data-act="undian">Kupon Saya</button>' : ""}
+      
     </div>
   </div>`;
 }
@@ -1004,8 +995,7 @@ function journeyCard() {
         Object.keys(S.stamp).length +
         " dari " +
         BOOTH_N +
-        " booth · Syarat undian " +
-        CONFIG.undian.hadiah,
+        " booth · Eksplorasi Lengkap 60 Booth",
       a: 'data-act="scan"',
       b: "Pindai",
     },
@@ -1036,7 +1026,7 @@ function viewUmpan() {
   const stampsCount = Object.keys(S.stamp).length;
   const target = BOOTH_N;
   const myFb = store.get("myFb", null);
-  const doneUndian = store.get("undian", null);
+  const doneAll = stampsCount >= target;
 
   $("#v-umpan").innerHTML = `
     <div class="sec" style="margin-top:0">
@@ -1054,7 +1044,7 @@ function viewUmpan() {
             <b class="num">${stampsCount}</b><span style="font-size:14px;font-weight:500;color:var(--mut);"> / ${target}</span>
           </div>
           <small style="font-size:11.5px;color:${stampsCount >= target ? 'var(--ok, #15803d)' : 'var(--primary, #15459e)'};font-weight:700;">
-            ${stampsCount >= target ? (doneUndian ? "🏆 Kupon Terdaftar" : "🏆 Siap Diundi") : `Tinggal ${target - stampsCount} lagi`}
+            ${stampsCount >= target ? "🏆 60 Booth Selesai" : `Tinggal ${target - stampsCount} lagi`}
           </small>
         </div>
 
@@ -1617,7 +1607,7 @@ function openDetail(no) {
               <div class="loc-panel-num">${pNum}</div>
               <div class="loc-info">
                 <div class="loc-info-title">Panel Poster A0 · ${esc(pArea)}</div>
-                <div class="loc-info-sub">${isStamped ? "Stempel misi tersimpan · Menambah peluang undian " + esc(CONFIG.undian.hadiah) : "Kunjungi booth fisik ini dan pindai kode QR untuk klaim stempel!"}</div>
+                <div class="loc-info-sub">${isStamped ? "Stempel misi tersimpan · Kunjungan tercatat" : "Kunjungi booth fisik ini dan pindai kode QR untuk klaim stempel!"}</div>
               </div>
             </div>
             ${
@@ -1879,7 +1869,7 @@ function promptPanitiaPin(onSuccess, onCancel) {
     `<div class="scrim" data-close="1"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="pt">
     <button type="button" class="x" data-close="1" aria-label="Tutup">×</button>
     <h2 id="pt">Akses Khusus Panitia</h2>
-    <p style="color:var(--mut);margin:6px 0 14px;font-size:14px">Fitur cetak QR booth dan undian doorprize hanya dapat diakses oleh panitia pelaksana.</p>
+    <p style="color:var(--mut);margin:6px 0 14px;font-size:14px">Fitur cetak QR booth pameran hanya dapat diakses oleh panitia pelaksana.</p>
     <form id="pinf" novalidate>
       <label class="f">PIN Panitia
         <input class="txt" id="pin-val" type="password" inputmode="numeric" placeholder="Masukkan PIN" autocomplete="on" required>
@@ -1955,7 +1945,7 @@ function viewHadir() {
       return `<div><em class="num">${v || ""}</em><i style="height:${(v / maxH) * 78}px"></i>${String(h).padStart(2, "0")}</div>`;
     })
     .join("")}</div></div></div>
-  ${undianPanel()}
+  
   <div class="sec"><h2>Untuk panitia</h2><div class="card">
     <p style="margin:0;color:var(--mut);font-size:14px">Tautan publik halaman ini untuk membuat QR pintu masuk di meja registrasi dan QR umpan balik di pintu keluar.</p>
     <label class="f" style="margin-top:10px">Tautan publik<input class="txt" id="pubUrl" type="url" inputmode="url" placeholder="https://..." value="${esc(url)}"></label>
@@ -2107,7 +2097,7 @@ function openGate() {
     <form class="wrapin" id="hf" novalidate>
       <ol class="flow" aria-label="Alur kunjungan"><li class="on"><b>1</b>Hadir</li><li><b>2</b>Jelajah</li><li><b>3</b>Rute</li><li><b>4</b>Umpan balik</li></ol>
       <h2 style="font-size:20px">Daftar hadir dulu</h2>
-      <p style="color:var(--mut);margin:6px 0 16px;font-size:14.5px">Mulai dari peran Anda; isian berikutnya menyesuaikan. Data digunakan untuk absensi kehadiran, interaksi booth pameran, dan kelayakan undian doorprize Dies Natalis ke-60 UP. Peran juga menentukan rekomendasi yang ditonjolkan di katalog.</p>
+      <p style="color:var(--mut);margin:6px 0 16px;font-size:14.5px">Mulai dari peran Anda; isian berikutnya menyesuaikan. Data digunakan untuk absensi kehadiran, interaksi booth pameran, pada perayaan Dies Natalis ke-60 UP. Peran juga menentukan rekomendasi yang ditonjolkan di katalog.</p>
       <div class="kv" style="margin-top:0;gap:14px">${formFields(true)}</div>
       <div style="text-align:center;margin-top:12px"><button type="button" class="link" data-act="skip">Lewati dulu, lihat katalog</button></div>
     </form></div>`;
@@ -2776,11 +2766,11 @@ function refreshAtt() {
   else if (S.tab === "beranda") viewBeranda();
 }
 
-/* ---------- Stempel booth dan undian ---------- */
+/* ---------- Stempel Kunjungan Booth 60 ---------- */
 const BOOTH_N = 60;
 function boothCode(p) {
   let h = 2166136261;
-  const s = CONFIG.undian.garam + "|" + p;
+  const s = "up60-gk-2026|" + p;
   for (let i = 0; i < s.length; i++) {
     h ^= s.charCodeAt(i);
     h = Math.imul(h, 16777619) >>> 0;
@@ -2817,7 +2807,7 @@ function recordStamp(raw, metode = "kamera") {
       msg: nama + " sudah tercatat. Lanjut ke booth lain.",
     };
   const last = store.get("lastStamp", 0),
-    wait = CONFIG.undian.jeda * 1000 - (Date.now() - last);
+    wait = 5000 - (Date.now() - last);
   if (Object.keys(S.stamp).length && wait > 0)
     return {
       ok: false,
@@ -2856,8 +2846,8 @@ function recordStamp(raw, metode = "kamera") {
       target +
       " booth" +
       (n >= target
-        ? " · Lengkap seluruh 60 booth! Kupon Undian Terbuka!"
-        : " (Tinggal " + (target - n) + " booth lagi ke undian)"),
+        ? " · Lengkap seluruh 60 booth! Jelajah Karya Selesai!"
+        : " (Tinggal " + (target - n) + " booth lagi untuk lengkap)"),
   };
 }
 
@@ -2944,8 +2934,7 @@ function handleDeepCode(raw, fromStart) {
   if (!fromStart) show("jelajah");
   setTimeout(() => {
     toast(r.msg);
-    if (r.ok && r.n >= BOOTH_N) openUndian();
-    else if (r.ok && r.p) promptBoothRating(r.p);
+    if (r.ok && r.p) promptBoothRating(r.p);
   }, 300);
 }
 function stampCard() {
@@ -3101,7 +3090,7 @@ function promptScanSuccess(r) {
       <div class="scan-rate-progress-box">
         <div class="scan-rate-progress-text">
           <b>Total ${r.n} dari ${target} Booth</b>
-          <span>${r.n >= target ? "🎉 Kupon Undian Siap Dibuka!" : `(Tinggal ${target - r.n} booth lagi ke undian)`}</span>
+          <span>${r.n >= target ? "🎉 Seluruh 60 Booth Lengkap!" : `(Tinggal ${target - r.n} booth lagi untuk lengkap)`}</span>
         </div>
         <div class="scan-rate-bar"><div class="scan-rate-bar-fill" style="width:${pct}%"></div></div>
       </div>
@@ -3119,7 +3108,7 @@ function promptScanSuccess(r) {
       <div class="scan-rate-footer" style="text-align:center;margin-top:2px">
         ${
           r.n >= target
-            ? `<button class="btn gold scan-continue-btn" data-act="scanRateClose">🎉 Lengkap! Buka Undian Sekarang →</button>`
+            ? `<button class="btn gold scan-continue-btn" data-act="scanRateClose">🎉 Selesai! Lihat Semua Booth →</button>`
             : `<button class="rating-skip-btn" data-act="scanRateClose" style="font-size:12.5px;padding:7px 16px">Lewati (Lanjut Memindai) →</button>`
         }
       </div>
@@ -3157,8 +3146,8 @@ function closeScan() {
 function openCamPrime() {
   $("#layer").innerHTML =
     `<div class="scrim"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="cp">
-    <h2 id="cp">Aktifkan kamera untuk undian</h2>
-    <p style="color:var(--mut);font-size:14.5px;margin:8px 0 14px">Setiap booth punya QR di bawah posternya. Pindai ${BOOTH_N} QR untuk ikut undian ${esc(CONFIG.undian.hadiah)}. Peramban akan meminta izin kamera; gambar tidak disimpan.</p>
+    <h2 id="cp">Aktifkan kamera untuk pindai booth</h2>
+    <p style="color:var(--mut);font-size:14.5px;margin:8px 0 14px">Setiap booth punya QR di bawah posternya. Pindai ${BOOTH_N} QR untuk melengkapi kunjungan 60 booth. Peramban akan meminta izin kamera; gambar tidak disimpan.</p>
     <div class="row"><button class="btn gold" data-act="prime">Izinkan kamera</button><button class="btn ghost" data-act="primex">Nanti saja</button></div></div></div>`;
 }
 async function camPrime() {
@@ -3179,13 +3168,13 @@ async function camPrime() {
     go("jelajah");
   }
 }
-/* pendaftaran undian */
+/* sinkronisasi stempel */
 const Undi = {
   col: null,
   rows: [],
   init() {
     if (Att.db) {
-      this.col = Att.db.collection("undian");
+      this.col = Att.db.collection("stamps");
       this.col.onSnapshot(
         (sn) => {
           this.rows = sn.docs.map((x) => x.data() || {});
@@ -3206,7 +3195,7 @@ const Undi = {
   },
   async sync() {
     if (S.att.mode !== "db" || !this.col || !S.att.canWrite) return;
-    const u = store.get("undian", {}) || {};
+    const u = store.get("stamps_data", {}) || {};
     try {
       await this.col.doc(this.id()).set({
         peran: S.peran || "",
@@ -3219,7 +3208,7 @@ const Undi = {
     } catch (e) {}
   },
 };
-function undianPanel() { return ""; }
+
 
 
 function viewQrBooth() {
@@ -3286,9 +3275,9 @@ document.addEventListener("click", async (e) => {
     const currentN = Object.keys(S.stamp).length;
     setTimeout(() => {
       closeScanRateSheet();
-      if (currentN >= BOOTH_N && !store.get("undian", null)) {
+      if (currentN >= BOOTH_N ) {
         closeScan();
-        setTimeout(openUndian, 300);
+        
       }
     }, 250);
     return;
@@ -3297,9 +3286,9 @@ document.addEventListener("click", async (e) => {
     e.stopPropagation();
     const currentN = Object.keys(S.stamp).length;
     closeScanRateSheet();
-    if (currentN >= BOOTH_N && !store.get("undian", null)) {
+    if (currentN >= BOOTH_N ) {
       closeScan();
-      setTimeout(openUndian, 300);
+      
     }
     return;
   }
@@ -3424,10 +3413,7 @@ document.addEventListener("click", async (e) => {
     closeScan();
     return;
   }
-  if (d.act === "undian") {
-    openUndian();
-    return;
-  }
+  
   if (d.act === "qrbooth") {
     if (!S.isPanitia) {
       promptPanitiaPin(() => {
@@ -3526,7 +3512,7 @@ document.addEventListener("submit", (e) => {
     e.preventDefault();
     scanManual();
   }
-  if (e.target.id === "uf") submitUndian(e);
+  
   if (e.target.id === "hf") submitForm(e);
   if (e.target.id === "ff") submitFeedback(e);
 });
