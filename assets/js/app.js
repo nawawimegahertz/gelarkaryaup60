@@ -108,6 +108,27 @@ const DATA = [{"no":1,"judul":"Unlocking Pomegranate's Anti-Aging Potential! Ino
 var DENAH_SVG = typeof window !== "undefined" && window.DENAH_SVG ? window.DENAH_SVG : "";
 const PANELS = {"1": [618, 200.0, 36, 34.7], "2": [618, 234.7, 36, 34.7], "3": [618, 269.5, 36, 34.7], "4": [618, 304.2, 36, 34.7], "5": [618, 338.9, 36, 34.7], "6": [618, 373.7, 36, 34.7], "7": [618, 408.4, 36, 34.7], "8": [618, 443.2, 36, 34.7], "9": [618, 477.9, 36, 34.7], "10": [618, 512.6, 36, 34.7], "11": [618, 547.4, 36, 34.7], "12": [618, 582.1, 36, 34.7], "13": [618, 616.8, 36, 34.7], "14": [618, 651.6, 36, 34.7], "15": [618, 686.3, 36, 34.7], "16": [618, 721.1, 36, 34.7], "17": [618, 755.8, 36, 34.7], "18": [618, 790.5, 36, 34.7], "19": [618, 825.3, 36, 34.7], "20": [593.7, 860, 22.3, 38], "21": [571.5, 860, 22.3, 38], "22": [549.2, 860, 22.3, 38], "23": [527.0, 860, 22.3, 38], "24": [504.7, 860, 22.3, 38], "25": [482.4, 860, 22.3, 38], "26": [460.2, 860, 22.3, 38], "27": [437.9, 860, 22.3, 38], "28": [415.7, 860, 22.3, 38], "29": [393.4, 860, 22.3, 38], "30": [371.1, 860, 22.3, 38], "31": [348.9, 860, 22.3, 38], "32": [326.6, 860, 22.3, 38], "33": [304.3, 860, 22.3, 38], "34": [282.1, 860, 22.3, 38], "35": [259.8, 860, 22.3, 38], "36": [237.6, 860, 22.3, 38], "37": [215.3, 860, 22.3, 38], "38": [193.0, 860, 22.3, 38], "39": [170.8, 860, 22.3, 38], "40": [148.5, 860, 22.3, 38], "41": [126.3, 860, 22.3, 38], "42": [104.0, 860, 22.3, 38], "43": [66, 859.2, 36, 38.8], "44": [66, 820.4, 36, 38.8], "45": [66, 781.7, 36, 38.8], "46": [66, 742.9, 36, 38.8], "47": [66, 704.1, 36, 38.8], "48": [66, 665.3, 36, 38.8], "49": [66, 626.6, 36, 38.8], "50": [66, 587.8, 36, 38.8], "51": [66, 549.0, 36, 38.8], "52": [66, 510.2, 36, 38.8], "53": [66, 471.4, 36, 38.8], "54": [66, 432.7, 36, 38.8], "55": [66, 393.9, 36, 38.8], "56": [66, 355.1, 36, 38.8], "57": [66, 316.3, 36, 38.8], "58": [66, 277.6, 36, 38.8], "59": [66, 238.8, 36, 38.8], "60": [66, 200.0, 36, 38.8]}; // nomor panel -> [x, y, lebar, tinggi] pada denah vektor 720x980 (nomor sama dengan label QR poster)
 const AREA = [[1,6,"Dinding kanan aula, dekat pintu masuk"],[7,13,"Dinding kanan aula, depan tempat wudhu"],[14,19,"Dinding kanan aula, menuju sudut bawah"],[20,26,"Deret bawah aula, sisi kanan"],[27,35,"Deret bawah aula, bagian tengah"],[36,42,"Deret bawah aula, sisi kiri"],[43,48,"Dinding kiri aula, sudut bawah"],[49,55,"Dinding kiri aula, bagian tengah"],[56,60,"Dinding kiri aula, dekat pintu keluar"]];
+/* ---------- Database 17 Tujuan SDGs ---------- */
+const SDGINFO = {
+  1: ["Tanpa Kemiskinan", "#E5243B"],
+  2: ["Tanpa Kelaparan", "#DDA63A"],
+  3: ["Kehidupan Sehat dan Sejahtera", "#4C9F38"],
+  4: ["Pendidikan Berkualitas", "#C5192D"],
+  5: ["Kesetaraan Gender", "#FF3A21"],
+  6: ["Air Bersih dan Sanitasi Layak", "#26BDE2"],
+  7: ["Energi Bersih dan Terjangkau", "#FCC30B"],
+  8: ["Pekerjaan Layak dan Pertumbuhan Ekonomi", "#A21942"],
+  9: ["Industri, Inovasi dan Infrastruktur", "#FD6925"],
+  10: ["Berkurangnya Kesenjangan", "#DD1367"],
+  11: ["Kota dan Permukiman Berkelanjutan", "#FD9D24"],
+  12: ["Konsumsi dan Produksi Bertanggung Jawab", "#BF8B2E"],
+  13: ["Penanganan Perubahan Iklim", "#3F7E44"],
+  14: ["Ekosistem Lautan", "#0A97D9"],
+  15: ["Ekosistem Daratan", "#56C02B"],
+  16: ["Perdamaian, Keadilan dan Kelembagaan Tangguh", "#00689D"],
+  17: ["Kemitraan untuk Mencapai Tujuan", "#19486A"]
+};
+
 const KLASTER = { IPTEKS: "IPTEKS", Kesehatan: "Kesehatan", Soshum: "Sosial Humaniora" };
 const KCOL = { IPTEKS: "#1857C4", Kesehatan: "#0E8F82", Soshum: "#C77D00" };
 const PERAN = {
