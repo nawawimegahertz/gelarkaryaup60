@@ -111,27 +111,11 @@ const AREA = [[1,6,"Dinding kanan aula, dekat pintu masuk"],[7,13,"Dinding kanan
 const KLASTER = { IPTEKS: "IPTEKS", Kesehatan: "Kesehatan", Soshum: "Sosial Humaniora" };
 const KCOL = { IPTEKS: "#1857C4", Kesehatan: "#0E8F82", Soshum: "#C77D00" };
 const PERAN = {
-  dosen: {
-    nama: "Dosen Tendik",
-    ket: "Skema dan kolaborasi",
-    warna: "var(--r-dosen)",
-  },
-  rektorat: {
-    nama: "Rektorat",
-    ket: "Pimpinan & Pegawai",
-    warna: "var(--r-rektorat)",
-  },
-  mahasiswa: {
-    nama: "Mahasiswa",
-    ket: "Topik dan inspirasi",
-    warna: "var(--r-mahasiswa)",
-  },
-  mitra: {
-    nama: "Mitra",
-    ket: "Dampak dan hilirisasi",
-    warna: "var(--r-mitra)",
-  },
-  umum: { nama: "Umum", ket: "Manfaat dan lokasi", warna: "var(--r-umum)" },
+  dosen: { nama: "Dosen", ket: "Skema dan kolaborasi", warna: "var(--r-dosen)" },
+  rektorat: { nama: "Rektorat", ket: "Pimpinan & Unit Kerja", warna: "var(--r-rektorat)" },
+  mahasiswa: { nama: "Mahasiswa", ket: "Topik dan inspirasi", warna: "var(--r-mahasiswa)" },
+  mitra: { nama: "Mitra", ket: "Dampak dan hilirisasi", warna: "var(--r-mitra)" },
+  umum: { nama: "Umum", ket: "Manfaat dan lokasi", warna: "var(--r-umum)" }
 };
 const TABS = [
   [
@@ -1821,6 +1805,9 @@ function openZoom(n) {
   z.onclick = () => z.remove();
   document.body.appendChild(z);
 }
+document.addEventListener("input", (e) => {
+  if (e.target.id === "fid") lookupDosen();
+});
 document.addEventListener("click", (e) => {
   const b = e.target.closest && e.target.closest("[data-zoom]");
   if (b) {
@@ -1989,122 +1976,55 @@ function makeQR() {
     } catch (e) {}
   });
 }
+/* ---------- Buku Tamu & Gerbang Hadir (Sesuai final_gelar-karya-up60.html) ---------- */
 function formFields(gate) {
-  return `<div><span class="k" style="font-size:12.5px;font-weight:700;color:var(--ink);letter-spacing:0.01em;">Anda Datang Sebagai</span>
-        <div class="roles" id="fr" role="radiogroup" aria-label="Peran" style="margin-top:8px">${Object.entries(
-          PERAN,
-        )
-          .map(
-            ([k, p]) =>
-              `<button type="button" class="role" role="radio" aria-checked="${S.peran === k}" data-fr="${k}">${p.nama}${gate ? `<small>${p.ket}</small>` : ""}</button>`,
-          )
-          .join("")}</div></div>
+  return `<div><span class="k" style="font-size:12px;font-weight:700;color:var(--mut);letter-spacing:.04em;text-transform:uppercase">Anda datang sebagai</span>
+        <div class="roles" id="fr" role="radiogroup" aria-label="Peran" style="margin-top:6px">${Object.entries(PERAN).map(([k, p]) => `<button type="button" class="role" role="radio" aria-checked="${S.peran === k}" data-fr="${k}">${p.nama}${gate ? `<small>${p.ket}</small>` : ""}</button>`).join("")}</div></div>
       <div id="dyn" class="kv" style="margin-top:0;gap:14px" aria-live="polite"></div>
       <p id="fe" style="color:var(--err);margin:0;font-size:14px" role="alert" hidden></p>
-      <button class="btn gold" type="submit" id="fs" hidden>Catat Kehadiran</button>`;
+      <button class="btn gold" type="submit" id="fs" hidden>Catat kehadiran</button>`;
 }
-const opts = (arr, ph) =>
-  `<option value="">${ph}</option>` +
-  arr.map((x) => `<option value="${esc(x)}">${esc(x)}</option>`).join("");
+
+const opts = (arr, ph) => `<option value="">${ph}</option>` + arr.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join("");
+
 function renderDyn(focus) {
   const box = $("#dyn");
   if (!box) return;
   const p = S.peran;
   let h = "";
-  if (p === "mahasiswa" || p === "dosen") {
-    h += `<label class="f">Fakultas Asal <span style="color:var(--err);font-weight:700">*</span><select class="txt" id="fa" required>${opts(CONFIG.fakultas, "Pilih fakultas")}</select></label>`;
+  const fN = lbl => `<label class="f">${lbl}<input class="txt" id="fn" autocomplete="name" value="${esc(store.get("nama", ""))}" required></label>`;
+  const fF = `<label class="f">Fakultas${p === "dosen" ? "" : " asal"}<select class="txt" id="fa" required>${opts(CONFIG.fakultas, "Pilih fakultas")}</select></label>`;
+
+  if (p === "dosen") {
+    h += `<label class="f">NIDN<input class="txt" id="fid" inputmode="numeric" maxlength="14" autocomplete="off" placeholder="10 digit" required></label><p id="fidh" class="hint" aria-live="polite">Nama dan fakultas terisi otomatis dari NIDN.</p>` + fN("Nama") + fF;
+  } else if (p === "mahasiswa") {
+    h += fN("Nama lengkap") + `<label class="f">NPM<input class="txt" id="fid" inputmode="numeric" maxlength="15" autocomplete="off" placeholder="Nomor Pokok Mahasiswa" required></label>` + fF;
   } else if (p === "rektorat") {
-    h += `<label class="f">Jabatan / Unit Kerja <span style="color:var(--err);font-weight:700">*</span><input class="txt" id="fa" placeholder="Contoh: Rektorat / WR / Lembaga / Biro" required></label>`;
+    h += fN("Nama lengkap") + `<label class="f">Jabatan / Unit Kerja di Rektorat<input class="txt" id="fa" placeholder="Contoh: Rektorat / WR / Lembaga / Biro" required></label>`;
   } else if (p === "mitra") {
-    h += `<label class="f">Jenis Mitra <span style="color:var(--err);font-weight:700">*</span><select class="txt" id="fj" required>${opts(CONFIG.jenisMitra, "Pilih jenis mitra")}</select></label><label class="f">Nama Instansi <span style="color:var(--err);font-weight:700">*</span><input class="txt" id="fi" autocomplete="organization" placeholder="Nama perusahaan / instansi" required></label>`;
+    h += `<label class="f">Jenis mitra<select class="txt" id="fj" required>${opts(CONFIG.jenisMitra, "Pilih jenis mitra")}</select></label><label class="f">Nama instansi<input class="txt" id="fi" autocomplete="organization" placeholder="Nama instansi/perusahaan" required></label>` + fN("Nama Anda");
   } else if (p === "umum") {
-    h += `<label class="f">Asal Instansi / Kota <span style="font-size:11.5px;color:var(--mut);font-weight:normal">(opsional)</span><input class="txt" id="fa" placeholder="Contoh: Alumni UP / Praktisi / Jakarta"></label>`;
+    h += fN("Nama lengkap");
   }
-  // Nama Lengkap wajib diisi untuk semua peran
+
   if (p) {
-    h += `<label class="f">Nama Lengkap <span style="color:var(--err);font-weight:700">*</span><input class="txt" id="fn" autocomplete="name" required placeholder="Masukkan nama lengkap Anda"></label>`;
+    h += `<label class="f">Nomor HP yang bisa dihubungi<input class="txt" id="fh" type="tel" inputmode="tel" autocomplete="tel" placeholder="08xxxxxxxxxx" value="${esc(store.get("hp", ""))}" required></label>`;
   }
+
   box.innerHTML = h;
-
-  // Isi otomatis dari riwayat localStorage
-  const savedNama = store.get("nama", ""),
-    savedAsal = store.get("asal", ""),
-    savedFak = store.get("fakultas", ""),
-    savedUnit = store.get("unitKerja", ""),
-    savedJenis = store.get("jenisMitra", ""),
-    savedInstansi = store.get("instansi", "");
-
-  const fa = $("#fa");
-  if (fa) {
-    if (p === "rektorat" && (savedUnit || savedAsal)) fa.value = savedUnit || savedAsal;
-    else if (savedFak || savedAsal) fa.value = savedFak || savedAsal;
-  }
-  const fj = $("#fj");
-  if (fj && savedJenis) fj.value = savedJenis;
-  const fi = $("#fi");
-  if (fi && savedInstansi) fi.value = savedInstansi;
-  const fn = $("#fn");
-  if (fn && savedNama) fn.value = savedNama;
-
   const b = $("#fs");
   if (b) b.hidden = !p;
   box.classList.remove("in");
   void box.offsetWidth;
   if (p) box.classList.add("in");
+
   if (focus && p) {
     const f = box.querySelector("select,input");
     if (f) f.focus({ preventScroll: true });
     box.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }
 }
-function openForm() {
-  lastFocus = document.activeElement;
-  $("#layer").innerHTML = `
-    <div class="scrim" data-close="1">
-      <form class="sheet detail-sheet" id="hf" role="dialog" aria-modal="true" aria-labelledby="ft" novalidate style="max-height:90vh;">
-        <div class="sheet-handle-bar"></div>
-        <div class="sheet-top-bar">
-          <div class="sheet-badge-group">
-            <span class="tag-pill"><i class="dot"></i>Presensi</span>
-            <span class="tag-panel">Daftar Hadir</span>
-          </div>
-          <button type="button" class="close-btn" data-close="1" aria-label="Tutup Dialog">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </div>
-        <div class="sheet-scroll-body">
-          <div class="hero-card">
-            <h2 id="ft" class="hero-title">Presensi Pengunjung</h2>
-            <p style="color:var(--mut);margin:0;font-size:13.5px;line-height:1.5">Untuk mencatat kehadiran atau mengganti peran. Isian menyesuaikan peran yang dipilih.</p>
-          </div>
-          <div class="info-card">
-            <div class="kv" style="margin-top:0;gap:14px">${formFields(false)}</div>
-          </div>
-        </div>
-      </form>
-    </div>`;
-  renderDyn(false);
-  const first = $("#fr button");
-  if (first) first.focus();
-}
-function openGate() {
-  $("#layer").innerHTML =
-    `<div class="gate" role="dialog" aria-modal="true" aria-labelledby="gt">
-    <div class="hero"><div class="wrap"><img src="${$("header.hero img").src}" alt="Logo Dies Natalis ke-60 Universitas Pancasila" width="76" height="72"><div><p class="eyebrow">Selamat datang</p><h1 id="gt">Gelar Karya Penelitian dan PKM, 60 Tahun UP</h1></div></div></div>
-    <form class="wrapin" id="hf" novalidate>
-      <ol class="flow" aria-label="Alur kunjungan"><li class="on"><b>1</b>Hadir</li><li><b>2</b>Jelajah</li><li><b>3</b>Rute</li><li><b>4</b>Umpan balik</li></ol>
-      <h2 style="font-size:20px">Daftar hadir dulu</h2>
-      <p style="color:var(--mut);margin:6px 0 16px;font-size:14.5px">Mulai dari peran Anda; isian berikutnya menyesuaikan. Data digunakan untuk absensi kehadiran, interaksi booth pameran, pada perayaan Dies Natalis ke-60 UP. Peran juga menentukan rekomendasi yang ditonjolkan di katalog.</p>
-      <div class="kv" style="margin-top:0;gap:14px">${formFields(true)}</div>
-      <div style="text-align:center;margin-top:12px"><button type="button" class="link" data-act="skip">Lewati dulu, lihat katalog</button></div>
-    </form></div>`;
-  renderDyn(false);
-  const first = $("#fr button");
-  if (first) first.focus();
-}
+
 function lookupDosen() {
   const el = $("#fid"), h = $("#fidh");
   if (!el || S.peran !== "dosen") return;
@@ -2128,6 +2048,35 @@ function lookupDosen() {
   }
 }
 
+function openForm() {
+  lastFocus = document.activeElement;
+  $("#layer").innerHTML = `<div class="scrim" data-close="1"><form class="sheet" id="hf" role="dialog" aria-modal="true" aria-labelledby="ft" novalidate>
+    <button type="button" class="x close-btn" data-close="1" aria-label="Tutup Dialog">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <h2 id="ft" style="font-size:18px;font-weight:800;margin:0 0 4px">Daftar hadir</h2>
+    <p style="color:var(--mut);margin:6px 0 14px;font-size:14px">Untuk mencatat pengunjung tambahan atau mengganti peran. Isian menyesuaikan peran yang dipilih.</p>
+    <div class="kv" style="margin-top:0;gap:14px">${formFields(false)}</div></form></div>`;
+  renderDyn(false);
+  const first = $("#fr button");
+  if (first) first.focus();
+}
+
+function openGate() {
+  $("#layer").innerHTML = `<div class="gate" role="dialog" aria-modal="true" aria-labelledby="gt">
+    <div class="hero"><div class="wrap"><img src="${$("header.hero img") ? $("header.hero img").src : "assets/img/logo-dies-60-up.png"}" alt="Logo Dies Natalis ke-60 Universitas Pancasila" width="76" height="72"><div><p class="eyebrow">Selamat datang</p><h1 id="gt">Gelar Karya Penelitian dan PKM, 60 Tahun UP</h1></div></div></div>
+    <form class="wrapin" id="hf" novalidate>
+      <ol class="flow" aria-label="Alur kunjungan"><li class="on"><b>1</b>Hadir</li><li><b>2</b>Jelajah</li><li><b>3</b>Rute</li><li><b>4</b>Umpan balik</li></ol>
+      <h2 style="font-size:20px">Daftar hadir dulu</h2>
+      <p style="color:var(--mut);margin:6px 0 16px;font-size:14.5px">Mulai dari peran Anda; isian berikutnya menyesuaikan. Data dipakai untuk penghitungan pengunjung dan e-sertifikat; hanya panitia yang melihat nama, nomor HP, NIDN, atau NPM. Peran juga menentukan informasi yang ditonjolkan di katalog.</p>
+      <div class="kv" style="margin-top:0;gap:14px">${formFields(true)}</div>
+      <div style="text-align:center;margin-top:12px"><button type="button" class="link" data-act="skip">Lewati dulu, lihat katalog</button></div>
+    </form></div>`;
+  renderDyn(false);
+  const first = $("#fr button");
+  if (first) first.focus();
+}
+
 async function submitForm(ev) {
   ev.preventDefault();
   const peran = S.peran,
@@ -2137,74 +2086,66 @@ async function submitForm(ev) {
     e.textContent = m;
     e.hidden = false;
   };
-  if (!peran) return err("Pilih peran Anda terlebih dahulu.");
-  if (!nama) {
-    if ($("#fn")) $("#fn").focus();
-    return err("Nama lengkap wajib diisi.");
-  }
+  if (!peran) return err("Pilih peran Anda.");
   let asal = "";
   if (peran === "mahasiswa" || peran === "dosen") {
     asal = $("#fa") ? $("#fa").value : "";
-    if (!asal) {
-      if ($("#fa")) $("#fa").focus();
-      return err("Pilih fakultas asal Anda.");
-    }
-    store.set("fakultas", asal);
-  } else if (peran === "rektorat") {
+    if (!asal) return err("Pilih fakultas asal Anda.");
+  }
+  if (peran === "rektorat") {
     asal = $("#fa") ? ($("#fa").value || "").trim() : "";
-    if (!asal) {
-      if ($("#fa")) $("#fa").focus();
-      return err("Isi jabatan atau unit kerja Anda di Rektorat.");
-    }
-    store.set("unitKerja", asal);
-    store.set("fakultas", asal);
-  } else if (peran === "mitra") {
+    if (!asal) return err("Isi jabatan atau unit kerja Anda di Rektorat.");
+  }
+  if (peran === "mitra") {
     const j = $("#fj") ? $("#fj").value : "",
       n = $("#fi") ? ($("#fi").value || "").trim() : "";
-    if (!j) {
-      if ($("#fj")) $("#fj").focus();
-      return err("Pilih jenis mitra.");
-    }
-    if (!n) {
-      if ($("#fi")) $("#fi").focus();
-      return err("Isi nama instansi mitra.");
-    }
+    if (!j) return err("Pilih jenis mitra.");
+    if (!n) return err("Isi nama instansi.");
     asal = j + " - " + n;
-    store.set("jenisMitra", j);
-    store.set("instansi", n);
-  } else if (peran === "umum") {
-    asal = $("#fa") ? ($("#fa").value || "").trim() : "";
-    if (!asal) asal = "Umum";
-    store.set("asal", asal);
   }
+  let id = "";
+  if (peran === "dosen") {
+    id = $("#fid") ? $("#fid").value.replace(/\D/g, "") : "";
+    if (id.length !== 10) return err("NIDN harus 10 digit angka.");
+  }
+  if (peran === "mahasiswa") {
+    id = $("#fid") ? $("#fid").value.replace(/\D/g, "") : "";
+    if (id.length < 6 || id.length > 15) return err("NPM tidak valid. Isi angka NPM Anda.");
+  }
+  if (!nama) return err("Isi nama Anda.");
+  const hp = ($("#fh") ? $("#fh").value || "" : "").replace(/[^\d+]/g, "");
+  if (!/^(\+62|62|0)8\d{7,12}$/.test(hp))
+    return err("Nomor HP tidak valid. Contoh: 08123456789.");
+
   const btn = ev.target.querySelector("button[type=submit]");
-  btn.disabled = true;
+  if (btn) btn.disabled = true;
+
   try {
-    const uid = Undi.id();
-    await Att.submit({ nama, peran, asal, uid, t: new Date().toISOString() });
+    const uid = (typeof Undi !== "undefined" && Undi.id) ? Undi.id() : ("UP60-" + Math.random().toString(36).slice(2, 8).toUpperCase());
+    await Att.submit({ nama, peran, asal, id, hp, uid, t: new Date().toISOString() });
     const wasGate = !!$(".gate");
     S.checked = true;
     store.set("hadir", true);
     store.set("peran", S.peran);
-    store.set("nama", nama);
     store.set("asal", asal);
-    Undi.sync();
+    store.set("idn", id);
+    store.set("nama", nama);
+    store.set("hp", hp);
     closeLayer();
     toast("Kehadiran tercatat. Silakan jelajahi karya.");
     refreshAtt();
     if (wasGate) {
       go("beranda");
       if (!store.get("kamera", false)) setTimeout(openCamPrime, 350);
-    } else render(S.tab);
+    } else {
+      render(S.tab);
+    }
   } catch (e) {
-    btn.disabled = false;
-    err(
-      e && e.message === "readonly"
-        ? "Akun Anda hanya dapat melihat halaman ini. Minta panitia memberi akses Contributor atau gunakan tautan formulir publik."
-        : "Kehadiran belum tercatat. Periksa koneksi lalu coba lagi.",
-    );
+    if (btn) btn.disabled = false;
+    err(e && e.message === "readonly" ? "Akun Anda hanya dapat melihat halaman ini. Gunakan tautan formulir publik." : "Kehadiran belum tercatat. Periksa koneksi lalu coba lagi.");
   }
 }
+
 
 /* ---------- Umpan balik ---------- */
 function myFbCard(myFb) {
@@ -3256,6 +3197,9 @@ function delRoute(n) {
   renderTabs();
 }
 
+document.addEventListener("input", (e) => {
+  if (e.target.id === "fid") lookupDosen();
+});
 document.addEventListener("click", async (e) => {
   const t = e.target.closest(
     "[data-go],[data-open],[data-open-sdg],[data-add],[data-del],[data-filter],[data-seg],[data-peran],[data-fr],[data-nilai],[data-act],[data-close],[data-map],[data-mseg],[data-mkl],[data-mroute],[data-mz],[data-rate],[data-sort],[data-scan-rate]",
