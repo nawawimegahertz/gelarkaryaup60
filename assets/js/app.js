@@ -1977,6 +1977,22 @@ function makeQR() {
   });
 }
 /* ---------- Buku Tamu & Gerbang Hadir (Sesuai final_gelar-karya-up60.html) ---------- */
+/* ---------- Normalisasi & Validasi Nomor Telepon Indonesia ---------- */
+function normalizeIndonesianPhone(input) {
+  if (!input) return "";
+  // Buang karakter non-angka dan format umum seperti spasi, tanda hubung, tanda kurung, titik
+  let s = String(input).replace(/[\s\-\.\(\)\'\",]/g, "").trim();
+  // Hilangkan awalan +6208 atau 6208 (kekeliruan input umum)
+  if (s.startsWith("+6208")) s = "08" + s.slice(5);
+  else if (s.startsWith("6208")) s = "08" + s.slice(4);
+  // Ubah awalan internasional +62 atau 62 menjadi 0 lokal
+  else if (s.startsWith("+62")) s = "0" + s.slice(3);
+  else if (s.startsWith("62") && s.length >= 10) s = "0" + s.slice(2);
+  // Tangani user yang langsung mengetik angka 8 (tanpa 0 di depan, misal 81234567890)
+  else if (s.startsWith("8") && s.length >= 9 && s.length <= 13) s = "0" + s;
+  return s;
+}
+
 function formFields(gate) {
   return `<div><span class="k" style="font-size:12px;font-weight:700;color:var(--mut);letter-spacing:.04em;text-transform:uppercase">Anda datang sebagai</span>
         <div class="roles" id="fr" role="radiogroup" aria-label="Peran" style="margin-top:6px">${Object.entries(PERAN).map(([k, p]) => `<button type="button" class="role" role="radio" aria-checked="${S.peran === k}" data-fr="${k}">${p.nama}${gate ? `<small>${p.ket}</small>` : ""}</button>`).join("")}</div></div>
@@ -2008,7 +2024,7 @@ function renderDyn(focus) {
   }
 
   if (p) {
-    h += `<label class="f">Nomor HP yang bisa dihubungi<input class="txt" id="fh" type="tel" inputmode="tel" autocomplete="tel" placeholder="08xxxxxxxxxx" value="${esc(store.get("hp", ""))}" required></label>`;
+    h += `<label class="f">Nomor HP yang bisa dihubungi<input class="txt" id="fh" type="tel" inputmode="tel" autocomplete="tel" placeholder="Contoh: 0812-3456-7890 atau +62 812..." value="${esc(store.get("hp", ""))}" required></label>`;
   }
 
   box.innerHTML = h;
@@ -2113,9 +2129,12 @@ async function submitForm(ev) {
     if (id.length < 6 || id.length > 15) return err("NPM tidak valid. Isi angka NPM Anda.");
   }
   if (!nama) return err("Isi nama Anda.");
-  const hp = ($("#fh") ? $("#fh").value || "" : "").replace(/[^\d+]/g, "");
-  if (!/^(\+62|62|0)8\d{7,12}$/.test(hp))
-    return err("Nomor HP tidak valid. Contoh: 08123456789.");
+  const rawHp = $("#fh") ? $("#fh").value || "" : "";
+  const hp = normalizeIndonesianPhone(rawHp);
+  // Validasi nomor HP/WhatsApp Indonesia (08xx 9-14 digit) atau telp instansi/kantor (021/022 dll 9-13 digit)
+  if (!/^(08[1-9]\d{6,11}|0[2-9]\d{7,10})$/.test(hp)) {
+    return err("Nomor HP/telepon tidak valid. Contoh: 0812-3456-7890, +62 812..., atau 08123456789.");
+  }
 
   const btn = ev.target.querySelector("button[type=submit]");
   if (btn) btn.disabled = true;
