@@ -5386,3 +5386,88 @@ button,
 
 
 
+
+
+/* ---------- Poster Foto & Zoom (Google Drive) ---------- */
+.poster {
+  display: block;
+  width: 100%;
+  margin: 16px 0 0;
+  padding: 0;
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: 12px;
+  background: var(--surface-subtle, #f8fafc);
+  cursor: zoom-in;
+  overflow: hidden;
+  text-align: left;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.poster:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+.poster img {
+  display: block;
+  width: 100%;
+  max-height: 55vh;
+  object-fit: contain;
+  background: #f1f5f9;
+}
+.poster small {
+  display: block;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted, #64748b);
+  text-align: center;
+  background: var(--surface, #ffffff);
+  border-top: 1px solid var(--border-subtle, #e2e8f0);
+}
+.pzoom {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(5, 15, 40, 0.94);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow: auto;
+  backdrop-filter: blur(4px);
+  animation: fadeInZoom 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pzoom img {
+  max-width: 95vw;
+  max-height: 95vh;
+  object-fit: contain;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+.pzoom button {
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  border: 0;
+  background: #ffffff;
+  color: #0A2A66;
+  font-size: 26px;
+  line-height: 1;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: transform 0.15s ease;
+}
+.pzoom button:hover {
+  transform: scale(1.08);
+}
+@keyframes fadeInZoom {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
